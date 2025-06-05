@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -27,7 +28,7 @@ const PropertyDetails = () => {
     location: "Mussoorie, Uttarakhand",
     price: 3500,
     rating: 4.8,
-    reviews: 127,
+    reviewCount: 127,
     images: [
       "https://images.unsplash.com/photo-1520637836862-4d197d17c93a?w=800&h=600&fit=crop",
       "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
@@ -134,7 +135,7 @@ const PropertyDetails = () => {
               <div className="flex items-center">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
                 <span className="font-medium">{property.rating}</span>
-                <span className="text-gray-600 ml-1">({property.reviews.length} reviews)</span>
+                <span className="text-gray-600 ml-1">({property.reviewCount} reviews)</span>
               </div>
               <div className="flex items-center text-gray-600">
                 <MapPin className="w-4 h-4 mr-1" />
@@ -168,7 +169,7 @@ const PropertyDetails = () => {
                   <h4 className="font-medium text-blue-800">Property Stats</h4>
                   <div className="text-sm space-y-1">
                     <p>Property ID: {property.id}</p>
-                    <p>Total Reviews: {property.reviews.length}</p>
+                    <p>Total Reviews: {property.reviewCount}</p>
                     <p>Host Since: {property.host.joinedYear}</p>
                     <p>Response Rate: {property.host.responseRate}</p>
                   </div>
@@ -302,7 +303,7 @@ const PropertyDetails = () => {
                   <div className="flex items-center text-sm">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
                     <span className="font-medium">{property.rating}</span>
-                    <span className="text-gray-500 ml-1">({property.reviews.length})</span>
+                    <span className="text-gray-500 ml-1">({property.reviewCount})</span>
                   </div>
                 </div>
               </CardHeader>
