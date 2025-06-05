@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Home, Calendar, MessageCircle, PenTool, Settings, Users, CreditCard, TrendingUp, 
-  Plus, UploadCloud, Check, AlertCircle, Camera
+  Plus, UploadCloud, Check, AlertCircle, Camera, Shield
 } from 'lucide-react';
 import { format } from 'date-fns';
 
