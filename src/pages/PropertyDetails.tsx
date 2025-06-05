@@ -49,11 +49,11 @@ const PropertyDetails = () => {
       { icon: Wifi, name: "Free WiFi" },
       { icon: Car, name: "Free parking" },
       { icon: Shield, name: "Self check-in" },
-      { name: "Kitchen" },
-      { name: "Heating" },
-      { name: "Mountain view" },
-      { name: "Garden" },
-      { name: "Fireplace" }
+      { icon: null, name: "Kitchen" },
+      { icon: null, name: "Heating" },
+      { icon: null, name: "Mountain view" },
+      { icon: null, name: "Garden" },
+      { icon: null, name: "Fireplace" }
     ],
     description: "Escape to this charming cottage nestled in the serene hills of Mussoorie. Perfect for a peaceful getaway with stunning mountain views, cozy interiors, and all modern amenities. The property features a beautiful garden, fireplace for cold evenings, and easy access to local attractions.",
     houseRules: [
