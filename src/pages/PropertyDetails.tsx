@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Star, Heart, Share, MapPin, Users, Bed, Bath, Wifi, Car, Shield, Calendar as CalendarIcon } from 'lucide-react';
+import { Star, Heart, Share, MapPin, Users, Bed, Bath, Wifi, Car, Shield, Calendar as CalendarIcon, Eye, Grid } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 
@@ -18,6 +18,7 @@ const PropertyDetails = () => {
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
   const [guests, setGuests] = useState(2);
+  const [advancedView, setAdvancedView] = useState(false);
 
   // Mock property data
   const property = {
@@ -117,7 +118,17 @@ const PropertyDetails = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.title}</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">{property.title}</h1>
+            <Button
+              variant={advancedView ? "default" : "outline"}
+              onClick={() => setAdvancedView(!advancedView)}
+              className="flex items-center space-x-2"
+            >
+              {advancedView ? <Grid className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              <span>{advancedView ? "Standard view" : "Advanced view"}</span>
+            </Button>
+          </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4 text-sm">
               <div className="flex items-center">
@@ -146,6 +157,44 @@ const PropertyDetails = () => {
             </div>
           </div>
         </div>
+
+        {/* Advanced View Info Panel */}
+        {advancedView && (
+          <Card className="mb-8 bg-blue-50 border-blue-200">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4 text-blue-900">Advanced Property Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <h4 className="font-medium text-blue-800">Property Stats</h4>
+                  <div className="text-sm space-y-1">
+                    <p>Property ID: {property.id}</p>
+                    <p>Total Reviews: {property.reviews.length}</p>
+                    <p>Host Since: {property.host.joinedYear}</p>
+                    <p>Response Rate: {property.host.responseRate}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-blue-800">Accommodation Details</h4>
+                  <div className="text-sm space-y-1">
+                    <p>Max Guests: {property.guests}</p>
+                    <p>Bedrooms: {property.bedrooms}</p>
+                    <p>Bathrooms: {property.bathrooms}</p>
+                    <p>Amenities: {property.amenities.length} available</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-blue-800">Pricing Info</h4>
+                  <div className="text-sm space-y-1">
+                    <p>Base Price: ₹{property.price}/night</p>
+                    <p>Service Fee: 10%</p>
+                    <p>Taxes: 12%</p>
+                    <p>Host Rating: {property.host.rating}★</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Image Gallery */}
         <div className="grid grid-cols-4 gap-2 mb-8 h-96 rounded-xl overflow-hidden">
