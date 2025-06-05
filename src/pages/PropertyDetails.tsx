@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Star, Heart, Share, MapPin, Users, Bed, Bath, Wifi, Car, Shield, Calendar as CalendarIcon, Eye, Grid } from 'lucide-react';
+import { Star, Heart, Share, MapPin, Users, Bed, Bath, Wifi, Car, Shield, Calendar as CalendarIcon, Eye, Grid, Home, Thermometer, Mountain, TreePine, Flame } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 
@@ -50,11 +50,11 @@ const PropertyDetails = () => {
       { icon: Wifi, name: "Free WiFi" },
       { icon: Car, name: "Free parking" },
       { icon: Shield, name: "Self check-in" },
-      { icon: null, name: "Kitchen" },
-      { icon: null, name: "Heating" },
-      { icon: null, name: "Mountain view" },
-      { icon: null, name: "Garden" },
-      { icon: null, name: "Fireplace" }
+      { icon: Home, name: "Kitchen" },
+      { icon: Thermometer, name: "Heating" },
+      { icon: Mountain, name: "Mountain view" },
+      { icon: TreePine, name: "Garden" },
+      { icon: Flame, name: "Fireplace" }
     ],
     description: "Escape to this charming cottage nestled in the serene hills of Mussoorie. Perfect for a peaceful getaway with stunning mountain views, cozy interiors, and all modern amenities. The property features a beautiful garden, fireplace for cold evenings, and easy access to local attractions.",
     houseRules: [
@@ -273,7 +273,6 @@ const PropertyDetails = () => {
                 {property.amenities.map((amenity, index) => (
                   <div key={index} className="flex items-center space-x-3">
                     {amenity.icon && <amenity.icon className="w-5 h-5 text-gray-600" />}
-                    {!amenity.icon && <div className="w-5 h-5" />}
                     <span className="text-gray-700">{amenity.name}</span>
                   </div>
                 ))}
