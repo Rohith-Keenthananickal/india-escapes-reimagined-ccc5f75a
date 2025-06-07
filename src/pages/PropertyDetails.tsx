@@ -201,7 +201,7 @@ const PropertyDetails = () => {
         <div className="grid grid-cols-4 gap-2 mb-8 h-96 rounded-xl overflow-hidden">
           <div className="col-span-2 row-span-2">
             <img 
-              src={property.images[0]} 
+              src={property.images[1]} 
               alt="Main view"
               className="w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer"
             />

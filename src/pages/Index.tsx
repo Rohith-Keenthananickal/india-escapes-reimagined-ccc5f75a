@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, Heart, Play, MapPin, Users, Wifi, Car } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const [likedProperties, setLikedProperties] = useState<number[]>([]);
-
+  const navigate = useNavigate();
   const toggleLike = (id: number) => {
     setLikedProperties(prev => 
       prev.includes(id) 
@@ -131,12 +132,14 @@ const Index = () => {
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Popular homestays</h2>
-          <Button variant="outline">View all</Button>
+          <Button variant="outline" asChild>
+            <Link to="/properties">View all</Link>
+          </Button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredProperties.map((property) => (
-            <Card key={property.id} className="group cursor-pointer hover:shadow-lg transition-shadow overflow-hidden">
+            <Card key={property.id} className="group cursor-pointer hover:shadow-lg transition-shadow overflow-hidden" onClick={() => navigate(`/property/${property.id}`)}>
               <div className="relative">
                 <img 
                   src={property.image} 
