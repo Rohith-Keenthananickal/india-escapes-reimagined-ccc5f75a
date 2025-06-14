@@ -1,16 +1,23 @@
-
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import SearchFilters from '@/components/SearchFilters';
+import EnhancedSearchBar from '@/components/EnhancedSearchBar';
+import BannerSlider from '@/components/BannerSlider';
+import AIAssistant from '@/components/AIAssistant';
+import SeasonalBooking from '@/components/SeasonalBooking';
+import ValueProposition from '@/components/ValueProposition';
+import MediaSection from '@/components/MediaSection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, Heart, Play, MapPin, Users, Wifi, Car } from 'lucide-react';
+import { Star, Heart, MapPin, Wifi, Car, Users, Home, Compass, Wrench } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const [likedProperties, setLikedProperties] = useState<number[]>([]);
+  const [activeTab, setActiveTab] = useState('homes');
+  const [activeFilter, setActiveFilter] = useState('all');
   const navigate = useNavigate();
+
   const toggleLike = (id: number) => {
     setLikedProperties(prev => 
       prev.includes(id) 
@@ -19,126 +26,212 @@ const Index = () => {
     );
   };
 
+  const mainTabs = [
+    { id: 'homes', label: 'Homes', icon: Home },
+    { id: 'experiences', label: 'Experiences', icon: Compass },
+    { id: 'services', label: 'Services', icon: Wrench }
+  ];
+
+  const regions = [
+    { id: 'backwater', label: 'Backwater & Scenic', count: 45 },
+    { id: 'hills', label: 'Hill Stations & Wildlife', count: 38 },
+    { id: 'beaches', label: 'Beaches & Coastal', count: 32 },
+    { id: 'cultural', label: 'Cultural & Heritage', count: 28 },
+    { id: 'spiritual', label: 'Spiritual & Wellness', count: 22 }
+  ];
+
+  const filters = [
+    { id: 'all', label: 'All Stays' },
+    { id: 'budget', label: 'Budget Friendly' },
+    { id: 'activities', label: 'Activities Nearby' },
+    { id: 'eco', label: 'Eco-Certified' }
+  ];
+
+  const airports = [
+    { name: 'Ernakulam (Kochi)', code: 'COK', stays: 120 },
+    { name: 'Trivandrum', code: 'TRV', stays: 85 },
+    { name: 'Calicut (Kozhikode)', code: 'CCJ', stays: 67 },
+    { name: 'Kannur', code: 'CNN', stays: 42 }
+  ];
+
   const featuredProperties = [
     {
       id: 1,
-      title: "Cozy Hill Station Cottage",
-      location: "Mussoorie, Uttarakhand",
+      title: "Traditional Backwater Homestay",
+      location: "Alleppey, Kerala",
       price: 3500,
       rating: 4.8,
       reviews: 127,
-      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c93a?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
       host: "Priya",
-      isNew: true
+      isNew: true,
+      region: 'backwater',
+      amenities: ['Wifi', 'Car', 'Boat'],
+      isEco: true
     },
     {
       id: 2,
-      title: "Heritage Haveli Experience",
-      location: "Jaipur, Rajasthan",
+      title: "Heritage Spice Garden Villa",
+      location: "Thekkady, Kerala",
       price: 6500,
       rating: 4.9,
       reviews: 89,
       image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=300&fit=crop",
       host: "Arjun",
-      isCertified: true
+      isCertified: true,
+      region: 'cultural',
+      amenities: ['Wifi', 'Car', 'Spa'],
+      isEco: false
     },
     {
       id: 3,
-      title: "Backwater Villa Retreat",
-      location: "Alleppey, Kerala",
+      title: "Coastal Fishing Village Stay",
+      location: "Varkala, Kerala",
       price: 4200,
       rating: 4.7,
       reviews: 203,
-      image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
-      host: "Sunita"
+      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c93a?w=400&h=300&fit=crop",
+      host: "Sunita",
+      region: 'beaches',
+      amenities: ['Wifi', 'Beach Access'],
+      isEco: true
     },
     {
       id: 4,
-      title: "Mountain View Homestay",
-      location: "Manali, Himachal Pradesh",
+      title: "Mountain View Tea Estate",
+      location: "Munnar, Kerala",
       price: 2800,
       rating: 4.6,
       reviews: 156,
       image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
       host: "Rajesh",
-      isNew: true
+      isNew: true,
+      region: 'hills',
+      amenities: ['Wifi', 'Trek Guide'],
+      isEco: true
     }
   ];
 
-  const collections = [
-    {
-      title: "Hill Stations",
-      count: "200+ stays",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop"
-    },
-    {
-      title: "Beach Houses",
-      count: "150+ stays",
-      image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=300&h=200&fit=crop"
-    },
-    {
-      title: "Heritage Stays",
-      count: "80+ stays",
-      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300&h=200&fit=crop"
-    },
-    {
-      title: "Luxury Villas",
-      count: "120+ stays",
-      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c93a?w=300&h=200&fit=crop"
-    }
-  ];
-
-  const guestStories = [
-    {
-      name: "Amit & Family",
-      story: "The most peaceful getaway we've had in years. The host was incredibly welcoming!",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face",
-      location: "Stayed in Coorg"
-    },
-    {
-      name: "Neha & Friends",
-      story: "Perfect for our girl's trip! Beautiful views and amazing local food recommendations.",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b5c5?w=60&h=60&fit=crop&crop=face",
-      location: "Stayed in Goa"
-    }
-  ];
+  const filteredProperties = featuredProperties.filter(property => {
+    if (activeFilter === 'budget') return property.price < 4000;
+    if (activeFilter === 'eco') return property.isEco;
+    if (activeFilter === 'activities') return property.amenities.length > 2;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="relative h-96 bg-gradient-to-r from-pink-500 to-orange-500">
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-        <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
-          <div className="text-white">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              Find your perfect<br />
-              <span className="text-yellow-300">getaway</span>
-            </h1>
-            <p className="text-xl mb-8 max-w-lg">
-              Discover unique stays and experiences across India, from cozy homestays to luxury villas.
-            </p>
+      {/* Enhanced Navigation Tabs */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-center space-x-8 py-4">
+            {mainTabs.map((tab) => {
+              const IconComponent = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    activeTab === tab.id 
+                      ? 'bg-pink-100 text-pink-600 font-medium' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <IconComponent className="w-5 h-5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Search Filters */}
-      <div className="max-w-7xl mx-auto px-4 -mt-16 relative z-10">
-        <SearchFilters />
+      {/* Enhanced Search Bar */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <EnhancedSearchBar />
       </div>
 
-      {/* Popular Homestays */}
+      {/* Banner Slider */}
+      <div className="max-w-7xl mx-auto px-4 mb-16">
+        <BannerSlider />
+      </div>
+
+      {/* Platform Introduction */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Popular homestays</h2>
-          <Button variant="outline" asChild>
-            <Link to="/properties">View all</Link>
-          </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">About Hevan Connect Travel</h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+              Hevan Connect Travel opens the doors to Kerala's most authentic homestay experiences—connecting travelers with traditional homes, vibrant local culture, and warm-hearted hosts. Discover the real Kerala through the eyes of locals who call it home.
+            </p>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-pink-600">200+</div>
+                <div className="text-sm text-gray-600">Verified Homestays</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-pink-600">50+</div>
+                <div className="text-sm text-gray-600">Destinations</div>
+              </div>
+            </div>
+          </div>
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=400&fit=crop"
+              alt="Kerala homestay experience"
+              className="rounded-2xl shadow-lg"
+            />
+          </div>
         </div>
+      </section>
+
+      {/* Homestay Discovery Section */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">Discover Kerala by Region</h2>
         
+        {/* Region Tabs */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          {regions.map((region) => (
+            <Badge
+              key={region.id}
+              variant="outline"
+              className="px-4 py-2 cursor-pointer hover:bg-pink-100 hover:border-pink-300"
+            >
+              {region.label} ({region.count})
+            </Badge>
+          ))}
+        </div>
+
+        {/* Filter Bar */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          {filters.map((filter) => (
+            <Button
+              key={filter.id}
+              variant={activeFilter === filter.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFilter(filter.id)}
+            >
+              {filter.label}
+            </Button>
+          ))}
+        </div>
+
+        {/* Airport Access Districts */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          {airports.map((airport) => (
+            <Card key={airport.code} className="p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+              <div className="text-lg font-bold text-gray-900">{airport.name}</div>
+              <div className="text-sm text-gray-600">{airport.code}</div>
+              <div className="text-xs text-pink-600 mt-1">{airport.stays} stays nearby</div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Property Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProperties.map((property) => (
+          {filteredProperties.map((property) => (
             <Card key={property.id} className="group cursor-pointer hover:shadow-lg transition-shadow overflow-hidden" onClick={() => navigate(`/property/${property.id}`)}>
               <div className="relative">
                 <img 
@@ -165,6 +258,9 @@ const Index = () => {
                 {property.isCertified && (
                   <Badge className="absolute top-3 left-3 bg-blue-500">Certified</Badge>
                 )}
+                {property.isEco && (
+                  <Badge className="absolute bottom-3 left-3 bg-green-600">Eco-Friendly</Badge>
+                )}
               </div>
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
@@ -181,6 +277,14 @@ const Index = () => {
                     <span className="text-gray-500 ml-1">({property.reviews})</span>
                   </div>
                 </div>
+                
+                {/* Amenities */}
+                <div className="flex items-center space-x-2 mb-2">
+                  {property.amenities.includes('Wifi') && <Wifi className="w-3 h-3 text-gray-500" />}
+                  {property.amenities.includes('Car') && <Car className="w-3 h-3 text-gray-500" />}
+                  <Users className="w-3 h-3 text-gray-500" />
+                </div>
+                
                 <div className="flex justify-between items-center">
                   <div>
                     <span className="text-lg font-bold">₹{property.price.toLocaleString()}</span>
@@ -192,85 +296,31 @@ const Index = () => {
             </Card>
           ))}
         </div>
-      </section>
 
-      {/* Collections */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Explore collections</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {collections.map((collection, index) => (
-            <Card key={index} className="group cursor-pointer hover:shadow-lg transition-shadow overflow-hidden">
-              <div className="relative h-40">
-                <img 
-                  src={collection.image} 
-                  alt={collection.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
-                  <div className="p-4 text-white">
-                    <h3 className="font-bold text-lg">{collection.title}</h3>
-                    <p className="text-sm opacity-90">{collection.count}</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
+        <div className="text-center mt-8">
+          <Button variant="outline" asChild>
+            <Link to="/properties">View all Kerala homestays</Link>
+          </Button>
         </div>
       </section>
 
-      {/* Video Highlight */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="relative rounded-2xl overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop"
-            alt="Experience video"
-            className="w-full h-96 object-cover"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <Button size="lg" className="rounded-full bg-white text-black hover:bg-gray-100">
-              <Play className="w-6 h-6 mr-2" />
-              Watch experiences
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* Seasonal Booking Section */}
+      <SeasonalBooking />
 
-      {/* Guest Stories */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Guest stories</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {guestStories.map((story, index) => (
-            <Card key={index} className="p-6">
-              <CardContent className="p-0">
-                <div className="flex items-start space-x-4">
-                  <img 
-                    src={story.image} 
-                    alt={story.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <blockquote className="text-gray-700 mb-3">
-                      "{story.story}"
-                    </blockquote>
-                    <div className="text-sm">
-                      <p className="font-medium text-gray-900">{story.name}</p>
-                      <p className="text-gray-600">{story.location}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+      {/* Value Proposition Section */}
+      <ValueProposition />
 
-      {/* Footer */}
+      {/* Media Section */}
+      <MediaSection />
+
+      {/* Updated Footer */}
       <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-bold text-lg mb-4">VacayRentals</h3>
-              <p className="text-gray-400">Your trusted platform for unique stays across India.</p>
+              <h3 className="font-bold text-lg mb-4">Hevan Connect Travel</h3>
+              <p className="text-gray-400 mb-4">Your trusted platform for authentic Kerala homestay experiences.</p>
+              <p className="text-sm text-gray-500">Supporting Kerala tourism and local communities through sustainable travel.</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
@@ -278,30 +328,36 @@ const Index = () => {
                 <li>Help Center</li>
                 <li>Contact Us</li>
                 <li>Cancellation Options</li>
+                <li>Travel Insurance</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Hosting</h4>
+              <h4 className="font-semibold mb-4">Kerala Experiences</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>Become a Host</li>
-                <li>Host Resources</li>
-                <li>Community Forum</li>
+                <li>Backwater Tours</li>
+                <li>Spice Garden Visits</li>
+                <li>Cultural Programs</li>
+                <li>Ayurveda Wellness</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
+              <h4 className="font-semibold mb-4">Connect With Us</h4>
               <ul className="space-y-2 text-gray-400">
+                <li>📸 Instagram Stories</li>
+                <li>📺 YouTube Channel</li>
                 <li>About Us</li>
-                <li>Careers</li>
                 <li>Terms of Service</li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 VacayRentals. All rights reserved.</p>
+            <p>&copy; 2024 Hevan Connect Travel. All rights reserved. | Promoting sustainable Kerala tourism.</p>
           </div>
         </div>
       </footer>
+
+      {/* AI Assistant */}
+      <AIAssistant />
     </div>
   );
 };
