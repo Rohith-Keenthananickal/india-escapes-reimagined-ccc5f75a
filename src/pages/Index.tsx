@@ -1,7 +1,5 @@
-
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import EnhancedSearchBar from '@/components/EnhancedSearchBar';
 import BannerSlider from '@/components/BannerSlider';
 import AIAssistant from '@/components/AIAssistant';
 import SeasonalBooking from '@/components/SeasonalBooking';
@@ -128,120 +126,110 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      {/* Hero Section with Background Image */}
-      <section className="relative h-[600px] bg-cover bg-center bg-no-repeat" style={{
-        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1600&h=900&fit=crop')"
-      }}>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          {/* Hero Title */}
-          <div className="text-center text-white mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              Live like a local. Discover Kerala's soul<br />
-              with a welcoming family
-            </h1>
-          </div>
-
-          {/* Search Section */}
-          <div className="w-full max-w-5xl px-4">
-            {/* Tab Navigation */}
-            <div className="flex justify-center mb-6">
-              <div className="bg-white rounded-full p-2 shadow-lg">
-                <div className="flex space-x-1">
-                  {mainTabs.map((tab) => {
-                    const IconComponent = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center space-x-2 px-6 py-3 rounded-full transition-all ${
-                          activeTab === tab.id 
-                            ? 'bg-gray-900 text-white shadow-md' 
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                        }`}
-                      >
-                        <IconComponent className="w-5 h-5" />
-                        <span className="font-medium">{tab.label}</span>
-                        {(tab.id === 'experiences' || tab.id === 'services') && (
-                          <Badge className="bg-blue-500 text-xs px-2 py-1">NEW</Badge>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+      {/* Hero Section with Banner Slider */}
+      <section className="relative">
+        <BannerSlider />
+        
+        {/* Search Overlay */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-5xl px-4">
+          {/* Tab Navigation */}
+          <div className="flex justify-center mb-6">
+            <div className="bg-white rounded-full p-2 shadow-lg">
+              <div className="flex space-x-1">
+                {mainTabs.map((tab) => {
+                  const IconComponent = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center space-x-2 px-6 py-3 rounded-full transition-all ${
+                        activeTab === tab.id 
+                          ? 'bg-gray-900 text-white shadow-md' 
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
+                    >
+                      <IconComponent className="w-5 h-5" />
+                      <span className="font-medium">{tab.label}</span>
+                      {(tab.id === 'experiences' || tab.id === 'services') && (
+                        <Badge className="bg-blue-500 text-xs px-2 py-1">NEW</Badge>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
+          </div>
 
-            {/* Search Bar */}
-            <Card className="w-full shadow-2xl border-0 bg-white rounded-2xl overflow-hidden">
-              <CardContent className="p-0">
-                <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-                  {/* Where */}
-                  <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Where</label>
-                      <input
-                        type="text"
-                        placeholder="Search destinations"
-                        value={destination}
-                        onChange={(e) => setDestination(e.target.value)}
-                        className="w-full text-gray-600 placeholder-gray-400 border-none outline-none bg-transparent text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Check-in */}
-                  <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Check in</label>
-                      <input
-                        type="date"
-                        value={checkIn}
-                        onChange={(e) => setCheckIn(e.target.value)}
-                        className="w-full text-gray-600 placeholder-gray-400 border-none outline-none bg-transparent text-sm"
-                        placeholder="Add dates"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Check-out */}
-                  <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Check out</label>
-                      <input
-                        type="date"
-                        value={checkOut}
-                        onChange={(e) => setCheckOut(e.target.value)}
-                        className="w-full text-gray-600 placeholder-gray-400 border-none outline-none bg-transparent text-sm"
-                        placeholder="Add dates"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Who - with search button */}
-                  <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer relative">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1 flex-1">
-                        <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Who</label>
-                        <select
-                          value={guests}
-                          onChange={(e) => setGuests(e.target.value)}
-                          className="w-full text-gray-600 border-none outline-none bg-transparent text-sm cursor-pointer"
-                        >
-                          <option value="1">1 guest</option>
-                          <option value="2">2 guests</option>
-                          <option value="3">3 guests</option>
-                          <option value="4">4+ guests</option>
-                        </select>
-                      </div>
-                      <Button className="ml-4 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full p-4 h-12 w-12 flex items-center justify-center shadow-lg">
-                        <Search className="w-5 h-5" />
-                      </Button>
-                    </div>
+          {/* Search Bar */}
+          <Card className="w-full shadow-2xl border-0 bg-white rounded-2xl overflow-hidden">
+            <CardContent className="p-0">
+              <div className="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                {/* Where */}
+                <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Where</label>
+                    <input
+                      type="text"
+                      placeholder="Search destinations"
+                      value={destination}
+                      onChange={(e) => setDestination(e.target.value)}
+                      className="w-full text-gray-600 placeholder-gray-400 border-none outline-none bg-transparent text-sm"
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+
+                {/* Check-in */}
+                <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Check in</label>
+                    <input
+                      type="date"
+                      value={checkIn}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                      className="w-full text-gray-600 placeholder-gray-400 border-none outline-none bg-transparent text-sm"
+                      placeholder="Add dates"
+                    />
+                  </div>
+                </div>
+
+                {/* Check-out */}
+                <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Check out</label>
+                    <input
+                      type="date"
+                      value={checkOut}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                      className="w-full text-gray-600 placeholder-gray-400 border-none outline-none bg-transparent text-sm"
+                      placeholder="Add dates"
+                    />
+                  </div>
+                </div>
+
+                {/* Who - with search button */}
+                <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer relative">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1 flex-1">
+                      <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Who</label>
+                      <select
+                        value={guests}
+                        onChange={(e) => setGuests(e.target.value)}
+                        className="w-full text-gray-600 border-none outline-none bg-transparent text-sm cursor-pointer"
+                      >
+                        <option value="1">1 guest</option>
+                        <option value="2">2 guests</option>
+                        <option value="3">3 guests</option>
+                        <option value="4">4+ guests</option>
+                      </select>
+                    </div>
+                    <Button className="ml-4 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full p-4 h-12 w-12 flex items-center justify-center shadow-lg">
+                      <Search className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
