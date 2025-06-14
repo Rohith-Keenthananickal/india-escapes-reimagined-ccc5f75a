@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import EnhancedSearchBar from '@/components/EnhancedSearchBar';
@@ -123,38 +124,64 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      {/* Enhanced Navigation Tabs */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-center space-x-8 py-4">
+      {/* Hero Section with Background Image */}
+      <div className="relative min-h-[600px] bg-cover bg-center bg-no-repeat" 
+           style={{
+             backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=800&fit=crop')"
+           }}>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        
+        {/* Hero Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-[600px] px-4">
+          {/* Hero Title */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              Live like a local. Discover Kerala's soul<br />
+              <span className="text-yellow-300">with a welcoming family</span>
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Experience authentic homestays and connect with Kerala's rich culture
+            </p>
+          </div>
+
+          {/* Main Tabs */}
+          <div className="flex justify-center space-x-8 mb-8">
             {mainTabs.map((tab) => {
               const IconComponent = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all ${
                     activeTab === tab.id 
-                      ? 'bg-pink-100 text-pink-600 font-medium' 
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-gray-900 shadow-lg' 
+                      : 'bg-white/20 text-white hover:bg-white/30'
                   }`}
                 >
                   <IconComponent className="w-5 h-5" />
-                  <span>{tab.label}</span>
+                  <span className="font-medium">{tab.label}</span>
+                  {(tab.id === 'experiences' || tab.id === 'services') && (
+                    <Badge className="bg-pink-500 text-white text-xs">NEW</Badge>
+                  )}
                 </button>
               );
             })}
           </div>
+
+          {/* Enhanced Search Bar */}
+          <div className="w-full max-w-5xl">
+            <EnhancedSearchBar />
+          </div>
         </div>
       </div>
 
-      {/* Enhanced Search Bar */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <EnhancedSearchBar />
-      </div>
-
-      {/* Banner Slider */}
-      <div className="max-w-7xl mx-auto px-4 mb-16">
+      {/* Banner Slider Section */}
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore Kerala's Beauty</h2>
+          <p className="text-lg text-gray-600">Discover the diverse landscapes and rich culture of God's Own Country</p>
+        </div>
         <BannerSlider />
       </div>
 
