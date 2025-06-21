@@ -8,12 +8,12 @@ const BannerSlider = () => {
 
   const slides = [
     {
-      image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=1200&h=600&fit=crop",
+      image: "https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-56bc-622f-a480-c13ca1116fcf/raw?se=2025-06-21T20%3A48%3A10Z&sp=r&sv=2024-08-04&sr=b&scid=745757ac-c80b-5eae-b9d7-ded278a26dbb&skoid=e9d2f8b1-028a-4cff-8eb1-d0e66fbefcca&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A17%3A27Z&ske=2025-06-22T17%3A17%3A27Z&sks=b&skv=2024-08-04&sig=dP3eTV/AWN5ylDgauEy9UyiHTIDn%2BBCm9H3RmZJP8iA%3D",
       caption: "Backwater Bliss",
       description: "Experience Kerala's serene backwaters"
     },
     {
-      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&h=600&fit=crop",
+      image: "https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-addc-622f-983e-f04923737bc6/raw?se=2025-06-21T20%3A58%3A34Z&sp=r&sv=2024-08-04&sr=b&scid=9d820c3d-4e95-58d7-9935-babeb003be6c&skoid=e9d2f8b1-028a-4cff-8eb1-d0e66fbefcca&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A16%3A02Z&ske=2025-06-22T17%3A16%3A02Z&sks=b&skv=2024-08-04&sig=YcawyB4lt4ji5pIuYRvf3QgCOJ/cLvEU/A1sTVpBQOM%3D",
       caption: "Cultural Immersion",
       description: "Discover rich heritage and traditions"
     },

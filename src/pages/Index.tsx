@@ -191,7 +191,12 @@ const Index = () => {
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">About Hevan Connect Travel</h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
-              Hevan Connect Travel opens the doors to Kerala's most authentic homestay experiences—connecting travelers with traditional homes, vibrant local culture, and warm-hearted hosts. Discover the real Kerala through the eyes of locals who call it home.
+              Hevan Connect Travel opens the doors to Kerala’s most authentic homestay experiences—
+ connecting travelers with traditional homes, vibrant local culture, and warm-hearted hosts. Every 
+stay is handpicked to offer more than comfort. a deeper connection to the people, traditions, and 
+natural beauty of Kerala. As a meaningful alternative to conventional accommodations unit, our 
+platform helps guests discover immersive, affordable stays while supporting sustainable tourism 
+and local livelihoods.
             </p>
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
@@ -216,7 +221,7 @@ const Index = () => {
 
       {/* Homestay Discovery Section */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Discover Kerala by Region</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">Your next story starts in a Kerala home ?</h2>
         
         {/* Region Tabs */}
         <div className="flex flex-wrap gap-3 mb-8">
