@@ -1,32 +1,35 @@
-
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const BannerSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
     {
-      image: "https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-56bc-622f-a480-c13ca1116fcf/raw?se=2025-06-21T20%3A48%3A10Z&sp=r&sv=2024-08-04&sr=b&scid=745757ac-c80b-5eae-b9d7-ded278a26dbb&skoid=e9d2f8b1-028a-4cff-8eb1-d0e66fbefcca&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A17%3A27Z&ske=2025-06-22T17%3A17%3A27Z&sks=b&skv=2024-08-04&sig=dP3eTV/AWN5ylDgauEy9UyiHTIDn%2BBCm9H3RmZJP8iA%3D",
+      image:
+        "https://www.tourmyholiday.com/upload/blogimage/kumarakom-backwaters-kumarakom-kerala-attr-hero-1.jpg",
       caption: "Backwater Bliss",
-      description: "Experience Kerala's serene backwaters"
+      description: "Experience Kerala's serene backwaters",
     },
     {
-      image: "https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-addc-622f-983e-f04923737bc6/raw?se=2025-06-21T20%3A58%3A34Z&sp=r&sv=2024-08-04&sr=b&scid=9d820c3d-4e95-58d7-9935-babeb003be6c&skoid=e9d2f8b1-028a-4cff-8eb1-d0e66fbefcca&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A16%3A02Z&ske=2025-06-22T17%3A16%3A02Z&sks=b&skv=2024-08-04&sig=YcawyB4lt4ji5pIuYRvf3QgCOJ/cLvEU/A1sTVpBQOM%3D",
+      image:
+        "https://cochinculturalcentre.org/wp-content/uploads/2025/06/Highlights-from-Our-Recent-Cultural-Festivals-and-Performances.webp",
       caption: "Cultural Immersion",
-      description: "Discover rich heritage and traditions"
+      description: "Discover rich heritage and traditions",
     },
     {
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop",
+      image:
+        "https://www.sreestours.com/blog/wp-content/uploads/2022/07/Munnar.jpg",
       caption: "Hill Station Retreat",
-      description: "Find peace in misty mountains"
+      description: "Find peace in misty mountains",
     },
     {
-      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c93a?w=1200&h=600&fit=crop",
+      image:
+        "https://www.oyorooms.com/travel-guide/wp-content/uploads/2019/04/Varkala-Beach.webp",
       caption: "Coastal Harmony",
-      description: "Relax by pristine beaches"
-    }
+      description: "Relax by pristine beaches",
+    },
   ];
 
   useEffect(() => {
@@ -52,7 +55,7 @@ const BannerSlider = () => {
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
+              index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
             <img
@@ -62,7 +65,9 @@ const BannerSlider = () => {
             />
             <div className="absolute inset-0 bg-black bg-opacity-40"></div>
             <div className="absolute bottom-8 left-8 text-white">
-              <h3 className="text-2xl md:text-3xl font-bold mb-2">{slide.caption}</h3>
+              <h3 className="text-2xl md:text-3xl font-bold mb-2">
+                {slide.caption}
+              </h3>
               <p className="text-lg opacity-90">{slide.description}</p>
             </div>
           </div>
@@ -78,7 +83,7 @@ const BannerSlider = () => {
       >
         <ChevronLeft className="w-6 h-6" />
       </Button>
-      
+
       <Button
         variant="ghost"
         size="icon"
@@ -94,7 +99,7 @@ const BannerSlider = () => {
           <button
             key={index}
             className={`w-3 h-3 rounded-full transition-colors ${
-              index === currentSlide ? 'bg-white' : 'bg-white/50'
+              index === currentSlide ? "bg-white" : "bg-white/50"
             }`}
             onClick={() => setCurrentSlide(index)}
           />
@@ -104,7 +109,8 @@ const BannerSlider = () => {
       {/* Title Overlay */}
       <div className="absolute top-8 left-8 text-white">
         <h1 className="text-3xl md:text-5xl font-bold">
-          Start Your Journey<br />
+          Start Your Journey
+          <br />
           <span className="text-yellow-300">with Us</span>
         </h1>
       </div>
