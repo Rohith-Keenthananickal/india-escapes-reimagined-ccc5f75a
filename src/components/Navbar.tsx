@@ -21,7 +21,7 @@ const Navbar = () => {
             <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">VR</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 hidden sm:block">VacayRentals</span>
+            <span className="text-xl font-bold text-gray-900 hidden sm:block">Hevan Connect Travel</span>
           </Link>
 
           {/* Search Bar - Desktop */}
