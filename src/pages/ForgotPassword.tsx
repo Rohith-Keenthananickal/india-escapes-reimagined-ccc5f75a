@@ -72,7 +72,7 @@ const ForgotPassword = () => {
             <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">VR</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">VacayRentals</span>
+            <span className="text-2xl font-bold text-gray-900">Hevan Connect Travel</span>
           </Link>
         </div>
 
