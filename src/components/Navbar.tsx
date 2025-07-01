@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,11 +5,18 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Search, Menu, Globe, User, Heart } from 'lucide-react';
+import { Search, Menu, Globe, User, Heart, Home, Compass, Wrench } from 'lucide-react';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [activeTab, setActiveTab] = useState("homes");
   const navigate = useNavigate();
+
+  const mainTabs = [
+    { id: "homes", label: "Homes", icon: Home },
+    { id: "experiences", label: "Experiences", icon: Compass },
+    { id: "services", label: "Services", icon: Wrench },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b shadow-sm">
@@ -24,18 +30,30 @@ const Navbar = () => {
             <span className="text-xl font-bold text-gray-900 hidden sm:block">Hevan Connect Travel</span>
           </Link>
 
-          {/* Search Bar - Desktop */}
+          {/* Main Tabs - Desktop */}
           <div className="hidden md:flex items-center space-x-2 flex-1 max-w-md mx-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input 
-                placeholder="Search destinations, experiences..." 
-                className="pl-10 pr-4 rounded-full border-gray-300 focus:border-pink-500"
-              />
-            </div>
-            <Button size="sm" className="rounded-full bg-pink-500 hover:bg-pink-600">
-              <Search className="w-4 h-4" />
-            </Button>
+            {mainTabs.map((tab) => {
+              const IconComponent = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                    activeTab === tab.id
+                      ? "bg-pink-100 text-pink-700 border border-pink-300"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span className="font-medium text-sm">{tab.label}</span>
+                  {(tab.id === "experiences" || tab.id === "services") && (
+                    <Badge className="bg-pink-500 text-white text-xs">
+                      NEW
+                    </Badge>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Right side */}
@@ -98,14 +116,31 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Search */}
+        {/* Mobile Tabs */}
         <div className="md:hidden pb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input 
-              placeholder="Search destinations..." 
-              className="pl-10 pr-4 rounded-full"
-            />
+          <div className="flex justify-center space-x-4">
+            {mainTabs.map((tab) => {
+              const IconComponent = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-all ${
+                    activeTab === tab.id
+                      ? "bg-pink-100 text-pink-700 border border-pink-300"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span className="font-medium text-sm">{tab.label}</span>
+                  {(tab.id === "experiences" || tab.id === "services") && (
+                    <Badge className="bg-pink-500 text-white text-xs">
+                      NEW
+                    </Badge>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

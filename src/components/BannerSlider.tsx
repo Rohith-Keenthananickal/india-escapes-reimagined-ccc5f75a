@@ -11,24 +11,32 @@ const BannerSlider = () => {
         "https://www.tourmyholiday.com/upload/blogimage/kumarakom-backwaters-kumarakom-kerala-attr-hero-1.jpg",
       caption: "Backwater Bliss",
       description: "Experience Kerala's serene backwaters",
+      title: "Start Your Journey",
+      subtitle: "with Us",
     },
     {
       image:
         "https://cochinculturalcentre.org/wp-content/uploads/2025/06/Highlights-from-Our-Recent-Cultural-Festivals-and-Performances.webp",
       caption: "Cultural Immersion",
       description: "Discover rich heritage and traditions",
+      title: "Immerse in Culture",
+      subtitle: "Kerala Awaits",
     },
     {
       image:
         "https://www.sreestours.com/blog/wp-content/uploads/2022/07/Munnar.jpg",
       caption: "Hill Station Retreat",
       description: "Find peace in misty mountains",
+      title: "Breathe the Hills",
+      subtitle: "Munnar Magic",
     },
     {
       image:
         "https://www.oyorooms.com/travel-guide/wp-content/uploads/2019/04/Varkala-Beach.webp",
       caption: "Coastal Harmony",
       description: "Relax by pristine beaches",
+      title: "Seaside Serenity",
+      subtitle: "Varkala Vibes",
     },
   ];
 
@@ -109,9 +117,9 @@ const BannerSlider = () => {
       {/* Title Overlay */}
       <div className="absolute top-8 left-8 text-white">
         <h1 className="text-3xl md:text-5xl font-bold">
-          Start Your Journey
+          {slides[currentSlide].title}
           <br />
-          <span className="text-yellow-300">with Us</span>
+          <span className="text-yellow-300">{slides[currentSlide].subtitle}</span>
         </h1>
       </div>
     </div>

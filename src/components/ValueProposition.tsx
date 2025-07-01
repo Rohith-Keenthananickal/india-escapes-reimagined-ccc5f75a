@@ -6,6 +6,7 @@ import {
   HeartHandshake,
   Landmark,
 } from "lucide-react";
+import React from "react";
 
 const mainValues = [
   {
@@ -42,6 +43,7 @@ const highlights = [
       "“This homestay follows eco-conscious practices such as rainwater harvesting, solar energy, and organic farming.”",
     border: "border-green-300",
     bg: "bg-green-50",
+    color: "bg-green-100 text-green-600",
   },
   {
     icon: (
@@ -52,6 +54,7 @@ const highlights = [
       "“Perfect for family vacations — spacious homes, safe surroundings, and friendly hosts make this a great choice for travelers with kids or elders.”",
     border: "border-blue-300",
     bg: "bg-blue-50",
+    color: "bg-blue-100 text-blue-600",
   },
   {
     icon: (
@@ -65,13 +68,14 @@ const highlights = [
       "“Experience living in a piece of Kerala's history. These homes reflect traditional architecture, antique furnishings, and timeless charm.”",
     border: "border-yellow-300",
     bg: "bg-yellow-50",
+    color: "bg-yellow-100 text-yellow-600",
   },
 ];
 
 const ValueProposition = () => {
   return (
     <>
-      <section className="py-20 bg-gradient-to-br from-white via-gray-50 to-yellow-50">
+      <section className="py-20 ">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-4xl font-extrabold text-center text-gray-900 mb-14 tracking-tight">
             Why Choose Kerala Homestays?
@@ -107,15 +111,17 @@ const ValueProposition = () => {
                 key={h.title}
                 tabIndex={0}
                 aria-label={h.title}
-                className={`rounded-xl border-2 ${h.border} ${h.bg} p-6 flex flex-col items-center shadow-sm hover:shadow-md transition-shadow duration-200 focus:outline-none focus:ring-4 focus:ring-yellow-100`}
+                className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 p-8 flex flex-col items-center focus:outline-none focus:ring-4 focus:ring-yellow-200"
               >
-                <div className="mb-3">{h.icon}</div>
-                <div className="text-lg font-semibold text-gray-800 mb-2">
+                <div className={`w-16 h-16 flex items-center justify-center rounded-full mb-6 text-3xl ${h.color} group-hover:scale-110 transition-transform duration-300`}>
+                  {React.cloneElement(h.icon, { className: "w-8 h-8", "aria-hidden": true })}
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
                   {h.title}
-                </div>
-                <div className="text-gray-600 text-center italic text-base">
+                </h3>
+                <p className="text-gray-700 text-base text-center leading-relaxed">
                   {h.quote}
-                </div>
+                </p>
               </div>
             ))}
           </div>

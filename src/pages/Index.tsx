@@ -6,9 +6,17 @@ import AIAssistant from "@/components/AIAssistant";
 import SeasonalBooking from "@/components/SeasonalBooking";
 import ValueProposition from "@/components/ValueProposition";
 import MediaSection from "@/components/MediaSection";
+import Certifications from "@/components/Certifications";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import {
   Star,
   Heart,
@@ -22,12 +30,21 @@ import {
   Plane,
   Clock,
   Award,
+  Waves,
+  Mountain,
+  TreePalm,
+  Landmark,
+  HeartPulse,
+  DollarSign,
+  Activity,
+  Leaf,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import CountUp from "react-countup";
+import { useInView } from "react-intersection-observer";
 
 const Index = () => {
   const [likedProperties, setLikedProperties] = useState<number[]>([]);
-  const [activeTab, setActiveTab] = useState("homes");
   const [activeFilter, setActiveFilter] = useState("all");
   const navigate = useNavigate();
 
@@ -37,25 +54,19 @@ const Index = () => {
     );
   };
 
-  const mainTabs = [
-    { id: "homes", label: "Homes", icon: Home },
-    { id: "experiences", label: "Experiences", icon: Compass },
-    { id: "services", label: "Services", icon: Wrench },
-  ];
-
   const regions = [
-    { id: "backwater", label: "Backwater & Scenic", count: 45 },
-    { id: "hills", label: "Hill Stations & Wildlife", count: 38 },
-    { id: "beaches", label: "Beaches & Coastal", count: 32 },
-    { id: "cultural", label: "Cultural & Heritage", count: 28 },
-    { id: "spiritual", label: "Spiritual & Wellness", count: 22 },
+    { id: "backwater", label: "Backwater & Scenic", count: 45, icon: Waves },
+    { id: "hills", label: "Hill Stations & Wildlife", count: 38, icon: Mountain },
+    { id: "beaches", label: "Beaches & Coastal", count: 32, icon: TreePalm },
+    { id: "cultural", label: "Cultural & Heritage", count: 28, icon: Landmark },
+    { id: "spiritual", label: "Spiritual & Wellness", count: 22, icon: HeartPulse },
   ];
 
   const filters = [
-    { id: "all", label: "All Stays" },
-    { id: "budget", label: "Budget Friendly" },
-    { id: "activities", label: "Activities Nearby" },
-    { id: "eco", label: "Eco-Certified" },
+    { id: "all", label: "All Stays", icon: Home },
+    { id: "budget", label: "Budget Friendly", icon: DollarSign },
+    { id: "activities", label: "Activities Nearby", icon: Activity },
+    { id: "eco", label: "Eco-Certified", icon: Leaf },
   ];
 
   const airports = [
@@ -73,7 +84,12 @@ const Index = () => {
       price: 3500,
       rating: 4.8,
       reviews: 127,
-      image: "https://gos3.ibcdn.com/19d4e61e623f11e7b5020a4cef95d023.jpg",
+      images: [
+        "https://gos3.ibcdn.com/19d4e61e623f11e7b5020a4cef95d023.jpg",
+        "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=500&h=400&fit=crop"
+      ],
       host: "Priya",
       isNew: true,
       region: "backwater",
@@ -87,7 +103,12 @@ const Index = () => {
       price: 6500,
       rating: 4.9,
       reviews: 89,
-      image: "https://spiceslapthekkady.com/images/gallery/gall-img-46.jpg",
+      images: [
+        "https://spiceslapthekkady.com/images/gallery/gall-img-46.jpg",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=400&fit=crop"
+      ],
       host: "Arjun",
       isCertified: true,
       region: "cultural",
@@ -101,8 +122,12 @@ const Index = () => {
       price: 4200,
       rating: 4.7,
       reviews: 203,
-      image:
+      images: [
         "https://www.keralatourism.org/images/newsbytes/large/varkala_papanasam_beach20240315082235_2211_1.jpg",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=400&fit=crop"
+      ],
       host: "Sunita",
       region: "beaches",
       amenities: ["Wifi", "Beach Access"],
@@ -115,8 +140,12 @@ const Index = () => {
       price: 2800,
       rating: 4.6,
       reviews: 156,
-      image:
+      images: [
         "https://media-cdn.tripadvisor.com/media/photo-s/09/0b/a5/f7/dream-catcher-plantation.jpg",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=400&fit=crop"
+      ],
       host: "Rajesh",
       isNew: true,
       region: "hills",
@@ -140,8 +169,11 @@ const Index = () => {
       price: 8500,
       rating: 4.9,
       reviews: 245,
-      image:
+      images: [
         "https://www.kumarakomlakeresort.in/assets/images/about-kumarakom-lake-resort/about/gallery/meandering-pool-duplex-villas-zoom.jpg",
+        "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=400&fit=crop"
+      ],
       host: "Maya Krishnan",
       isPriority: true,
       district: "Kottayam",
@@ -153,8 +185,11 @@ const Index = () => {
       price: 12000,
       rating: 4.8,
       reviews: 189,
-      image:
+      images: [
         "https://hectindiai.s3.ap-south-1.amazonaws.com/0000/126/2024/10/15/spice-jungle-resort-by-maat-hotels-14-600.webp",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500&h=400&fit=crop"
+      ],
       host: "Ravi Menon",
       isPriority: true,
       district: "Idukki",
@@ -166,8 +201,11 @@ const Index = () => {
       price: 9500,
       rating: 4.9,
       reviews: 156,
-      image:
+      images: [
         "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/01KovalamBeach%26Kerala.jpg/330px-01KovalamBeach%26Kerala.jpg",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&h=400&fit=crop"
+      ],
       host: "Priya Nair",
       isPriority: true,
       district: "Thiruvananthapuram",
@@ -199,8 +237,11 @@ const Index = () => {
       price: 3800,
       rating: 4.7,
       reviews: 23,
-      image:
+      images: [
         "https://uravuecolinks.com/wp-content/uploads/2020/07/Honeymoon-Cottage-3.jpg",
+        "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=400&fit=crop"
+      ],
       host: "Arjun Kumar",
       isNew: true,
       daysAgo: 2,
@@ -212,8 +253,11 @@ const Index = () => {
       price: 5200,
       rating: 4.6,
       reviews: 8,
-      image:
+      images: [
         "https://a0.muscache.com/im/pictures/34cb93b4-3960-4e57-a619-126a95573fa1.jpg?im_w=720",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500&h=400&fit=crop"
+      ],
       host: "Lakshmi Pillai",
       isNew: true,
       daysAgo: 5,
@@ -225,8 +269,11 @@ const Index = () => {
       price: 4500,
       rating: 4.8,
       reviews: 15,
-      image:
+      images: [
         "https://cf.bstatic.com/xdata/images/hotel/max1024x768/322999418.jpg?k=606c35151e0bea2eaf660185db79e322dc1ff6a7e10b84f84db0fb80bfb7407d&o=&hp=1",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=400&fit=crop"
+      ],
       host: "Suresh Varma",
       isNew: true,
       daysAgo: 1,
@@ -238,8 +285,11 @@ const Index = () => {
       price: 3200,
       rating: 4.5,
       reviews: 12,
-      image:
+      images: [
         "https://www.keralatourism.org/images/newsbytes/large/varkala_papanasam_beach20240315082235_2211_1.jpg",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&h=400&fit=crop"
+      ],
       host: "Bindu Jose",
       isNew: true,
       daysAgo: 3,
@@ -318,32 +368,6 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Main Tabs */}
-          <div className="flex justify-center space-x-8 mb-8">
-            {mainTabs.map((tab) => {
-              const IconComponent = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all ${
-                    activeTab === tab.id
-                      ? "bg-white text-gray-900 shadow-lg"
-                      : "bg-white/20 text-white hover:bg-white/30"
-                  }`}
-                >
-                  <IconComponent className="w-5 h-5" />
-                  <span className="font-medium">{tab.label}</span>
-                  {(tab.id === "experiences" || tab.id === "services") && (
-                    <Badge className="bg-pink-500 text-white text-xs">
-                      NEW
-                    </Badge>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
           {/* Enhanced Search Bar */}
           <div className="w-full max-w-5xl">
             <EnhancedSearchBar />
@@ -367,7 +391,7 @@ const Index = () => {
 
       {/* Platform Introduction */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className=" items-center">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
               About Hevan Connect Travel
@@ -382,24 +406,16 @@ const Index = () => {
               helps guests discover immersive, affordable stays while supporting
               sustainable tourism and local livelihoods.
             </p>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-pink-600">200+</div>
-                <div className="text-sm text-gray-600">Verified Homestays</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-pink-600">50+</div>
-                <div className="text-sm text-gray-600">Destinations</div>
-              </div>
-            </div>
+            {/* Animated Stats Grid */}
+            <AnimatedStats />
           </div>
-          <div className="relative">
+          {/* <div className="relative">
             <img
               src="https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=400&fit=crop"
               alt="Kerala homestay experience"
               className="rounded-2xl shadow-lg"
             />
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -411,33 +427,46 @@ const Index = () => {
 
         {/* Region Tabs */}
         <div className="flex flex-wrap gap-3 mb-8">
-          {regions.map((region) => (
-            <Badge
-              key={region.id}
-              variant="outline"
-              className="px-4 py-2 cursor-pointer hover:bg-pink-100 hover:border-pink-300"
-            >
-              {region.label} ({region.count})
-            </Badge>
-          ))}
+          {regions.map((region) => {
+            const Icon = region.icon;
+            const isActive = false; // You can add active state logic if needed
+            return (
+              <button
+                key={region.id}
+                className={`flex items-center gap-2 px-5 py-2 rounded-full font-medium shadow-sm transition-all duration-300 border border-transparent text-sm transform hover:scale-105 hover:shadow-lg
+                  ${isActive ? "bg-gradient-to-r from-pink-500 to-yellow-400 text-white shadow-lg" : "bg-white text-gray-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-yellow-50 hover:border-pink-300 hover:text-pink-700"}
+                `}
+              >
+                <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                <span>{region.label}</span>
+                <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-600 transition-colors duration-300 group-hover:bg-pink-200 group-hover:text-pink-700">{region.count}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Filter Bar */}
         <div className="flex flex-wrap gap-3 mb-8">
-          {filters.map((filter) => (
-            <Button
-              key={filter.id}
-              variant={activeFilter === filter.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveFilter(filter.id)}
-            >
-              {filter.label}
-            </Button>
-          ))}
+          {filters.map((filter) => {
+            const Icon = filter.icon;
+            const isActive = activeFilter === filter.id;
+            return (
+              <button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={`flex items-center gap-2 px-5 py-2 rounded-full font-medium shadow-sm transition-all duration-300 border text-sm transform hover:scale-105 hover:shadow-lg
+                  ${isActive ? "bg-gradient-to-r from-green-400 to-green-600 text-white shadow-lg scale-105" : "bg-white text-gray-700 border-gray-300 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:border-green-400 hover:text-green-700"}
+                `}
+              >
+                <Icon className="w-5 h-5 transition-transform duration-300 hover:rotate-12" />
+                <span>{filter.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Airport Access Districts */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {airports.map((airport) => (
             <Card
               key={airport.code}
@@ -452,7 +481,7 @@ const Index = () => {
               </div>
             </Card>
           ))}
-        </div>
+        </div> */}
 
         {/* Property Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -463,40 +492,50 @@ const Index = () => {
               onClick={() => navigate(`/property/${property.id}`)}
             >
               <div className="relative">
-                <img
-                  src={property.image}
-                  alt={property.title}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
-                />
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {property.images.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <img
+                          src={image}
+                          alt={`${property.title} - Image ${index + 1}`}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-12" onClick={e => e.stopPropagation()} />
+                  <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-12" onClick={e => e.stopPropagation()} />
+                </Carousel>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute top-3 right-3 bg-white/80 hover:bg-white"
+                  className="absolute top-3 right-3 bg-white/80 hover:bg-white z-10 transition-all duration-300 hover:scale-110 hover:shadow-lg"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleLike(property.id);
                   }}
                 >
                   <Heart
-                    className={`w-4 h-4 ${
+                    className={`w-4 h-4 transition-all duration-300 ${
                       likedProperties.includes(property.id)
-                        ? "fill-red-500 text-red-500"
-                        : "text-gray-600"
+                        ? "fill-red-500 text-red-500 scale-110"
+                        : "text-gray-600 hover:text-red-500 hover:scale-110"
                     }`}
                   />
                 </Button>
                 {property.isNew && (
-                  <Badge className="absolute top-3 left-3 bg-green-500">
+                  <Badge className="absolute top-3 left-3 bg-green-500 z-10">
                     New
                   </Badge>
                 )}
                 {property.isCertified && (
-                  <Badge className="absolute top-3 left-3 bg-blue-500">
+                  <Badge className="absolute top-3 left-3 bg-blue-500 z-10">
                     Certified
                   </Badge>
                 )}
                 {property.isEco && (
-                  <Badge className="absolute bottom-3 left-3 bg-green-600">
+                  <Badge className="absolute bottom-3 left-3 bg-green-600 z-10">
                     Eco-Friendly
                   </Badge>
                 )}
@@ -549,7 +588,11 @@ const Index = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button variant="outline" asChild>
+          <Button 
+            variant="outline" 
+            asChild
+            className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gradient-to-r hover:from-pink-50 hover:to-yellow-50 hover:border-pink-300 hover:text-pink-700"
+          >
             <Link to="/properties">View all Kerala homestays</Link>
           </Button>
         </div>
@@ -578,15 +621,25 @@ const Index = () => {
               onClick={() => navigate(`/property/${homestay.id}`)}
             >
               <div className="relative">
-                <img
-                  src={homestay.image}
-                  alt={homestay.title}
-                  className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <Badge className="absolute top-4 left-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1">
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {homestay.images.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <img
+                          src={image}
+                          alt={`${homestay.title} - Image ${index + 1}`}
+                          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-12" onClick={e => e.stopPropagation()} />
+                  <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-12" onClick={e => e.stopPropagation()} />
+                </Carousel>
+                <Badge className="absolute top-4 left-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1 z-10">
                   Priority Choice
                 </Badge>
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 z-10">
                   <div className="flex items-center text-sm font-medium">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
                     {homestay.rating}
@@ -701,11 +754,21 @@ const Index = () => {
               onClick={() => navigate(`/property/${homestay.id}`)}
             >
               <div className="relative">
-                <img
-                  src={homestay.image}
-                  alt={homestay.title}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
-                />
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {homestay.images.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <img
+                          src={image}
+                          alt={`${homestay.title} - Image ${index + 1}`}
+                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-12" onClick={e => e.stopPropagation()} />
+                  <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-12" onClick={e => e.stopPropagation()} />
+                </Carousel>
                 <Badge className="absolute top-3 left-3 bg-green-500">
                   {homestay.daysAgo === 1
                     ? "Today"
@@ -768,7 +831,7 @@ const Index = () => {
         <div className="text-center mt-8">
           <Button
             variant="outline"
-            className="border-green-300 text-green-700 hover:bg-green-100"
+            className="border-green-300 text-green-700 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:border-green-400 hover:text-green-800"
           >
             View More New Listings
           </Button>
@@ -813,7 +876,10 @@ const Index = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button asChild>
+          <Button 
+            asChild
+            className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
+          >
             <Link to="/districts">Explore All Districts</Link>
           </Button>
         </div>
@@ -827,6 +893,9 @@ const Index = () => {
 
       {/* Media Section */}
       <MediaSection />
+
+      {/* Certifications Section */}
+      <Certifications />
 
       {/* Updated Footer */}
       <footer className="bg-gray-900 text-white py-16">
@@ -945,5 +1014,34 @@ const Index = () => {
     </div>
   );
 };
+
+function AnimatedStats() {
+  const stats = [
+    { label: "Verified Homestays", value: 200, suffix: "+", color: "text-pink-600" },
+    { label: "Destinations", value: 50, suffix: "+", color: "text-pink-600" },
+    { label: "Happy Guests", value: 5000, suffix: "+", color: "text-green-600" },
+    { label: "Local Hosts", value: 300, suffix: "+", color: "text-blue-600" },
+    { label: "Unique Experiences", value: 120, suffix: "+", color: "text-yellow-600" },
+    { label: "Years of Service", value: 10, suffix: "+", color: "text-purple-600" },
+  ];
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
+
+  return (
+    <div ref={ref} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mt-8">
+      {stats.map((stat, idx) => (
+        <div className="text-center" key={stat.label}>
+          <div className={`text-2xl md:text-3xl font-bold ${stat.color}`}>
+            {inView ? (
+              <CountUp end={stat.value} duration={1.5} suffix={stat.suffix} />
+            ) : (
+              `0${stat.suffix}`
+            )}
+          </div>
+          <div className="text-sm text-gray-600 mt-1">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default Index;
