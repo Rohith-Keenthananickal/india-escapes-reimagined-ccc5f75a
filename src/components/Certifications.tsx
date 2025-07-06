@@ -219,7 +219,7 @@ const Certifications = () => {
         </div>
 
         {/* Industry Awards */}
-        <div className="mb-24">
+        {/* <div className="mb-24">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
               Industry Recognition & Awards
@@ -269,7 +269,7 @@ const Certifications = () => {
               );
             })}
           </div>
-        </div>
+        </div> */}
 
         {/* Trust Indicators */}
         <div className="relative">

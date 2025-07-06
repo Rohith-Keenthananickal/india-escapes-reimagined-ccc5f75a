@@ -128,7 +128,7 @@ const ValueProposition = () => {
         </div>
       </section>
       <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8 rounded-2xl shadow-lg border border-gray-200">
+        <div className="mx-auto px-4 flex flex-col md:flex-row items-center gap-8 rounded-2xl shadow-lg border border-gray-200 max-w-[96vw] p-5">
           <div className="flex-1 flex flex-col justify-center">
             <h2
               className="text-3xl font-extrabold text-green-700 mb-4"
