@@ -577,7 +577,7 @@ const Index = () => {
       </section>
 
       {/* Priority Homestays – District Focus */}
-      <section className="max-w-7xl mx-auto px-4 py-16 bg-gradient-to-br from-pink-50 to-purple-50">
+      {/* <section className="max-w-7xl mx-auto px-4 py-16 bg-gradient-to-br from-pink-50 to-purple-50">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <Award className="w-8 h-8 text-pink-600 mr-3" />
@@ -662,7 +662,7 @@ const Index = () => {
             </Card>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Airport-Accessible District Highlights */}
       <section className="max-w-7xl mx-auto px-4 py-16">

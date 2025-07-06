@@ -33,7 +33,7 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('popularity');
-  const [isSticky, setIsSticky] = useState(false);
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
 
   const categories = [
     { 
@@ -101,17 +101,6 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
     { value: "rating", label: "Highest Rated" },
   ];
 
-  // Handle sticky behavior
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setIsSticky(scrollY > 100);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Notify parent of filter changes
   useEffect(() => {
     onFiltersChange?.({
@@ -169,87 +158,12 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
     return chips;
   };
 
-  const MobileFilters = () => (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" className="md:hidden flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4" />
-          Filters
-          {(selectedCategory !== 'all' || selectedFilters.length > 0) && (
-            <Badge className="ml-1 bg-pink-500">
-              {(selectedCategory !== 'all' ? 1 : 0) + selectedFilters.filter(f => f !== 'all').length}
-            </Badge>
-          )}
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="bottom" className="h-[80vh]">
-        <SheetHeader>
-          <SheetTitle>Filter Homestays</SheetTitle>
-        </SheetHeader>
-        <div className="py-4 space-y-6">
-          {/* Categories */}
-          <div>
-            <h3 className="font-semibold mb-3">Categories</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                const isSelected = selectedCategory === category.id;
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => handleCategorySelect(category.id)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-                      isSelected 
-                        ? 'border-pink-400 bg-pink-50' 
-                        : 'border-gray-200 hover:border-pink-200'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5 mx-auto mb-2 text-gray-600" />
-                    <div className="text-xs font-medium text-center">{category.label}</div>
-                    <Badge variant="secondary" className="mt-1 text-xs">{category.count}</Badge>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div>
-            <h3 className="font-semibold mb-3">Filters</h3>
-            <div className="space-y-2">
-              {filters.map((filter) => {
-                const Icon = filter.icon;
-                const isSelected = selectedFilters.includes(filter.id);
-                return (
-                  <button
-                    key={filter.id}
-                    onClick={() => handleFilterToggle(filter.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                      isSelected 
-                        ? 'border-green-400 bg-green-50' 
-                        : 'border-gray-200 hover:border-green-200'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="font-medium">{filter.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-
   return (
-    <div className={`bg-white transition-all duration-300 ${
-      isSticky ? 'sticky top-0 z-40 shadow-lg' : ''
-    }`}>
+    <div className="bg-white transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Category Cards - Desktop */}
         <div className="hidden md:block mb-6">
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide p-3 " style={{ scrollbarWidth: 'none' }}>
             {categories.map((category) => {
               const Icon = category.icon;
               const isSelected = selectedCategory === category.id;
@@ -257,7 +171,7 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
                 <button
                   key={category.id}
                   onClick={() => handleCategorySelect(category.id)}
-                  className={`flex-shrink-0 group relative overflow-hidden rounded-2xl p-6 min-w-[200px] h-[120px] transition-all duration-300 hover:scale-105 hover:shadow-xl ${
+                  className={`flex-shrink-0 group relative overflow-hidden rounded-2xl p-6 min-w-[200px] h-[120px] transition-all duration-300 hover:scale-105 hover:shadow-xl mb-3  ${
                     category.background
                   } ${
                     isSelected 
@@ -331,7 +245,7 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
 
         {/* Active Filter Chips */}
         {getActiveFilterChips().length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6 p-3">
             <span className="text-sm font-medium text-gray-600 mr-2 hidden md:block">Active filters:</span>
             {getActiveFilterChips().map((chip) => (
               <div
@@ -365,7 +279,19 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
         {/* Mobile Filter Button */}
         <div className="md:hidden mb-4">
           <div className="flex items-center justify-between">
-            <MobileFilters />
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => setMobileSheetOpen(true)}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              Filters
+              {(selectedCategory !== 'all' || selectedFilters.length > 0) && (
+                <Badge className="ml-1 bg-pink-500">
+                  {(selectedCategory !== 'all' ? 1 : 0) + selectedFilters.filter(f => f !== 'all').length}
+                </Badge>
+              )}
+            </Button>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue />
@@ -379,7 +305,6 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
               </SelectContent>
             </Select>
           </div>
-          
           {/* Mobile Filter Chips */}
           {getActiveFilterChips().length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
@@ -400,6 +325,65 @@ const HomestayFilters = ({ onFiltersChange }: HomestayFiltersProps) => {
               ))}
             </div>
           )}
+          <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
+            <SheetContent side="bottom" className="h-[80vh]">
+              <SheetHeader>
+                <SheetTitle>Filter Homestays</SheetTitle>
+              </SheetHeader>
+              <div className="py-4 space-y-6">
+                {/* Categories */}
+                <div>
+                  <h3 className="font-semibold mb-3">Categories</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {categories.map((category) => {
+                      const Icon = category.icon;
+                      const isSelected = selectedCategory === category.id;
+                      return (
+                        <button
+                          key={category.id}
+                          onClick={() => handleCategorySelect(category.id)}
+                          className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                            isSelected 
+                              ? 'border-pink-400 bg-pink-50' 
+                              : 'border-gray-200 hover:border-pink-200'
+                          }`}
+                        >
+                          <Icon className="w-5 h-5 mx-auto mb-2 text-gray-600" />
+                          <div className="text-xs font-medium text-center">{category.label}</div>
+                          <Badge variant="secondary" className="mt-1 text-xs">{category.count}</Badge>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Filters */}
+                <div>
+                  <h3 className="font-semibold mb-3">Filters</h3>
+                  <div className="space-y-2">
+                    {filters.map((filter) => {
+                      const Icon = filter.icon;
+                      const isSelected = selectedFilters.includes(filter.id);
+                      return (
+                        <button
+                          key={filter.id}
+                          onClick={() => handleFilterToggle(filter.id)}
+                          className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
+                            isSelected 
+                              ? 'border-green-400 bg-green-50' 
+                              : 'border-gray-200 hover:border-green-200'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                          <span className="font-medium">{filter.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </div>
