@@ -1,112 +1,116 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Leaf, Shield, Star, Globe, Heart, CheckCircle, Users, Zap, Medal, TrendingUp, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { Award, Leaf, Shield, Star, Globe, Heart, CheckCircle, Users, Zap, Medal, TrendingUp } from "lucide-react";
 
 const Certifications = () => {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-
-  const professionalCertifications = [
+  const certifications = [
     {
-      id: "kerala-tourism",
+      id: 1,
       name: "Kerala Tourism Department Certified",
+      logo: "🏛️",
+      description: "Official recognition from the Government of Kerala Tourism Department, ensuring compliance with state tourism standards and authentic cultural experiences.",
+      category: "Government Certified",
+      year: "2024",
       icon: Award,
-      description: "Official recognition from the Government of Kerala Tourism Department, ensuring compliance with state tourism standards.",
-      fullDescription: "Official recognition from the Government of Kerala Tourism Department, ensuring compliance with state tourism standards and authentic cultural experiences throughout Kerala's diverse regions.",
-      status: "Certified 2024",
-      validity: "Valid till Dec 2025",
-      badge: "Govt Certified",
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
+      color: "from-blue-600 to-blue-700",
+      bgColor: "bg-white",
+      borderColor: "border-blue-200",
+      validity: "Valid until Dec 2025"
     },
     {
-      id: "fssai-food",
-      name: "FSSAI Food Safety Certification",
-      icon: Shield,
-      description: "Food Safety and Standards Authority of India certification ensuring highest standards of food hygiene.",
-      fullDescription: "Food Safety and Standards Authority of India certification ensuring highest standards of food hygiene and safety in all homestay kitchens, with regular audits and compliance monitoring.",
-      status: "Certified 2024",
-      validity: "Valid till Mar 2025",
-      badge: "Food Safety",
-      color: "from-amber-500 to-amber-600",
-      bgColor: "bg-amber-50",
-      borderColor: "border-amber-200"
-    }
-  ];
-
-  const ecoSustainability = [
-    {
-      id: "iso-14001",
+      id: 2,
       name: "ISO 14001 Environmental Management",
+      logo: "🌿",
+      description: "International standard for environmental management systems, demonstrating commitment to sustainable practices and environmental responsibility.",
+      category: "International Standard",
+      year: "2023",
       icon: Leaf,
-      description: "International standard for environmental management systems, demonstrating commitment to sustainable practices.",
-      fullDescription: "International standard for environmental management systems, demonstrating commitment to sustainable practices and environmental responsibility across all operations and partner homestays.",
-      status: "Certified 2023",
-      validity: "Valid till Nov 2024",
-      badge: "International Standard",
-      color: "from-green-500 to-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200"
+      color: "from-green-600 to-green-700",
+      bgColor: "bg-white",
+      borderColor: "border-green-200",
+      validity: "Valid until Nov 2024"
     },
     {
-      id: "unwto-sustainable",
-      name: "UNWTO Sustainable Tourism Award",
-      icon: Globe,
-      description: "Recognition from the World Tourism Organization for outstanding contribution to sustainable tourism development.",
-      fullDescription: "Recognition from the World Tourism Organization for outstanding contribution to sustainable tourism development and cultural heritage preservation in Kerala's backwater regions.",
-      status: "Awarded 2023",
-      validity: "Lifetime Achievement",
-      badge: "International Award",
-      color: "from-teal-500 to-teal-600",
-      bgColor: "bg-teal-50",
-      borderColor: "border-teal-200"
-    }
-  ];
-
-  const communityPartnerships = [
-    {
-      id: "responsible-tourism",
+      id: 3,
       name: "Responsible Tourism Partnership",
+      logo: "🤝",
+      description: "Certified partner of the Kerala Responsible Tourism Mission, supporting community development and cultural preservation initiatives.",
+      category: "Community Partnership",
+      year: "2024",
       icon: Heart,
-      description: "Certified partner of the Kerala Responsible Tourism Mission, supporting community development initiatives.",
-      fullDescription: "Certified partner of the Kerala Responsible Tourism Mission, supporting community development and cultural preservation initiatives while ensuring direct economic benefits to local families.",
-      status: "Partner 2024",
-      validity: "Ongoing Partnership",
-      badge: "Community Partner",
-      color: "from-rose-500 to-rose-600",
-      bgColor: "bg-rose-50",
-      borderColor: "border-rose-200"
+      color: "from-rose-600 to-rose-700",
+      bgColor: "bg-white",
+      borderColor: "border-rose-200",
+      validity: "Ongoing Partnership"
+    },
+    {
+      id: 4,
+      name: "FSSAI Food Safety Certification",
+      logo: "🍽️",
+      description: "Food Safety and Standards Authority of India certification ensuring highest standards of food hygiene and safety in all homestay kitchens.",
+      category: "Food Safety",
+      year: "2024",
+      icon: Shield,
+      color: "from-amber-600 to-amber-700",
+      bgColor: "bg-white",
+      borderColor: "border-amber-200",
+      validity: "Valid until Mar 2025"
+    },
+    {
+      id: 5,
+      name: "UNWTO Sustainable Tourism Award",
+      logo: "🌍",
+      description: "Recognition from the World Tourism Organization for outstanding contribution to sustainable tourism development and cultural heritage preservation.",
+      category: "International Award",
+      year: "2023",
+      icon: Globe,
+      color: "from-indigo-600 to-indigo-700",
+      bgColor: "bg-white",
+      borderColor: "border-indigo-200",
+      validity: "Lifetime Achievement"
+    },
+    {
+      id: 6,
+      name: "Premium Hospitality Excellence",
+      logo: "⭐",
+      description: "Awarded for exceptional hospitality standards, guest satisfaction, and maintaining premium quality across all homestay experiences.",
+      category: "Quality Excellence",
+      year: "2024",
+      icon: Star,
+      color: "from-purple-600 to-purple-700",
+      bgColor: "bg-white",
+      borderColor: "border-purple-200",
+      validity: "Annual Recognition"
     }
   ];
 
-  const hospitalityAwards = [
+  const awards = [
     {
-      id: "hospitality-excellence",
-      name: "Premium Hospitality Excellence",
-      icon: Star,
-      description: "Awarded for exceptional hospitality standards and guest satisfaction across all homestay experiences.",
-      fullDescription: "Awarded for exceptional hospitality standards, guest satisfaction, and maintaining premium quality across all homestay experiences with consistent 4.8+ ratings.",
-      status: "Awarded 2024",
-      validity: "Annual Recognition",
-      badge: "Quality Excellence",
-      color: "from-purple-500 to-purple-600",
-      bgColor: "bg-purple-50",
-      borderColor: "border-purple-200"
+      id: 1,
+      title: "Excellence in Tourism Innovation 2024",
+      organization: "Ministry of Tourism, Government of India",
+      description: "Recognized for innovative approach in promoting authentic homestay experiences and digital transformation in rural tourism.",
+      year: "2024",
+      category: "National Award",
+      icon: Medal
     },
     {
-      id: "tourism-innovation",
-      name: "Excellence in Tourism Innovation 2024",
-      icon: Medal,
-      description: "Recognized for innovative approach in promoting authentic homestay experiences and digital transformation.",
-      fullDescription: "Recognized by the Ministry of Tourism, Government of India for innovative approach in promoting authentic homestay experiences and digital transformation in rural tourism sector.",
-      status: "Awarded 2024",
-      validity: "National Recognition",
-      badge: "National Award",
-      color: "from-indigo-500 to-indigo-600",
-      bgColor: "bg-indigo-50",
-      borderColor: "border-indigo-200"
+      id: 2,
+      title: "Sustainable Tourism Champion",
+      organization: "Green Tourism India Foundation",
+      description: "Awarded for outstanding commitment to environmental conservation and sustainable tourism practices across Kerala.",
+      year: "2023",
+      category: "Environmental Excellence",
+      icon: Leaf
+    },
+    {
+      id: 3,
+      title: "Community Impact & Cultural Preservation",
+      organization: "Responsible Tourism Council of India",
+      description: "Honored for significant positive impact on local communities and preservation of traditional Kerala culture and heritage.",
+      year: "2024",
+      category: "Social Impact",
+      icon: Heart
     }
   ];
 
@@ -114,190 +118,170 @@ const Certifications = () => {
     {
       icon: Shield,
       title: "100% Verified Hosts",
-      description: "Every host undergoes thorough background verification",
+      description: "Every host undergoes thorough background verification and property inspection",
       stat: "500+",
-      color: "from-blue-500 to-blue-600"
+      color: "from-blue-600 to-blue-700"
     },
     {
       icon: CheckCircle,
       title: "Quality Assured",
-      description: "Regular quality audits and guest feedback monitoring",
+      description: "Regular quality audits and guest feedback monitoring ensure consistent standards",
       stat: "98%",
-      color: "from-green-500 to-green-600"
+      color: "from-green-600 to-green-700"
     },
     {
       icon: Users,
       title: "Community Support",
-      description: "Direct economic benefits to local families",
+      description: "Direct economic benefits to local families and preservation of traditional livelihoods",
       stat: "300+",
-      color: "from-rose-500 to-rose-600"
+      color: "from-rose-600 to-rose-700"
     },
     {
       icon: TrendingUp,
       title: "Guest Satisfaction",
-      description: "Consistently high ratings and repeat bookings",
+      description: "Consistently high ratings and repeat bookings from satisfied travelers",
       stat: "4.8/5",
-      color: "from-amber-500 to-amber-600"
+      color: "from-amber-600 to-amber-700"
     }
   ];
-
-  const CertificationCard = ({ cert, delay = 0 }: { cert: any; delay?: number }) => {
-    const Icon = cert.icon;
-    const isHovered = hoveredCard === cert.id;
-
-    return (
-      <Card
-        className={`group relative overflow-hidden border-2 ${cert.borderColor} hover:border-opacity-60 transition-all duration-500 hover:shadow-xl hover:-translate-y-2 bg-white cursor-pointer animate-fade-in`}
-        style={{ animationDelay: `${delay}ms` }}
-        onMouseEnter={() => setHoveredCard(cert.id)}
-        onMouseLeave={() => setHoveredCard(null)}
-      >
-        <div className="absolute top-4 right-4">
-          <Badge className={`bg-gradient-to-r ${cert.color} text-white font-medium text-xs px-3 py-1 shadow-sm`}>
-            {cert.badge}
-          </Badge>
-        </div>
-        
-        <CardContent className="p-6 pt-16">
-          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg mb-6 group-hover:scale-110 transition-transform duration-300 border border-gray-100">
-            <Icon className={`w-8 h-8 text-transparent bg-gradient-to-r ${cert.color} bg-clip-text`} />
-          </div>
-          
-          <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight group-hover:text-blue-700 transition-colors duration-300 line-clamp-2">
-            {cert.name}
-          </h4>
-          
-          <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
-            {isHovered ? cert.fullDescription : cert.description}
-          </p>
-          
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Badge variant="outline" className="text-xs font-medium border-gray-300 text-gray-600 bg-gray-50">
-              {cert.status}
-            </Badge>
-            <Badge variant="outline" className="text-xs font-medium border-green-300 text-green-700 bg-green-50">
-              {cert.validity}
-            </Badge>
-          </div>
-
-          {isHovered && (
-            <div className="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700 transition-colors duration-200">
-              <span>View Details</span>
-              <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" />
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const SectionHeader = ({ title, subtitle, delay = 0 }: { title: string; subtitle: string; delay?: number }) => (
-    <div className={`text-center mb-12 animate-fade-in`} style={{ animationDelay: `${delay}ms` }}>
-      <h3 className="text-2xl font-bold text-gray-900 mb-3">{title}</h3>
-      <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto mb-4 rounded-full"></div>
-      <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">{subtitle}</p>
-    </div>
-  );
 
   return (
     <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Main Header */}
-        <div className="text-center mb-20 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-xl mb-8">
-            <Award className="w-10 h-10 text-white" />
+        {/* Header */}
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg mb-6">
+            <Award className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Certifications & Accreditations
           </h2>
-          <div className="w-32 h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto mb-8 rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto mb-6 rounded-full"></div>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Our commitment to excellence is validated through internationally recognized certifications and prestigious industry awards.
+            Our unwavering commitment to excellence is validated through internationally recognized certifications, 
+            government accreditations, and prestigious industry awards that demonstrate our dedication to quality, 
+            sustainability, and authentic travel experiences.
           </p>
         </div>
 
         {/* Professional Certifications */}
-        <div className="mb-20">
-          <SectionHeader 
-            title="Professional Certifications"
-            subtitle="Government and international certifications ensuring the highest quality and compliance standards"
-            delay={100}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {professionalCertifications.map((cert, index) => (
-              <CertificationCard key={cert.id} cert={cert} delay={200 + index * 100} />
-            ))}
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center justify-center mb-20">
-          <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent w-full max-w-md"></div>
-        </div>
-
-        {/* Eco & Sustainability */}
-        <div className="mb-20">
-          <SectionHeader 
-            title="Eco & Sustainability"
-            subtitle="Environmental management and sustainable tourism certifications for responsible travel"
-            delay={300}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {ecoSustainability.map((cert, index) => (
-              <CertificationCard key={cert.id} cert={cert} delay={400 + index * 100} />
-            ))}
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center justify-center mb-20">
-          <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent w-full max-w-md"></div>
-        </div>
-
-        {/* Community Partnerships */}
-        <div className="mb-20">
-          <SectionHeader 
-            title="Community Partnerships"
-            subtitle="Collaborative initiatives supporting local communities and cultural preservation"
-            delay={500}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-8 max-w-2xl mx-auto">
-            {communityPartnerships.map((cert, index) => (
-              <CertificationCard key={cert.id} cert={cert} delay={600 + index * 100} />
-            ))}
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center justify-center mb-20">
-          <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent w-full max-w-md"></div>
-        </div>
-
-        {/* Tourism & Hospitality Awards */}
         <div className="mb-24">
-          <SectionHeader 
-            title="Tourism & Hospitality Awards"
-            subtitle="Prestigious awards recognizing excellence in hospitality and tourism innovation"
-            delay={700}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {hospitalityAwards.map((cert, index) => (
-              <CertificationCard key={cert.id} cert={cert} delay={800 + index * 100} />
-            ))}
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Professional Certifications
+            </h3>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Internationally recognized standards and government certifications ensuring the highest quality and compliance
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {certifications.map((cert) => {
+              const Icon = cert.icon;
+              return (
+                <Card
+                  key={cert.id}
+                  className={`group relative overflow-hidden border-2 ${cert.borderColor} hover:border-opacity-80 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-white`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-gray-50/50"></div>
+                  <CardContent className="relative p-8">
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="text-4xl transform group-hover:scale-110 transition-transform duration-300">
+                        {cert.logo}
+                      </div>
+                      <Badge className={`bg-gradient-to-r ${cert.color} text-white font-semibold px-4 py-2 shadow-lg`}>
+                        {cert.category}
+                      </Badge>
+                    </div>
+                    
+                    <h4 className="text-xl font-bold text-gray-900 mb-4 leading-tight group-hover:text-blue-700 transition-colors duration-300">
+                      {cert.name}
+                    </h4>
+                    
+                    <p className="text-gray-600 mb-6 leading-relaxed text-sm line-clamp-3">
+                      {cert.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                      <div className="flex items-center text-sm text-gray-500 font-medium">
+                        <Icon className="w-5 h-5 mr-2 text-gray-400" />
+                        <span>Certified {cert.year}</span>
+                      </div>
+                      <Badge variant="outline" className="text-xs font-medium border-gray-300 text-gray-600 bg-gray-50">
+                        {cert.validity}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Industry Awards */}
+        <div className="mb-24">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Industry Recognition & Awards
+            </h3>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Prestigious awards and recognition from leading tourism organizations and government bodies
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {awards.map((award) => {
+              const Icon = award.icon;
+              return (
+                <Card
+                  key={award.id}
+                  className="group relative overflow-hidden border-2 border-amber-200 hover:border-amber-300 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-white"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-yellow-50/30"></div>
+                  <CardContent className="relative p-8">
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <Badge className="bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-semibold mb-2 shadow-lg">
+                          {award.category}
+                        </Badge>
+                        <div className="text-sm text-gray-600 font-semibold bg-amber-50 px-3 py-1 rounded-full">
+                          {award.year}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <h4 className="text-xl font-bold text-gray-900 mb-4 leading-tight group-hover:text-amber-700 transition-colors duration-300">
+                      {award.title}
+                    </h4>
+                    
+                    <p className="text-sm text-amber-700 mb-4 font-semibold bg-amber-50 px-3 py-2 rounded-lg">
+                      {award.organization}
+                    </p>
+                    
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      {award.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
         {/* Trust Indicators */}
-        <div className="relative animate-fade-in" style={{ animationDelay: '900ms' }}>
+        <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-indigo-600/5 to-purple-600/5 rounded-3xl"></div>
-          <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 md:p-12">
+          <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-100 p-12">
             <div className="text-center mb-12">
               <h3 className="text-3xl font-bold text-gray-900 mb-6">
                 Why Choose Hevan Connect Travel?
               </h3>
               <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
                 Our platform combines professional standards with authentic experiences, ensuring every stay meets 
-                the highest quality and safety requirements.
+                the highest quality and safety requirements while supporting local communities.
               </p>
             </div>
             
@@ -305,7 +289,7 @@ const Certifications = () => {
               {trustMetrics.map((metric, index) => {
                 const Icon = metric.icon;
                 return (
-                  <div key={index} className="text-center group animate-fade-in" style={{ animationDelay: `${1000 + index * 100}ms` }}>
+                  <div key={index} className="text-center group">
                     <div className="relative mb-6">
                       <div className="w-20 h-20 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-all duration-300 shadow-lg border border-gray-200">
                         <Icon className={`w-10 h-10 text-transparent bg-gradient-to-r ${metric.color} bg-clip-text`} />
