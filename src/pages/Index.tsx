@@ -7,6 +7,7 @@ import SeasonalBooking from "@/components/SeasonalBooking";
 import ValueProposition from "@/components/ValueProposition";
 import MediaSection from "@/components/MediaSection";
 import Certifications from "@/components/Certifications";
+import HomestayFilters from "@/components/HomestayFilters";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,11 @@ import { useInView } from "react-intersection-observer";
 
 const Index = () => {
   const [likedProperties, setLikedProperties] = useState<number[]>([]);
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilters, setActiveFilters] = useState({
+    category: 'all',
+    filters: [] as string[],
+    sortBy: 'popularity'
+  });
   const navigate = useNavigate();
 
   const toggleLike = (id: number) => {
@@ -154,12 +159,40 @@ const Index = () => {
     },
   ];
 
+  // Apply filters to properties
   const filteredProperties = featuredProperties.filter((property) => {
-    if (activeFilter === "budget") return property.price < 4000;
-    if (activeFilter === "eco") return property.isEco;
-    if (activeFilter === "activities") return property.amenities.length > 2;
+    // Category filter
+    if (activeFilters.category !== 'all' && property.region !== activeFilters.category) {
+      return false;
+    }
+    
+    // Additional filters
+    if (activeFilters.filters.includes('budget') && property.price >= 4000) return false;
+    if (activeFilters.filters.includes('eco') && !property.isEco) return false;
+    if (activeFilters.filters.includes('activities') && property.amenities.length <= 2) return false;
+    
     return true;
   });
+
+  // Sort properties
+  const sortedProperties = [...filteredProperties].sort((a, b) => {
+    switch (activeFilters.sortBy) {
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'rating':
+        return b.rating - a.rating;
+      case 'newest':
+        return (a.isNew ? 1 : 0) - (b.isNew ? 1 : 0);
+      default: // popularity
+        return b.reviews - a.reviews;
+    }
+  });
+
+  const handleFiltersChange = (newFilters: { category: string; filters: string[]; sortBy: string }) => {
+    setActiveFilters(newFilters);
+  };
 
   const priorityHomestays = [
     {
@@ -419,73 +452,18 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Homestay Discovery Section */}
+      {/* Homestay Discovery Section with New Filters */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">
           Your next story starts in a Kerala home ?
         </h2>
 
-        {/* Region Tabs */}
-        <div className="flex flex-wrap gap-3 mb-8">
-          {regions.map((region) => {
-            const Icon = region.icon;
-            const isActive = false; // You can add active state logic if needed
-            return (
-              <button
-                key={region.id}
-                className={`flex items-center gap-2 px-5 py-2 rounded-full font-medium shadow-sm transition-all duration-300 border border-transparent text-sm transform hover:scale-105 hover:shadow-lg
-                  ${isActive ? "bg-gradient-to-r from-pink-500 to-yellow-400 text-white shadow-lg" : "bg-white text-gray-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-yellow-50 hover:border-pink-300 hover:text-pink-700"}
-                `}
-              >
-                <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                <span>{region.label}</span>
-                <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-600 transition-colors duration-300 group-hover:bg-pink-200 group-hover:text-pink-700">{region.count}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Filter Bar */}
-        <div className="flex flex-wrap gap-3 mb-8">
-          {filters.map((filter) => {
-            const Icon = filter.icon;
-            const isActive = activeFilter === filter.id;
-            return (
-              <button
-                key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
-                className={`flex items-center gap-2 px-5 py-2 rounded-full font-medium shadow-sm transition-all duration-300 border text-sm transform hover:scale-105 hover:shadow-lg
-                  ${isActive ? "bg-gradient-to-r from-green-400 to-green-600 text-white shadow-lg scale-105" : "bg-white text-gray-700 border-gray-300 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:border-green-400 hover:text-green-700"}
-                `}
-              >
-                <Icon className="w-5 h-5 transition-transform duration-300 hover:rotate-12" />
-                <span>{filter.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Airport Access Districts */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {airports.map((airport) => (
-            <Card
-              key={airport.code}
-              className="p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
-            >
-              <div className="text-lg font-bold text-gray-900">
-                {airport.name}
-              </div>
-              <div className="text-sm text-gray-600">{airport.code}</div>
-              <div className="text-xs text-pink-600 mt-1">
-                {airport.stays} stays nearby
-              </div>
-            </Card>
-          ))}
-        </div> */}
+        {/* New Filters Component */}
+        <HomestayFilters onFiltersChange={handleFiltersChange} />
 
         {/* Property Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredProperties.map((property) => (
+          {sortedProperties.map((property) => (
             <Card
               key={property.id}
               className="group cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
