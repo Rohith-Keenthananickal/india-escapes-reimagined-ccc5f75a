@@ -1,7 +1,6 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Leaf, Shield, Star, Globe, Heart, CheckCircle, Users, Zap, Medal, Certificate, TrendingUp } from "lucide-react";
+import { Award, Leaf, Shield, Star, Globe, Heart, CheckCircle, Users, Zap, Medal, TrendingUp } from "lucide-react";
 
 const Certifications = () => {
   const certifications = [
@@ -152,7 +151,7 @@ const Certifications = () => {
         {/* Header */}
         <div className="text-center mb-20">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg mb-6">
-            <Certificate className="w-8 h-8 text-white" />
+            <Award className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Certifications & Accreditations
