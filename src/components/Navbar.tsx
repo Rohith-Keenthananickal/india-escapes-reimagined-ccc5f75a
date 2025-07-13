@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,30 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("homes");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Update active tab based on current route
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === "/") {
+      setActiveTab("homes");
+    } else if (path === "/experiences") {
+      setActiveTab("experiences");
+    } else if (path === "/services") {
+      setActiveTab("services");
+    }
+  }, [location.pathname]);
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === "homes") {
+      navigate("/");
+    } else if (tabId === "experiences") {
+      navigate("/experiences");
+    } else if (tabId === "services") {
+      navigate("/services");
+    }
+  };
 
   const mainTabs = [
     { id: "homes", label: "Homes", icon: Home },
@@ -37,7 +61,7 @@ const Navbar = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabClick(tab.id)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                     activeTab === tab.id
                       ? "bg-pink-100 text-pink-700 border border-pink-300"
@@ -124,7 +148,7 @@ const Navbar = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabClick(tab.id)}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-all ${
                     activeTab === tab.id
                       ? "bg-pink-100 text-pink-700 border border-pink-300"

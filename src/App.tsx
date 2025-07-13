@@ -14,6 +14,8 @@ import PropertyDetails from "./pages/PropertyDetails";
 import BookingFlow from "./pages/BookingFlow";
 import UserDashboard from "./pages/UserDashboard";
 import HostDashboard from "./pages/HostDashboard";
+import Experiences from "./pages/Experiences";
+import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/experiences" element={<Experiences />} />
+          <Route path="/services" element={<Services />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
