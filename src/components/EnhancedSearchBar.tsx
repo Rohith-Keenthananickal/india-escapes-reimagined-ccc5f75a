@@ -1,9 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Search, MapPin, Calendar, Users, Locate, Landmark, Mountain, TreePalm, Building2 } from 'lucide-react';
 
 const SUGGESTIONS = [
@@ -45,7 +41,6 @@ export default function EnhancedSearchBar() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState('1');
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
 
@@ -61,110 +56,105 @@ export default function EnhancedSearchBar() {
         position: "absolute",
         top: rect.bottom + window.scrollY,
         left: rect.left + window.scrollX,
-        width: rect.width,
+        width: '350px',
         zIndex: 1000,
+        
       });
     }
   }, [showSuggestions]);
 
   return (
-    <div className="w-full">
-      <div className="w-full max-w-1xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg border-0 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Destination */}
-            <div className="relative space-y-2">
-              <label className="text-sm font-medium text-gray-700">Where</label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  ref={inputRef}
-                  placeholder="Search destinations"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  onFocus={() => setShowSuggestions(true)}
-                  onBlur={handleBlur}
-                  className="w-full pl-10 border-gray-300 focus:border-pink-500 rounded-full"
-                />
-                {/* Portal-based dropdown rendering */}
-                {showSuggestions && createPortal(
-                  <div style={dropdownStyle} className="bg-white rounded-2xl shadow-2xl max-h-90 overflow-y-auto border border-gray-100">
-                    <div className="px-5 py-3 border-b text-xs text-gray-500 font-semibold">
-                      Suggested destinations
-                    </div>
-                    <ul>
-                      {SUGGESTIONS.map((s, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-center gap-3 px-5 py-3 cursor-pointer hover:bg-gray-100 transition"
-                          onMouseDown={() => setDestination(s.title)}
-                        >
-                          <span>{s.icon}</span>
-                          <div>
-                            <div className="font-medium text-gray-900">{s.title}</div>
-                            <div className="text-xs text-gray-500">{s.subtitle}</div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>,
-                  document.body
-                )}
-              </div>
-            </div>
-
-            {/* Check-in */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Check-in</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  className="pl-10 border-gray-300 focus:border-pink-500 rounded-full"
-                />
-              </div>
-            </div>
-
-            {/* Check-out */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Check-out</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  className="pl-10 border-gray-300 focus:border-pink-500 rounded-full"
-                />
-              </div>
-            </div>
-
-            {/* Guests */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Guests</label>
-              <div className="relative">
-                <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <select
-                  value={guests}
-                  onChange={(e) => setGuests(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:border-pink-500 focus:outline-none"
-                >
-                  <option value="1">1 Guest</option>
-                  <option value="2">2 Guests</option>
-                  <option value="3">3 Guests</option>
-                  <option value="4">4+ Guests</option>
-                </select>
-              </div>
-            </div>
+    <div className="w-full flex justify-center items-center mt-8 mb-8">
+      <div className="relative w-full max-w-4xl">
+        <div className="flex items-center bg-white rounded-full shadow-2xl px-2 py-2 md:py-0 md:px-2 border-0 min-h-[72px]">
+          {/* Where */}
+          <div className="flex flex-col justify-center px-6 py-2">
+            <span className="text-sm font-bold text-gray-900">Where</span>
+            <input
+              ref={inputRef}
+              placeholder="Search destinations"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={handleBlur}
+              className="bg-transparent outline-none text-base text-gray-700 placeholder-gray-500 font-normal mt-0.5"
+              style={{ minWidth: 0 }}
+            />
+            {/* Portal-based dropdown rendering */}
+            {showSuggestions && createPortal(
+              <div style={dropdownStyle} className="bg-white rounded-2xl shadow-2xl max-h-90 overflow-y-auto border border-gray-100">
+                <div className="px-5 py-3 border-b text-xs text-gray-500 font-semibold">
+                  Suggested destinations
+                </div>
+                <ul>
+                  {SUGGESTIONS.map((s, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-center gap-3 px-5 py-3 cursor-pointer hover:bg-gray-100 transition"
+                      onMouseDown={() => setDestination(s.title)}
+                    >
+                      <span>{s.icon}</span>
+                      <div>
+                        <div className="font-medium text-gray-900">{s.title}</div>
+                        <div className="text-xs text-gray-500">{s.subtitle}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>,
+              document.body
+            )}
           </div>
-          <div className="flex justify-center mt-6">
-            <Button className="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600">
-              <Search className="w-4 h-4 mr-2" />
-              Search Kerala Homestays
-            </Button>
+
+          {/* Divider */}
+          <div className="hidden md:block h-10 w-px bg-gray-200 mx-2" />
+
+          {/* Check-in */}
+          <div className="flex flex-col justify-center px-6 py-2">
+            <span className="text-sm font-bold text-gray-900">Check in</span>
+            <input
+              type="date"
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className="bg-transparent outline-none text-base text-gray-700 placeholder-gray-500 font-normal mt-0.5"
+              placeholder="Add dates"
+              style={{ minWidth: 0 }}
+            />
           </div>
+
+          {/* Divider */}
+          <div className="hidden md:block h-10 w-px bg-gray-200 mx-2" />
+
+          {/* Check-out */}
+          <div className="flex flex-col justify-center px-6 py-2">
+            <span className="text-sm font-bold text-gray-900">Check out</span>
+            <input
+              type="date"
+              value={checkOut}
+              onChange={(e) => setCheckOut(e.target.value)}
+              className="bg-transparent outline-none text-base text-gray-700 placeholder-gray-500 font-normal mt-0.5"
+              placeholder="Add dates"
+              style={{ minWidth: 0 }}
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="hidden md:block h-10 w-px bg-gray-200 mx-2" />
+
+          {/* Who */}
+          <div className="flex flex-col justify-center px-6 py-2">
+            <span className="text-sm font-bold text-gray-900">Who</span>
+            <span className="text-base text-gray-500 font-normal mt-0.5">Add guests</span>
+          </div>
+
+          {/* Floating Search Button */}
+          <button
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-pink-500 hover:bg-pink-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg border-4 border-white focus:outline-none transition"
+            style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}
+            aria-label="Search"
+          >
+            <Search className="w-6 h-6" />
+          </button>
         </div>
       </div>
     </div>

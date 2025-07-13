@@ -368,6 +368,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      <div className="w-full">
+            <EnhancedSearchBar />
+          </div>
 
       {/* Hero Section with Background Image */}
       <div className="relative min-h-[600px] bg-cover bg-center bg-no-repeat overflow-hidden">
@@ -402,9 +405,7 @@ const Index = () => {
           </div>
 
           {/* Enhanced Search Bar */}
-          <div className="w-full max-w-5xl">
-            <EnhancedSearchBar />
-          </div>
+          
         </div>
       </div>
 
