@@ -27,7 +27,6 @@ import Navbar from "@/components/Navbar";
 const Services = () => {
   const [likedServices, setLikedServices] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("popularity");
 
   const toggleLike = (id: number) => {
@@ -178,32 +177,44 @@ const Services = () => {
     },
   ];
 
-  // Filter services
+  // Filter services by search only
   const filteredServices = services.filter((service) => {
     const matchesSearch = service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          service.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          service.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || service.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
-  // Sort services
-  const sortedServices = [...filteredServices].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.startingPrice - b.startingPrice;
-      case 'price-high':
-        return b.startingPrice - a.startingPrice;
-      case 'rating':
-        return b.rating - a.rating;
-      case 'response':
-        const responseTimeA = parseFloat(a.responseTime);
-        const responseTimeB = parseFloat(b.responseTime);
-        return responseTimeA - responseTimeB;
-      default: // popularity
-        return b.reviews - a.reviews;
+  // Group services by category
+  const groupedServices = categories.slice(1).reduce((groups, category) => {
+    const categoryServices = filteredServices.filter(service => service.category === category.id);
+    
+    // Sort services within each category
+    const sortedCategoryServices = [...categoryServices].sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return a.startingPrice - b.startingPrice;
+        case 'price-high':
+          return b.startingPrice - a.startingPrice;
+        case 'rating':
+          return b.rating - a.rating;
+        case 'response':
+          const responseTimeA = parseFloat(a.responseTime);
+          const responseTimeB = parseFloat(b.responseTime);
+          return responseTimeA - responseTimeB;
+        default: // popularity
+          return b.reviews - a.reviews;
+      }
+    });
+
+    if (sortedCategoryServices.length > 0) {
+      groups[category.id] = {
+        ...category,
+        services: sortedCategoryServices
+      };
     }
-  });
+    return groups;
+  }, {} as Record<string, any>);
 
   const getAvailabilityColor = (availability: string) => {
     if (availability === "Available") return "bg-green-100 text-green-800";
@@ -229,7 +240,7 @@ const Services = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Filters Section */}
+        {/* Filters Section - Remove category filter since we show all categories */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -240,19 +251,6 @@ const Services = () => {
               className="pl-10"
             />
           </div>
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full md:w-48">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full md:w-48">
               <SelectValue placeholder="Sort by" />
@@ -267,132 +265,129 @@ const Services = () => {
           </Select>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {categories.map((category) => {
-            const IconComponent = category.icon;
+        {/* Service Categories as Rows */}
+        <div className="space-y-12">
+          {Object.values(groupedServices).map((group: any) => {
+            const IconComponent = group.icon;
             return (
-              <Button
-                key={category.id}
-                variant={selectedCategory === category.id ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category.id)}
-                className="flex items-center gap-2"
-              >
-                <IconComponent className="h-4 w-4" />
-                {category.label}
-              </Button>
+              <div key={group.id} className="space-y-6">
+                {/* Category Header */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+                    <IconComponent className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground">{group.label}</h2>
+                    <p className="text-muted-foreground">{group.services.length} service{group.services.length !== 1 ? 's' : ''} available</p>
+                  </div>
+                </div>
+
+                {/* Horizontal Scrolling Services */}
+                <div className="relative">
+                  <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+                    {group.services.map((service: any) => (
+                      <Card key={service.id} className="flex-none w-80 group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer overflow-hidden snap-start">
+                        <div className="relative">
+                          <img
+                            src={service.image}
+                            alt={service.title}
+                            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          {service.isVerified && (
+                            <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground flex items-center gap-1">
+                              <ShieldCheck className="h-3 w-3" />
+                              Verified
+                            </Badge>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-3 right-3 h-8 w-8 bg-background/80 hover:bg-background"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleLike(service.id);
+                            }}
+                          >
+                            <Heart
+                              className={`h-4 w-4 ${
+                                likedServices.includes(service.id)
+                                  ? "fill-red-500 text-red-500"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          </Button>
+                        </div>
+
+                        <CardContent className="p-5">
+                          <div className="space-y-3">
+                            <div>
+                              <h3 className="font-semibold text-foreground line-clamp-2 text-lg">
+                                {service.title}
+                              </h3>
+                              <p className="text-sm text-primary font-medium">
+                                {service.provider}
+                              </p>
+                              <div className="flex items-center text-sm text-muted-foreground mt-1">
+                                <MapPin className="h-3 w-3 mr-1" />
+                                {service.location}
+                              </div>
+                            </div>
+
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {service.description}
+                            </p>
+
+                            <div className="flex items-center justify-between text-xs">
+                              <Badge variant="outline" className={getAvailabilityColor(service.availability)}>
+                                {service.availability}
+                              </Badge>
+                              <div className="flex items-center text-muted-foreground">
+                                <Clock className="h-3 w-3 mr-1" />
+                                Responds in {service.responseTime}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+                                <span className="text-sm font-medium">{service.rating}</span>
+                                <span className="text-xs text-muted-foreground ml-1">
+                                  ({service.reviews})
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-lg font-bold text-foreground">
+                                  ₹{service.startingPrice.toLocaleString()}
+                                </span>
+                                <p className="text-xs text-muted-foreground">starting from</p>
+                              </div>
+                            </div>
+
+                            <div className="pt-2 border-t">
+                              <p className="text-xs text-muted-foreground">
+                                {service.experience} experience
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
 
-        {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-muted-foreground">
-            {sortedServices.length} service{sortedServices.length !== 1 ? 's' : ''} found
-          </p>
-        </div>
-
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {sortedServices.map((service) => (
-            <Card key={service.id} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
-              <div className="relative">
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                {service.isVerified && (
-                  <Badge className="absolute top-3 left-3 bg-blue-600 text-white flex items-center gap-1">
-                    <ShieldCheck className="h-3 w-3" />
-                    Verified
-                  </Badge>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-3 right-3 h-8 w-8 bg-background/80 hover:bg-background"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLike(service.id);
-                  }}
-                >
-                  <Heart
-                    className={`h-4 w-4 ${
-                      likedServices.includes(service.id)
-                        ? "fill-red-500 text-red-500"
-                        : "text-muted-foreground"
-                    }`}
-                  />
-                </Button>
-              </div>
-
-              <CardContent className="p-4">
-                <div className="space-y-3">
-                  <div>
-                    <h3 className="font-semibold text-foreground line-clamp-2">
-                      {service.title}
-                    </h3>
-                    <p className="text-sm text-primary font-medium">
-                      {service.provider}
-                    </p>
-                    <div className="flex items-center text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-3 w-3 mr-1" />
-                      {service.location}
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {service.description}
-                  </p>
-
-                  <div className="flex items-center justify-between text-xs">
-                    <Badge variant="outline" className={getAvailabilityColor(service.availability)}>
-                      {service.availability}
-                    </Badge>
-                    <div className="flex items-center text-muted-foreground">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Responds in {service.responseTime}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
-                      <span className="text-sm font-medium">{service.rating}</span>
-                      <span className="text-xs text-muted-foreground ml-1">
-                        ({service.reviews})
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-lg font-bold text-foreground">
-                        ₹{service.startingPrice.toLocaleString()}
-                      </span>
-                      <p className="text-xs text-muted-foreground">starting from</p>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground">
-                      {service.experience} experience
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
         {/* Empty State */}
-        {sortedServices.length === 0 && (
+        {Object.keys(groupedServices).length === 0 && (
           <div className="text-center py-12">
             <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">
               No services found
             </h3>
             <p className="text-muted-foreground">
-              Try adjusting your search or filters to find more services.
+              Try adjusting your search to find more services.
             </p>
           </div>
         )}
