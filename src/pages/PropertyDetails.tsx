@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import PropertyMap from "@/components/PropertyMap";
+import NearbyLocations from "@/components/NearbyLocations";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,30 +32,32 @@ import {
   Mountain,
   TreePine,
   Flame,
+  Map,
+  Navigation,
+  ShoppingCart,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { useCart } from "@/hooks/use-cart";
 
-const PropertyDetails = () => {
+interface PropertyDetailsProps {
+  latitude?: number;
+  longitude?: number;
+}
+
+const PropertyDetails = ({
+  latitude = 30.4599,
+  longitude = 78.0648,
+}: PropertyDetailsProps) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
   const [checkIn, setCheckIn] = useState<Date | undefined>();
   const [checkOut, setCheckOut] = useState<Date | undefined>();
   const [guests, setGuests] = useState(2);
+  const [rooms, setRooms] = useState(1);
   const [advancedView, setAdvancedView] = useState(false);
-
-  const mapContainerStyle = {
-    width: "100%",
-    height: "100%",
-  };
-  const mussoorieCoords = { lat: 30.4599, lng: 78.0648 };
-
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "",
-  });
+  const { addHotel } = useCart();
 
   // Mock property data
   const property = {
@@ -151,6 +155,37 @@ const PropertyDetails = () => {
         guests,
         total: calculateTotal(),
       },
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (!checkIn || !checkOut) {
+      toast({
+        title: "Select dates",
+        description: "Please select check-in and check-out dates.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const hotelData = {
+      id: id || "1",
+      title: property.title,
+      location: property.location,
+      price: property.price,
+      rating: property.rating,
+      image: property.images[0],
+      checkIn,
+      checkOut,
+      guests,
+      rooms,
+      totalAmount: calculateTotal(),
+    };
+
+    addHotel(hotelData);
+    toast({
+      title: "Added to cart!",
+      description: `${property.title} has been added to your cart.`,
     });
   };
 
@@ -460,6 +495,29 @@ const PropertyDetails = () => {
                   </div>
                 </div>
 
+                {/* Rooms */}
+                <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <span className="font-medium">Rooms</span>
+                  <div className="flex items-center space-x-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setRooms(Math.max(1, rooms - 1))}
+                      disabled={rooms <= 1}
+                    >
+                      -
+                    </Button>
+                    <span>{rooms}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setRooms(rooms + 1)}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+
                 {/* Price Breakdown */}
                 {checkIn && checkOut && (
                   <div className="space-y-2 pt-4 border-t">
@@ -518,13 +576,24 @@ const PropertyDetails = () => {
                   </div>
                 )}
 
-                <Button
-                  onClick={handleBookNow}
-                  className="w-full bg-pink-500 hover:bg-pink-600"
-                  size="lg"
-                >
-                  Reserve
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    onClick={handleAddToCart}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    size="lg"
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Add to Cart
+                  </Button>
+
+                  <Button
+                    onClick={handleBookNow}
+                    className="w-full bg-pink-500 hover:bg-pink-600"
+                    size="lg"
+                  >
+                    Reserve
+                  </Button>
+                </div>
 
                 <p className="text-center text-sm text-gray-600">
                   You won't be charged yet
@@ -580,26 +649,213 @@ const PropertyDetails = () => {
 
         {/* Location */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">Where you'll be</h2>
-          <div className="h-96 rounded-xl overflow-hidden">
-            {isLoaded ? (
-              <GoogleMap
-                mapContainerStyle={mapContainerStyle}
-                center={mussoorieCoords}
-                zoom={13}
-                options={{
-                  disableDefaultUI: true,
-                  clickableIcons: false,
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold">Where you'll be</h2>
+              <p className="text-gray-600 mt-1">
+                Explore the area around your accommodation
+              </p>
+            </div>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-2"
+                onClick={() => {
+                  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    property.location
+                  )}`;
+                  window.open(url, "_blank");
                 }}
               >
-                <Marker position={mussoorieCoords} />
-              </GoogleMap>
-            ) : (
-              <div className="h-full w-full flex items-center justify-center bg-gray-200">
-                <span className="text-gray-600">Loading map...</span>
-              </div>
-            )}
+                <Map className="w-4 h-4" />
+                <span>View on Maps</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-2"
+                onClick={() => {
+                  const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Navigation className="w-4 h-4" />
+                <span>Get Directions</span>
+              </Button>
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <div className="h-96 rounded-xl overflow-hidden border shadow-lg">
+                <PropertyMap
+                  latitude={latitude}
+                  longitude={longitude}
+                  propertyName={property.title}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <MapPin className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-bold text-lg text-blue-900">
+                    Location Details
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-900">
+                        Address
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        {property.location}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-900">
+                        Coordinates
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        {latitude.toFixed(4)}, {longitude.toFixed(4)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-900">
+                        Altitude
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        ~2,000m above sea level
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-900">
+                        Region
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        Garhwal Himalayas, Uttarakhand
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <Mountain className="w-6 h-6 text-green-600" />
+                  </div>
+                  <h3 className="font-bold text-lg text-green-900">
+                    Quick Facts
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-900">
+                      Distance from Mall Road:
+                    </span>
+                    <span className="text-sm font-semibold text-green-700">
+                      0.8 km
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-900">
+                      Nearest Airport:
+                    </span>
+                    <span className="text-sm font-semibold text-green-700">
+                      Jolly Grant (35 km)
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-900">
+                      Nearest Railway:
+                    </span>
+                    <span className="text-sm font-semibold text-green-700">
+                      Dehradun (35 km)
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-900">
+                      Best Time to Visit:
+                    </span>
+                    <span className="text-sm font-semibold text-green-700">
+                      Mar-Jun, Sep-Nov
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-900">
+                      Weather:
+                    </span>
+                    <span className="text-sm font-semibold text-green-700">
+                      Cool & Pleasant
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-purple-50 to-violet-50">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <TreePine className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <h3 className="font-bold text-lg text-purple-900">
+                    Local Highlights
+                  </h3>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-sm text-purple-700">
+                      Scenic mountain views
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-sm text-purple-700">
+                      Walking distance to attractions
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-sm text-purple-700">
+                      Local markets & restaurants
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-sm text-purple-700">
+                      Adventure activities nearby
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* Nearby Places */}
+        <div className="mt-12">
+          <NearbyLocations
+            latitude={latitude}
+            longitude={longitude}
+            propertyName={property.title}
+            showMap={false}
+          />
         </div>
 
         {/* Host Info */}

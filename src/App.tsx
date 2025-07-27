@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import UserDashboard from "./pages/UserDashboard";
 import HostDashboard from "./pages/HostDashboard";
 import Experiences from "./pages/Experiences";
 import Services from "./pages/Services";
+import LocationDemo from "./pages/LocationDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +39,7 @@ const App = () => (
           <Route path="/booking/:id" element={<BookingFlow />} />
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/host" element={<HostDashboard />} />
+          <Route path="/location-demo" element={<LocationDemo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

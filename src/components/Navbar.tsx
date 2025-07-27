@@ -1,11 +1,26 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Search, Menu, Globe, User, Heart, Home, Compass, Wrench } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Search,
+  Menu,
+  Globe,
+  User,
+  Heart,
+  Home,
+  Compass,
+  Wrench,
+} from "lucide-react";
+import Cart from "./Cart";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,7 +66,9 @@ const Navbar = () => {
             <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">VR</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 hidden sm:block">Hevan Connect Travel</span>
+            <span className="text-xl font-bold text-gray-900 hidden sm:block">
+              Hevan Connect Travel
+            </span>
           </Link>
 
           {/* Main Tabs - Desktop */}
@@ -82,10 +99,15 @@ const Navbar = () => {
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" className="hidden sm:flex text-sm font-medium">
+            <Button
+              variant="ghost"
+              className="hidden sm:flex text-sm font-medium"
+            >
               Become a host
             </Button>
-            
+
+            <Cart />
+
             <Button variant="ghost" size="icon">
               <Globe className="w-4 h-4" />
             </Button>
@@ -93,7 +115,10 @@ const Navbar = () => {
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2 border rounded-full px-3 py-2">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2 border rounded-full px-3 py-2"
+                  >
                     <Menu className="w-4 h-4" />
                     <Avatar className="w-6 h-6">
                       <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" />
@@ -102,10 +127,10 @@ const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
                     <Heart className="w-4 h-4 mr-2" />
                     Wishlists
                   </DropdownMenuItem>
@@ -119,21 +144,22 @@ const Navbar = () => {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2 border rounded-full px-3 py-2">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2 border rounded-full px-3 py-2"
+                  >
                     <Menu className="w-4 h-4" />
                     <User className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate('/login')}>
+                  <DropdownMenuItem onClick={() => navigate("/login")}>
                     Login
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/signup')}>
+                  <DropdownMenuItem onClick={() => navigate("/signup")}>
                     Sign up
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Become a host
-                  </DropdownMenuItem>
+                  <DropdownMenuItem>Become a host</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
