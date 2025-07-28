@@ -16,6 +16,7 @@ import HostDashboard from "./pages/HostDashboard";
 import Experiences from "./pages/Experiences";
 import Services from "./pages/Services";
 import LocationDemo from "./pages/LocationDemo";
+import CartPage from "./pages/CartPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/host" element={<HostDashboard />} />
           <Route path="/location-demo" element={<LocationDemo />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

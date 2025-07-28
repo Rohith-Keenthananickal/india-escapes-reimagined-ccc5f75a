@@ -150,6 +150,21 @@ const LocationCard = ({
                 </div>
               )}
             </div>
+            {showAddToCart && (
+              <div className="mt-3">
+                <Button
+                  size="sm"
+                  className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddToCart();
+                  }}
+                >
+                  <ShoppingCart className="w-3 h-3 mr-1" />
+                  Add to Cart
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </Card>
