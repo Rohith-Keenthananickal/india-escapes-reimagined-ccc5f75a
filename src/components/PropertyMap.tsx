@@ -63,7 +63,7 @@ const PropertyMap = ({
   const [selectedLocation, setSelectedLocation] = useState<CartItem | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [mapType, setMapType] = useState<google.maps.MapTypeId>(google.maps.MapTypeId.ROADMAP);
+  const [mapType, setMapType] = useState<google.maps.MapTypeId | null>(null);
   const [routeSegments, setRouteSegments] = useState<RouteSegment[]>([]);
   const [showRoutes, setShowRoutes] = useState(true);
   const [totalTripDistance, setTotalTripDistance] = useState(0);
@@ -82,6 +82,13 @@ const PropertyMap = ({
     googleMapsApiKey: googleMapsApiKey || "",
     libraries: mapLibraries,
   });
+
+  // Initialize mapType when Google Maps API is loaded
+  useEffect(() => {
+    if (isLoaded && window.google) {
+      setMapType(window.google.maps.MapTypeId.ROADMAP);
+    }
+  }, [isLoaded]);
 
   const calculateDistance = (
     lat1: number,
@@ -204,7 +211,7 @@ const PropertyMap = ({
 
   // Create custom marker for property with image
   const createPropertyMarker = (map: google.maps.Map) => {
-    if (!propertyCoords.lat || !propertyCoords.lng) return null;
+    if (!propertyCoords.lat || !propertyCoords.lng || !window.google) return null;
 
     // Create a div element for the marker
     const markerElement = document.createElement("div");
@@ -261,7 +268,7 @@ const PropertyMap = ({
     };
 
     // Create the overlay
-    const overlay = new google.maps.OverlayView();
+    const overlay = new window.google.maps.OverlayView();
 
     overlay.onAdd = function () {
       const panes = overlay.getPanes();
@@ -272,7 +279,7 @@ const PropertyMap = ({
       const projection = overlay.getProjection();
       if (projection) {
         const point = projection.fromLatLngToDivPixel(
-          new google.maps.LatLng(propertyCoords)
+          new window.google.maps.LatLng(propertyCoords)
         );
 
         if (point) {
@@ -294,7 +301,7 @@ const PropertyMap = ({
 
   // Create custom marker for cart items
   const createCartItemMarker = (map: google.maps.Map, item: CartItem, index: number) => {
-    if (!item.position) return null;
+    if (!item.position || !window.google) return null;
 
     // Create a div element for the marker
     const markerElement = document.createElement("div");
@@ -370,7 +377,7 @@ const PropertyMap = ({
     };
 
     // Create the overlay
-    const overlay = new google.maps.OverlayView();
+    const overlay = new window.google.maps.OverlayView();
 
     overlay.onAdd = function () {
       const panes = overlay.getPanes();
@@ -381,7 +388,7 @@ const PropertyMap = ({
       const projection = overlay.getProjection();
       if (projection) {
         const point = projection.fromLatLngToDivPixel(
-          new google.maps.LatLng(item.position!)
+          new window.google.maps.LatLng(item.position!)
         );
 
         if (point) {
@@ -422,9 +429,9 @@ const PropertyMap = ({
   }, [cartItems, showCartItems, useOptimalRoute]);
 
   useEffect(() => {
-    if (map && isLoaded) {
+    if (map && isLoaded && window.google) {
       const timer = setTimeout(() => {
-        google.maps.event.trigger(map, "resize");
+        window.google.maps.event.trigger(map, "resize");
       }, 100);
       return () => clearTimeout(timer);
     }
@@ -433,16 +440,18 @@ const PropertyMap = ({
   const handleFullscreenToggle = () => {
     setIsFullscreen(!isFullscreen);
     setTimeout(() => {
-      if (map) {
-        google.maps.event.trigger(map, "resize");
+      if (map && window.google) {
+        window.google.maps.event.trigger(map, "resize");
       }
     }, 100);
   };
 
   const handleMapTypeToggle = () => {
-    const newMapType = mapType === google.maps.MapTypeId.ROADMAP 
-      ? google.maps.MapTypeId.SATELLITE 
-      : google.maps.MapTypeId.ROADMAP;
+    if (!isLoaded || !window.google || !mapType) return;
+    
+    const newMapType = mapType === window.google.maps.MapTypeId.ROADMAP 
+      ? window.google.maps.MapTypeId.SATELLITE 
+      : window.google.maps.MapTypeId.ROADMAP;
     setMapType(newMapType);
     if (map) {
       map.setMapTypeId(newMapType);
@@ -470,8 +479,8 @@ const PropertyMap = ({
   };
 
   const handleFitBounds = () => {
-    if (map && cartItems.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
+    if (map && cartItems.length > 0 && window.google) {
+      const bounds = new window.google.maps.LatLngBounds();
       cartItems.forEach((item) => {
         if (item.position) {
           bounds.extend(item.position);
@@ -555,7 +564,7 @@ const PropertyMap = ({
           size="sm"
           onClick={handleMapTypeToggle}
           className="bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white/95"
-          title={mapType === google.maps.MapTypeId.ROADMAP ? "Switch to Satellite" : "Switch to Map"}
+          title={mapType === (isLoaded && window.google ? window.google.maps.MapTypeId.ROADMAP : null) ? "Switch to Satellite" : "Switch to Map"}
         >
           <Layers className="w-4 h-4" />
         </Button>
@@ -589,7 +598,7 @@ const PropertyMap = ({
         center={propertyCoords}
         zoom={14}
         onLoad={setMap}
-        mapTypeId={mapType}
+        mapTypeId={mapType || (isLoaded && window.google ? window.google.maps.MapTypeId.ROADMAP : undefined)}
         options={{
           disableDefaultUI: true,
           clickableIcons: false,
@@ -598,7 +607,7 @@ const PropertyMap = ({
           streetViewControl: false,
           fullscreenControl: false,
           // Show labels in satellite mode
-          styles: mapType === google.maps.MapTypeId.SATELLITE ? [] : undefined,
+          styles: mapType === (isLoaded && window.google ? window.google.maps.MapTypeId.SATELLITE : null) ? [] : undefined,
         }}
       >
         {/* Show route lines between cart items */}
@@ -623,7 +632,7 @@ const PropertyMap = ({
             position={selectedLocation.position}
             onCloseClick={() => setSelectedLocation(null)}
             options={{
-              pixelOffset: new google.maps.Size(0, -20),
+              pixelOffset: window.google ? new window.google.maps.Size(0, -20) : undefined,
               maxWidth: 300,
               disableAutoPan: false,
             }}
