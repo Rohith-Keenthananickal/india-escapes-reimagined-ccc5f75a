@@ -57,7 +57,10 @@ const PropertyDetails = ({
   const [guests, setGuests] = useState(2);
   const [rooms, setRooms] = useState(1);
   const [advancedView, setAdvancedView] = useState(false);
-  const { addHotel } = useCart();
+  const { addHotel, hotels } = useCart();
+
+  // Check if this property is already in cart
+  const isInCart = hotels.some((hotel) => hotel.id === (id || "1"));
 
   // Mock property data
   const property = {
@@ -187,6 +190,10 @@ const PropertyDetails = ({
       title: "Added to cart!",
       description: `${property.title} has been added to your cart.`,
     });
+  };
+
+  const handleViewCart = () => {
+    navigate("/cart");
   };
 
   return (
@@ -577,14 +584,25 @@ const PropertyDetails = ({
                 )}
 
                 <div className="space-y-2">
-                  <Button
-                    onClick={handleAddToCart}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                    size="lg"
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Add to Cart
-                  </Button>
+                  {isInCart ? (
+                    <Button
+                      onClick={handleViewCart}
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      size="lg"
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      View Cart
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleAddToCart}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      size="lg"
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Add to Cart
+                    </Button>
+                  )}
 
                   <Button
                     onClick={handleBookNow}
@@ -698,7 +716,7 @@ const PropertyDetails = ({
             </div>
 
             <div className="space-y-4">
-              <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+              {/* <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="p-2 bg-blue-100 rounded-lg">
                     <MapPin className="w-6 h-6 text-blue-600" />
@@ -753,7 +771,7 @@ const PropertyDetails = ({
                     </div>
                   </div>
                 </div>
-              </Card>
+              </Card> */}
 
               <Card className="p-6 border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
                 <div className="flex items-center space-x-3 mb-4">

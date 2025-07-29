@@ -10,6 +10,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import EmailVerification from "./pages/EmailVerification";
 import PropertyListing from "./pages/PropertyListing";
 import PropertyDetails from "./pages/PropertyDetails";
+import LocationDetails from "./pages/LocationDetails";
 import BookingFlow from "./pages/BookingFlow";
 import UserDashboard from "./pages/UserDashboard";
 import HostDashboard from "./pages/HostDashboard";
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/email-verification" element={<EmailVerification />} />
           <Route path="/properties" element={<PropertyListing />} />
           <Route path="/property/:id" element={<PropertyDetails />} />
+          <Route path="/location/:id" element={<LocationDetails />} />
           <Route path="/booking/:id" element={<BookingFlow />} />
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/host" element={<HostDashboard />} />

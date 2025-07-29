@@ -60,7 +60,9 @@ const PropertyMap = ({
   cartItems = [],
   showCartItems = false,
 }: PropertyMapProps) => {
-  const [selectedLocation, setSelectedLocation] = useState<CartItem | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<CartItem | null>(
+    null
+  );
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mapType, setMapType] = useState<google.maps.MapTypeId | null>(null);
@@ -211,7 +213,8 @@ const PropertyMap = ({
 
   // Create custom marker for property with image
   const createPropertyMarker = (map: google.maps.Map) => {
-    if (!propertyCoords.lat || !propertyCoords.lng || !window.google) return null;
+    if (!propertyCoords.lat || !propertyCoords.lng || !window.google)
+      return null;
 
     // Create a div element for the marker
     const markerElement = document.createElement("div");
@@ -231,7 +234,9 @@ const PropertyMap = ({
     imageElement.style.backgroundColor = "#9C27B0"; // Default background color if image fails
 
     const img = document.createElement("img");
-    img.src = propertyImage || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop&crop=center";
+    img.src =
+      propertyImage ||
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop&crop=center";
     img.style.width = "100%";
     img.style.height = "100%";
     img.style.objectFit = "cover";
@@ -253,7 +258,9 @@ const PropertyMap = ({
 
     // Add click handler to redirect to Google Maps
     markerElement.onclick = () => {
-      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(propertyName)}@${propertyCoords.lat},${propertyCoords.lng}`;
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        propertyName
+      )}@${propertyCoords.lat},${propertyCoords.lng}`;
       window.open(url, "_blank");
     };
 
@@ -300,7 +307,11 @@ const PropertyMap = ({
   };
 
   // Create custom marker for cart items
-  const createCartItemMarker = (map: google.maps.Map, item: CartItem, index: number) => {
+  const createCartItemMarker = (
+    map: google.maps.Map,
+    item: CartItem,
+    index: number
+  ) => {
     if (!item.position || !window.google) return null;
 
     // Create a div element for the marker
@@ -340,7 +351,9 @@ const PropertyMap = ({
     imageElement.style.backgroundColor = getCartItemColor(item);
 
     const img = document.createElement("img");
-    img.src = item.imageUrl || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop&crop=center";
+    img.src =
+      item.imageUrl ||
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop&crop=center";
     img.style.width = "100%";
     img.style.height = "100%";
     img.style.objectFit = "cover";
@@ -354,7 +367,9 @@ const PropertyMap = ({
       imageElement.style.color = "white";
       imageElement.style.fontWeight = "bold";
       imageElement.style.fontSize = "14px";
-      imageElement.innerText = (item.title || item.name || "?").charAt(0).toUpperCase();
+      imageElement.innerText = (item.title || item.name || "?")
+        .charAt(0)
+        .toUpperCase();
     };
 
     imageElement.appendChild(img);
@@ -420,7 +435,16 @@ const PropertyMap = ({
         });
       }
     }
-  }, [isLoaded, map, latitude, longitude, propertyName, propertyImage, showCartItems, cartItems]);
+  }, [
+    isLoaded,
+    map,
+    latitude,
+    longitude,
+    propertyName,
+    propertyImage,
+    showCartItems,
+    cartItems,
+  ]);
 
   useEffect(() => {
     if (showCartItems && cartItems.length > 0) {
@@ -448,10 +472,11 @@ const PropertyMap = ({
 
   const handleMapTypeToggle = () => {
     if (!isLoaded || !window.google || !mapType) return;
-    
-    const newMapType = mapType === window.google.maps.MapTypeId.ROADMAP 
-      ? window.google.maps.MapTypeId.SATELLITE 
-      : window.google.maps.MapTypeId.ROADMAP;
+
+    const newMapType =
+      mapType === window.google.maps.MapTypeId.ROADMAP
+        ? window.google.maps.MapTypeId.SATELLITE
+        : window.google.maps.MapTypeId.ROADMAP;
     setMapType(newMapType);
     if (map) {
       map.setMapTypeId(newMapType);
@@ -468,13 +493,17 @@ const PropertyMap = ({
   const handleViewOnGoogleMaps = (location: CartItem) => {
     if (location.position) {
       const searchQuery = location.title || location.name || "location";
-      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}@${location.position.lat},${location.position.lng}`;
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        searchQuery
+      )}@${location.position.lat},${location.position.lng}`;
       window.open(url, "_blank");
     }
   };
 
   const handlePropertyViewOnGoogleMaps = () => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(propertyName)}@${propertyCoords.lat},${propertyCoords.lng}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      propertyName
+    )}@${propertyCoords.lat},${propertyCoords.lng}`;
     window.open(url, "_blank");
   };
 
@@ -558,13 +587,20 @@ const PropertyMap = ({
             <Maximize2 className="w-4 h-4" />
           )}
         </Button>
-        
+
         <Button
           variant="secondary"
           size="sm"
           onClick={handleMapTypeToggle}
           className="bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white/95"
-          title={mapType === (isLoaded && window.google ? window.google.maps.MapTypeId.ROADMAP : null) ? "Switch to Satellite" : "Switch to Map"}
+          title={
+            mapType ===
+            (isLoaded && window.google
+              ? window.google.maps.MapTypeId.ROADMAP
+              : null)
+              ? "Switch to Satellite"
+              : "Switch to Map"
+          }
         >
           <Layers className="w-4 h-4" />
         </Button>
@@ -586,9 +622,7 @@ const PropertyMap = ({
         <div className="text-sm font-medium text-gray-700 flex items-center gap-2">
           <MapPin className="w-4 h-4 text-blue-500" />
           <span>
-            {showCartItems
-              ? `${cartItems.length} trip items`
-              : propertyName}
+            {showCartItems ? `${cartItems.length} trip items` : propertyName}
           </span>
         </div>
       </div>
@@ -598,7 +632,12 @@ const PropertyMap = ({
         center={propertyCoords}
         zoom={14}
         onLoad={setMap}
-        mapTypeId={mapType || (isLoaded && window.google ? window.google.maps.MapTypeId.ROADMAP : undefined)}
+        mapTypeId={
+          mapType ||
+          (isLoaded && window.google
+            ? window.google.maps.MapTypeId.ROADMAP
+            : undefined)
+        }
         options={{
           disableDefaultUI: true,
           clickableIcons: false,
@@ -607,7 +646,13 @@ const PropertyMap = ({
           streetViewControl: false,
           fullscreenControl: false,
           // Show labels in satellite mode
-          styles: mapType === (isLoaded && window.google ? window.google.maps.MapTypeId.SATELLITE : null) ? [] : undefined,
+          styles:
+            mapType ===
+            (isLoaded && window.google
+              ? window.google.maps.MapTypeId.SATELLITE
+              : null)
+              ? []
+              : undefined,
         }}
       >
         {/* Show route lines between cart items */}
@@ -632,7 +677,9 @@ const PropertyMap = ({
             position={selectedLocation.position}
             onCloseClick={() => setSelectedLocation(null)}
             options={{
-              pixelOffset: window.google ? new window.google.maps.Size(0, -20) : undefined,
+              pixelOffset: window.google
+                ? new window.google.maps.Size(0, -20)
+                : undefined,
               maxWidth: 300,
               disableAutoPan: false,
             }}
@@ -717,7 +764,7 @@ const PropertyMap = ({
       )}
 
       {/* Trip summary when showing cart items */}
-      {showCartItems && cartItems.length > 0 && (
+      {/* {showCartItems && cartItems.length > 0 && (
         <div className="absolute bottom-4 right-4 z-10 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 max-w-xs">
           <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
             <ShoppingCart className="w-4 h-4" />
@@ -780,7 +827,7 @@ const PropertyMap = ({
             </div>
           )}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

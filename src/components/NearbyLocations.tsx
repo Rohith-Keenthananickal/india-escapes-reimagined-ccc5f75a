@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,6 +95,7 @@ const NearbyLocations = ({
   showMap = false,
   onLocationClick,
 }: NearbyLocationsProps) => {
+  const navigate = useNavigate();
   const [locations, setLocations] = useState<Location[]>([]);
   const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -443,16 +445,36 @@ const NearbyLocations = ({
     if (onLocationClick) {
       onLocationClick(location);
     } else {
-      if (location.placeId) {
-        const url = `https://www.google.com/maps/place/?q=place_id:${location.placeId}`;
-        window.open(url, "_blank");
-      } else {
-        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          location.name
-        )}`;
-        window.open(url, "_blank");
-      }
+      navigate(`/location/${location.id}`);
     }
+  };
+
+  const handleCardClick = (location: Location) => {
+    const serializableLocation = {
+      id: location.id,
+      name: location.name,
+      type: location.type,
+      category: location.category,
+      position: location.position,
+      rating: location.rating,
+      distance: location.distance,
+      description: location.description,
+      color: location.color,
+      placeId: location.placeId,
+      photos: location.photos,
+      phone: location.phone,
+      website: location.website,
+      address: location.address,
+      openingHours: location.openingHours,
+      priceLevel: location.priceLevel,
+      imageUrl: location.imageUrl,
+      isPopular: location.isPopular,
+      isTrending: location.isTrending,
+      tags: location.tags,
+    };
+    navigate(`/location/${location.id}`, {
+      state: { location: serializableLocation },
+    });
   };
 
   const handleDirections = (location: Location) => {
@@ -712,6 +734,7 @@ const NearbyLocations = ({
                       <Card
                         key={location.id}
                         className="group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden border-0 bg-white/95 backdrop-blur-sm"
+                        onClick={() => handleCardClick(location)}
                       >
                         <div className="relative">
                           <div className="h-32 relative overflow-hidden">
@@ -800,7 +823,7 @@ const NearbyLocations = ({
                           </div>
 
                           {location.tags && location.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-3">
+                            <div className="flex flex-wrap gap-1">
                               {location.tags.slice(0, 2).map((tag, index) => (
                                 <Badge
                                   key={index}
@@ -812,32 +835,6 @@ const NearbyLocations = ({
                               ))}
                             </div>
                           )}
-
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 text-xs border-2 hover:border-blue-500 hover:bg-blue-50 shadow-sm hover:shadow-md transition-shadow duration-200"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleLocationClick(location);
-                              }}
-                            >
-                              <ExternalLink className="w-3 h-3 mr-1" />
-                              View
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-xs border-2 hover:border-green-500 hover:bg-green-50 shadow-sm hover:shadow-md transition-shadow duration-200"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDirections(location);
-                              }}
-                            >
-                              <Navigation className="w-3 h-3" />
-                            </Button>
-                          </div>
                         </CardContent>
                       </Card>
                     ))}
@@ -849,7 +846,7 @@ const NearbyLocations = ({
                         key={location.id}
                         location={location}
                         variant="compact"
-                        onClick={() => handleLocationClick(location)}
+                        onClick={() => handleCardClick(location)}
                         showActions={false}
                         showAddToCart={true}
                       />
