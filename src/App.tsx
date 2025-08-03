@@ -19,6 +19,7 @@ import Services from "./pages/Services";
 import LocationDemo from "./pages/LocationDemo";
 import CartPage from "./pages/CartPage";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./lib/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -28,25 +29,27 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/experiences" element={<Experiences />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/email-verification" element={<EmailVerification />} />
-          <Route path="/properties" element={<PropertyListing />} />
-          <Route path="/property/:id" element={<PropertyDetails />} />
-          <Route path="/location/:id" element={<LocationDetails />} />
-          <Route path="/booking/:id" element={<BookingFlow />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/host" element={<HostDashboard />} />
-          <Route path="/location-demo" element={<LocationDemo />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+  <ScrollToTop /> {/* ✅ Move it here */}
+  <Routes>
+    <Route path="/" element={<Index />} />
+    <Route path="/experiences" element={<Experiences />} />
+    <Route path="/services" element={<Services />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/signup" element={<SignUp />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/email-verification" element={<EmailVerification />} />
+    <Route path="/properties" element={<PropertyListing />} />
+    <Route path="/property/:id" element={<PropertyDetails />} />
+    <Route path="/location/:id" element={<LocationDetails />} />
+    <Route path="/booking/:id" element={<BookingFlow />} />
+    <Route path="/dashboard" element={<UserDashboard />} />
+    <Route path="/host" element={<HostDashboard />} />
+    <Route path="/location-demo" element={<LocationDemo />} />
+    <Route path="/cart" element={<CartPage />} />
+    <Route path="*" element={<NotFound />} />
+  </Routes>
+</BrowserRouter>
+
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -14,7 +14,7 @@ export const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({ children }) 
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const { isLoaded: mapsLoaded, loadError: mapsLoadError } = useJsApiLoader({
-    id: 'google-maps-script',
+    id: 'google-map-script',
     googleMapsApiKey: googleMapsApiKey || '',
     libraries,
   });
