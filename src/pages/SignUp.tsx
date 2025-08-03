@@ -252,13 +252,7 @@ const SignUp = () => {
           </CardContent>
         </Card>
 
-        <div className="mt-8 text-center">
-          <img 
-            src="https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=300&h=150&fit=crop" 
-            alt="Tropical view" 
-            className="w-full h-32 object-cover rounded-xl opacity-80"
-          />
-        </div>
+       
       </div>
     </div>
   );

@@ -171,13 +171,7 @@ const Login = () => {
           </CardContent>
         </Card>
 
-        <div className="mt-8 text-center">
-          <img 
-            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=150&fit=crop" 
-            alt="Mountain view" 
-            className="w-full h-32 object-cover rounded-xl opacity-80"
-          />
-        </div>
+        
       </div>
     </div>
   );
