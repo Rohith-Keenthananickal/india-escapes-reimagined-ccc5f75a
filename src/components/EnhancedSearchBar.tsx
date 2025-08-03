@@ -10,10 +10,13 @@ import {
   Mountain,
   TreePalm,
   Building2,
+  Loader2,
 } from "lucide-react";
 import DateFilter from "@/components/ui/DateFilter";
 import GuestFilter from "@/components/ui/GuestFilter";
 import { format } from "date-fns";
+import { useGooglePlaces } from "@/hooks/use-google-places";
+import { GoogleMapsLoader } from "@/components/GoogleMapsLoader";
 
 const SUGGESTIONS = [
   {
@@ -63,6 +66,58 @@ export default function EnhancedSearchBar() {
   });
   const inputRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
+  const [selectedPlace, setSelectedPlace] = useState<{
+    place_id: string;
+    name: string;
+    formatted_address: string;
+    geometry: { location: { lat: number; lng: number } };
+  } | null>(null);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // Google Places hook
+  const { predictions, isLoading, error, getPlacePredictions, getPlaceDetails, clearPredictions } = useGooglePlaces();
+
+  // Handle destination input change with debounced search
+  const handleDestinationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDestination(value);
+    setSelectedPlace(null);
+
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Debounce the search
+    const timeout = setTimeout(() => {
+      if (value.trim().length >= 2) {
+        getPlacePredictions(value);
+        setShowSuggestions(true);
+      } else {
+        clearPredictions();
+        setShowSuggestions(false);
+      }
+    }, 300);
+
+    setSearchTimeout(timeout);
+  };
+
+  // Handle place selection
+  const handlePlaceSelect = async (prediction: {
+    place_id: string;
+    description: string;
+    structured_formatting: { main_text: string; secondary_text: string };
+  }) => {
+    const placeDetails = await getPlaceDetails(prediction.place_id);
+    if (placeDetails) {
+      setSelectedPlace(placeDetails);
+      setDestination(prediction.description);
+      setShowSuggestions(false);
+      clearPredictions();
+      
+
+    }
+  };
 
   // Hide dropdown on blur, but allow click selection
   const handleBlur = (e: React.FocusEvent) => {
@@ -128,23 +183,45 @@ export default function EnhancedSearchBar() {
     }
   }, [showSuggestions]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
+
   return (
     <div className="w-full flex justify-center items-center mt-8 mb-8">
-      <div className="relative w-full max-w-4xl">
-        <div className="flex items-center bg-white rounded-full shadow-2xl px-2 py-2 md:py-0 md:px-2 border-0 min-h-[72px]">
-          {/* Where */}
-          <div className="flex flex-col justify-center px-6 py-2">
-            <span className="text-sm font-bold text-gray-900">Where</span>
-            <input
-              ref={inputRef}
-              placeholder="Search destinations"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={handleBlur}
-              className="bg-transparent outline-none text-base text-gray-700 placeholder-gray-500 font-normal mt-0.5"
-              style={{ minWidth: 0 }}
-            />
+      <GoogleMapsLoader>
+        <div className="relative w-full max-w-4xl">
+                      <div className="flex items-center bg-white rounded-full shadow-2xl px-2 py-2 md:py-0 md:px-2 border-0 min-h-[72px]">
+              {/* Where */}
+              <div className="flex flex-col justify-center px-6 py-2">
+              <span className="text-sm font-bold text-gray-900">Where</span>
+              <input
+                ref={inputRef}
+                placeholder="Search destinations"
+                value={destination}
+                onChange={handleDestinationChange}
+                onFocus={() => {
+                  if (destination.trim().length >= 2) {
+                    setShowSuggestions(true);
+                  }
+                }}
+                onBlur={handleBlur}
+                className="bg-transparent outline-none text-base text-gray-700 placeholder-gray-500 font-normal mt-0.5"
+                style={{ minWidth: 0 }}
+              />
+              {selectedPlace && (
+                <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>
+                    {selectedPlace.geometry.location.lat.toFixed(4)}, {selectedPlace.geometry.location.lng.toFixed(4)}
+                  </span>
+                </div>
+              )}
             {/* Portal-based dropdown rendering */}
             {showSuggestions &&
               createPortal(
@@ -153,26 +230,65 @@ export default function EnhancedSearchBar() {
                   className="bg-white rounded-2xl shadow-2xl max-h-90 overflow-y-auto border border-gray-100"
                 >
                   <div className="px-5 py-3 border-b text-xs text-gray-500 font-semibold">
-                    Suggested destinations
+                    {isLoading ? "Searching..." : "Suggested destinations"}
                   </div>
                   <ul>
-                    {SUGGESTIONS.map((s, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center gap-3 px-5 py-3 cursor-pointer hover:bg-gray-100 transition"
-                        onMouseDown={() => setDestination(s.title)}
-                      >
-                        <span>{s.icon}</span>
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            {s.title}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {s.subtitle}
-                          </div>
-                        </div>
+                    {isLoading ? (
+                      <li className="flex items-center justify-center px-5 py-4">
+                        <Loader2 className="w-5 h-5 animate-spin text-pink-500" />
+                        <span className="ml-2 text-sm text-gray-600">Searching destinations...</span>
                       </li>
-                    ))}
+                    ) : predictions.length > 0 ? (
+                      predictions.map((prediction, idx) => (
+                        <li
+                          key={prediction.place_id}
+                          className="flex items-center gap-3 px-5 py-3 cursor-pointer hover:bg-gray-100 transition"
+                          onMouseDown={() => handlePlaceSelect(prediction)}
+                        >
+                          <MapPin className="text-pink-500 w-5 h-5" />
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">
+                              {prediction.structured_formatting.main_text}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {prediction.structured_formatting.secondary_text}
+                            </div>
+                          </div>
+                        </li>
+                      ))
+                                         ) : error ? (
+                       <li className="px-5 py-4 text-sm text-red-500 text-center">
+                         <div>API Error: {error}</div>
+                         <div className="text-xs text-gray-400 mt-1">
+                           Please check your Google Maps API configuration
+                         </div>
+                       </li>
+                     ) : destination.trim().length >= 2 ? (
+                       <li className="px-5 py-4 text-sm text-gray-500 text-center">
+                         <div>No destinations found</div>
+                         <div className="text-xs text-gray-400 mt-1">
+                           Try a different search term or check your internet connection
+                         </div>
+                       </li>
+                     ) : (
+                      SUGGESTIONS.map((s, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-center gap-3 px-5 py-3 cursor-pointer hover:bg-gray-100 transition"
+                          onMouseDown={() => setDestination(s.title)}
+                        >
+                          <span>{s.icon}</span>
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {s.title}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {s.subtitle}
+                            </div>
+                          </div>
+                        </li>
+                      ))
+                    )}
                   </ul>
                 </div>,
                 document.body
@@ -250,6 +366,7 @@ export default function EnhancedSearchBar() {
         guestCount={guestCount}
         onGuestChange={handleGuestChange}
       />
+      </GoogleMapsLoader>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Leaf, Shield, Star, Globe, Heart, CheckCircle, Users, Zap, Medal, TrendingUp } from "lucide-react";
+import { Award, Leaf, Shield, Star, Globe, Heart, CheckCircle, Users, Zap, Medal, TrendingUp, UserCheck, Award as AwardIcon, Handshake, ThumbsUp } from "lucide-react";
 
 const Certifications = () => {
   const certifications = [
@@ -116,32 +116,36 @@ const Certifications = () => {
 
   const trustMetrics = [
     {
-      icon: Shield,
+      icon: UserCheck,
       title: "100% Verified Hosts",
       description: "Every host undergoes thorough background verification and property inspection",
       stat: "500+",
-      color: "from-blue-600 to-blue-700"
+      color: "from-blue-600 to-blue-700",
+      iconColor: "text-blue-600"
     },
     {
-      icon: CheckCircle,
+      icon: AwardIcon,
       title: "Quality Assured",
       description: "Regular quality audits and guest feedback monitoring ensure consistent standards",
       stat: "98%",
-      color: "from-green-600 to-green-700"
+      color: "from-green-600 to-green-700",
+      iconColor: "text-green-600"
     },
     {
-      icon: Users,
+      icon: Handshake,
       title: "Community Support",
       description: "Direct economic benefits to local families and preservation of traditional livelihoods",
       stat: "300+",
-      color: "from-rose-600 to-rose-700"
+      color: "from-rose-600 to-rose-700",
+      iconColor: "text-rose-600"
     },
     {
-      icon: TrendingUp,
+      icon: ThumbsUp,
       title: "Guest Satisfaction",
       description: "Consistently high ratings and repeat bookings from satisfied travelers",
       stat: "4.8/5",
-      color: "from-amber-600 to-amber-700"
+      color: "from-amber-600 to-amber-700",
+      iconColor: "text-amber-600"
     }
   ];
 
@@ -291,9 +295,9 @@ const Certifications = () => {
                 return (
                   <div key={index} className="text-center group">
                     <div className="relative mb-6">
-                      <div className="w-20 h-20 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-all duration-300 shadow-lg border border-gray-200">
-                        <Icon className={`w-10 h-10 text-transparent bg-gradient-to-r ${metric.color} bg-clip-text`} />
-                      </div>
+                                             <div className="w-20 h-20 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-all duration-300 shadow-lg border border-gray-200">
+                         <Icon className={`w-10 h-10 ${metric.iconColor}`} />
+                       </div>
                       <div className={`absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r ${metric.color} rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg`}>
                         {metric.stat}
                       </div>

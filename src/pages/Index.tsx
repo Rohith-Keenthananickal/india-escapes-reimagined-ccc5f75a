@@ -6,9 +6,18 @@ import AIAssistant from "@/components/AIAssistant";
 import SeasonalBooking from "@/components/SeasonalBooking";
 import ValueProposition from "@/components/ValueProposition";
 import MediaSection from "@/components/MediaSection";
+import Certifications from "@/components/Certifications";
+import HomestayFilters from "@/components/HomestayFilters";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import {
   Star,
   Heart,
@@ -22,16 +31,26 @@ import {
   Plane,
   Clock,
   Award,
+  Waves,
+  Mountain,
+  TreePalm,
+  Landmark,
+  HeartPulse,
+  DollarSign,
+  Activity,
+  Leaf,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import HomestayFilters from "@/components/HomestayFilters";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import Certifications from "@/components/Certifications";
+import CountUp from "react-countup";
+import { useInView } from "react-intersection-observer";
 
 const Index = () => {
   const [likedProperties, setLikedProperties] = useState<number[]>([]);
-  const [activeTab, setActiveTab] = useState("homes");
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilters, setActiveFilters] = useState({
+    category: 'all',
+    filters: [] as string[],
+    sortBy: 'popularity'
+  });
   const navigate = useNavigate();
 
   const toggleLike = (id: number) => {
@@ -40,31 +59,19 @@ const Index = () => {
     );
   };
 
-  const mainTabs = [
-    { id: "homes", label: "Homes", icon: Home },
-    { id: "experiences", label: "Experiences", icon: Compass },
-    { id: "services", label: "Services", icon: Wrench },
-  ];
-
   const regions = [
-    { id: "backwater", label: "Backwater & Scenic", count: 45 },
-    { id: "hills", label: "Hill Stations & Wildlife", count: 38 },
-    { id: "beaches", label: "Beaches & Coastal", count: 32 },
-    { id: "cultural", label: "Cultural & Heritage", count: 28 },
-    { id: "spiritual", label: "Spiritual & Wellness", count: 22 },
+    { id: "backwater", label: "Backwater & Scenic", count: 45, icon: Waves },
+    { id: "hills", label: "Hill Stations & Wildlife", count: 38, icon: Mountain },
+    { id: "beaches", label: "Beaches & Coastal", count: 32, icon: TreePalm },
+    { id: "cultural", label: "Cultural & Heritage", count: 28, icon: Landmark },
+    { id: "spiritual", label: "Spiritual & Wellness", count: 22, icon: HeartPulse },
   ];
-
-  const [activeFilters, setActiveFilters] = useState({
-    category: 'all',
-    filters: [] as string[],
-    sortBy: 'popularity'
-  });
 
   const filters = [
-    { id: "all", label: "All Stays" },
-    { id: "budget", label: "Budget Friendly" },
-    { id: "activities", label: "Activities Nearby" },
-    { id: "eco", label: "Eco-Certified" },
+    { id: "all", label: "All Stays", icon: Home },
+    { id: "budget", label: "Budget Friendly", icon: DollarSign },
+    { id: "activities", label: "Activities Nearby", icon: Activity },
+    { id: "eco", label: "Eco-Certified", icon: Leaf },
   ];
 
   const airports = [
@@ -152,12 +159,40 @@ const Index = () => {
     },
   ];
 
+  // Apply filters to properties
   const filteredProperties = featuredProperties.filter((property) => {
-    if (activeFilter === "budget") return property.price < 4000;
-    if (activeFilter === "eco") return property.isEco;
-    if (activeFilter === "activities") return property.amenities.length > 2;
+    // Category filter
+    if (activeFilters.category !== 'all' && property.region !== activeFilters.category) {
+      return false;
+    }
+    
+    // Additional filters
+    if (activeFilters.filters.includes('budget') && property.price >= 4000) return false;
+    if (activeFilters.filters.includes('eco') && !property.isEco) return false;
+    if (activeFilters.filters.includes('activities') && property.amenities.length <= 2) return false;
+    
     return true;
   });
+
+  // Sort properties
+  const sortedProperties = [...filteredProperties].sort((a, b) => {
+    switch (activeFilters.sortBy) {
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'rating':
+        return b.rating - a.rating;
+      case 'newest':
+        return (a.isNew ? 1 : 0) - (b.isNew ? 1 : 0);
+      default: // popularity
+        return b.reviews - a.reviews;
+    }
+  });
+
+  const handleFiltersChange = (newFilters: { category: string; filters: string[]; sortBy: string }) => {
+    setActiveFilters(newFilters);
+  };
 
   const priorityHomestays = [
     {
@@ -167,8 +202,11 @@ const Index = () => {
       price: 8500,
       rating: 4.9,
       reviews: 245,
-      image:
+      images: [
         "https://www.kumarakomlakeresort.in/assets/images/about-kumarakom-lake-resort/about/gallery/meandering-pool-duplex-villas-zoom.jpg",
+        "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=400&fit=crop"
+      ],
       host: "Maya Krishnan",
       isPriority: true,
       district: "Kottayam",
@@ -180,8 +218,11 @@ const Index = () => {
       price: 12000,
       rating: 4.8,
       reviews: 189,
-      image:
+      images: [
         "https://hectindiai.s3.ap-south-1.amazonaws.com/0000/126/2024/10/15/spice-jungle-resort-by-maat-hotels-14-600.webp",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=500&h=400&fit=crop"
+      ],
       host: "Ravi Menon",
       isPriority: true,
       district: "Idukki",
@@ -193,29 +234,16 @@ const Index = () => {
       price: 9500,
       rating: 4.9,
       reviews: 156,
-      image:
+      images: [
         "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/01KovalamBeach%26Kerala.jpg/330px-01KovalamBeach%26Kerala.jpg",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&h=400&fit=crop"
+      ],
       host: "Priya Nair",
       isPriority: true,
       district: "Thiruvananthapuram",
     },
   ];
-
-    // Sort properties
-    const sortedProperties = [...filteredProperties].sort((a, b) => {
-      switch (activeFilters.sortBy) {
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
-        case 'newest':
-          return (a.isNew ? 1 : 0) - (b.isNew ? 1 : 0);
-        default: // popularity
-          return b.reviews - a.reviews;
-      }
-    });
 
   const airportDistricts = [
     {
@@ -330,10 +358,6 @@ const Index = () => {
   ];
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
-  const handleFiltersChange = (newFilters: { category: string; filters: string[]; sortBy: string }) => {
-    setActiveFilters(newFilters);
-  };
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length);
@@ -344,10 +368,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-{/* Enhanced Search Bar */}
-<div className="w-full">
+      <div className="w-full">
             <EnhancedSearchBar />
           </div>
+
       {/* Hero Section with Background Image */}
       <div className="relative min-h-[600px] bg-cover bg-center bg-no-repeat overflow-hidden">
         {/* Animated Background Images */}
@@ -380,7 +404,7 @@ const Index = () => {
             </p>
           </div>
 
-
+          {/* Enhanced Search Bar */}
           
         </div>
       </div>
@@ -401,7 +425,7 @@ const Index = () => {
 
       {/* Platform Introduction */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className=" items-center">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
               About Hevan Connect Travel
@@ -416,156 +440,27 @@ const Index = () => {
               helps guests discover immersive, affordable stays while supporting
               sustainable tourism and local livelihoods.
             </p>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-pink-600">200+</div>
-                <div className="text-sm text-gray-600">Verified Homestays</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-pink-600">50+</div>
-                <div className="text-sm text-gray-600">Destinations</div>
-              </div>
-            </div>
+            {/* Animated Stats Grid */}
+            <AnimatedStats />
           </div>
-          <div className="relative">
+          {/* <div className="relative">
             <img
               src="https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=400&fit=crop"
               alt="Kerala homestay experience"
               className="rounded-2xl shadow-lg"
             />
-          </div>
+          </div> */}
         </div>
       </section>
 
-      {/* Homestay Discovery Section */}
+      {/* Homestay Discovery Section with New Filters */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">
           Your next story starts in a Kerala home ?
         </h2>
-          
-           {/* New Filters Component */}
+
+        {/* New Filters Component */}
         <HomestayFilters onFiltersChange={handleFiltersChange} />
-       {/* Property Grid */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sortedProperties.map((property) => (
-            <Card
-              key={property.id}
-              className="group cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
-              onClick={() => navigate(`/property/${property.id}`)}
-            >
-              <div className="relative">
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {property.images.map((image, index) => (
-                      <CarouselItem key={index}>
-                        <img
-                          src={image}
-                          alt={`${property.title} - Image ${index + 1}`}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-12" onClick={e => e.stopPropagation()} />
-                  <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-12" onClick={e => e.stopPropagation()} />
-                </Carousel>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-3 right-3 bg-white/80 hover:bg-white z-10 transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLike(property.id);
-                  }}
-                >
-                  <Heart
-                    className={`w-4 h-4 transition-all duration-300 ${
-                      likedProperties.includes(property.id)
-                        ? "fill-red-500 text-red-500 scale-110"
-                        : "text-gray-600 hover:text-red-500 hover:scale-110"
-                    }`}
-                  />
-                </Button>
-                {property.isNew && (
-                  <Badge className="absolute top-3 left-3 bg-green-500 z-10">
-                    New
-                  </Badge>
-                )}
-                {property.isCertified && (
-                  <Badge className="absolute top-3 left-3 bg-blue-500 z-10">
-                    Certified
-                  </Badge>
-                )}
-                {property.isEco && (
-                  <Badge className="absolute bottom-3 left-3 bg-green-600 z-10">
-                    Eco-Friendly
-                  </Badge>
-                )}
-              </div>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 line-clamp-1">
-                      {property.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <MapPin className="w-3 h-3 mr-1" />
-                      {property.location}
-                    </p>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
-                    <span className="font-medium">{property.rating}</span>
-                    <span className="text-gray-500 ml-1">
-                      ({property.reviews})
-                    </span>
-                  </div>
-                </div>
-
-                {/* Amenities */}
-                <div className="flex items-center space-x-2 mb-2">
-                  {property.amenities.includes("Wifi") && (
-                    <Wifi className="w-3 h-3 text-gray-500" />
-                  )}
-                  {property.amenities.includes("Car") && (
-                    <Car className="w-3 h-3 text-gray-500" />
-                  )}
-                  <Users className="w-3 h-3 text-gray-500" />
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <div>
-                    <span className="text-lg font-bold">
-                      ₹{property.price.toLocaleString()}
-                    </span>
-                    <span className="text-gray-600"> / night</span>
-                  </div>
-                  <span className="text-sm text-gray-600">
-                    Host: {property.host}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Airport Access Districts */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {airports.map((airport) => (
-            <Card
-              key={airport.code}
-              className="p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
-            >
-              <div className="text-lg font-bold text-gray-900">
-                {airport.name}
-              </div>
-              <div className="text-sm text-gray-600">{airport.code}</div>
-              <div className="text-xs text-pink-600 mt-1">
-                {airport.stays} stays nearby
-              </div>
-            </Card>
-          ))}
-        </div> */}
 
         {/* Property Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -672,7 +567,11 @@ const Index = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button variant="outline" asChild>
+          <Button 
+            variant="outline" 
+            asChild
+            className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gradient-to-r hover:from-pink-50 hover:to-yellow-50 hover:border-pink-300 hover:text-pink-700"
+          >
             <Link to="/properties">View all Kerala homestays</Link>
           </Button>
         </div>
@@ -701,15 +600,25 @@ const Index = () => {
               onClick={() => navigate(`/property/${homestay.id}`)}
             >
               <div className="relative">
-                <img
-                  src={homestay.image}
-                  alt={homestay.title}
-                  className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <Badge className="absolute top-4 left-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1">
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {homestay.images.map((image, index) => (
+                      <CarouselItem key={index}>
+                        <img
+                          src={image}
+                          alt={`${homestay.title} - Image ${index + 1}`}
+                          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-12" onClick={e => e.stopPropagation()} />
+                  <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-white/80 hover:bg-gradient-to-r hover:from-pink-100 hover:to-red-100 border-0 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg hover:-rotate-12" onClick={e => e.stopPropagation()} />
+                </Carousel>
+                <Badge className="absolute top-4 left-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1 z-10">
                   Priority Choice
                 </Badge>
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 z-10">
                   <div className="flex items-center text-sm font-medium">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
                     {homestay.rating}
@@ -802,8 +711,8 @@ const Index = () => {
         </div>
       </section>
 
-       {/* Newly Listed Homestays */}
-       <section className="max-w-7xl mx-auto px-4 py-16 bg-green-50">
+      {/* Newly Listed Homestays */}
+      <section className="max-w-7xl mx-auto px-4 py-16 bg-green-50">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <Clock className="w-8 h-8 text-green-600 mr-3" />
@@ -1084,5 +993,34 @@ const Index = () => {
     </div>
   );
 };
+
+function AnimatedStats() {
+  const stats = [
+    { label: "Verified Homestays", value: 200, suffix: "+", color: "text-pink-600" },
+    { label: "Destinations", value: 50, suffix: "+", color: "text-pink-600" },
+    { label: "Happy Guests", value: 5000, suffix: "+", color: "text-green-600" },
+    { label: "Local Hosts", value: 300, suffix: "+", color: "text-blue-600" },
+    { label: "Unique Experiences", value: 120, suffix: "+", color: "text-yellow-600" },
+    { label: "Years of Service", value: 10, suffix: "+", color: "text-purple-600" },
+  ];
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
+
+  return (
+    <div ref={ref} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mt-8">
+      {stats.map((stat, idx) => (
+        <div className="text-center" key={stat.label}>
+          <div className={`text-2xl md:text-3xl font-bold ${stat.color}`}>
+            {inView ? (
+              <CountUp end={stat.value} duration={1.5} suffix={stat.suffix} />
+            ) : (
+              `0${stat.suffix}`
+            )}
+          </div>
+          <div className="text-sm text-gray-600 mt-1">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default Index;
