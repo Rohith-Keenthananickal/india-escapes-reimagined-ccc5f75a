@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   MapPin,
@@ -53,6 +54,7 @@ const SUGGESTIONS = [
 ];
 
 export default function EnhancedSearchBar() {
+  const navigate = useNavigate();
   const [destination, setDestination] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [checkIn, setCheckIn] = useState<Date | undefined>();
@@ -75,7 +77,7 @@ export default function EnhancedSearchBar() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // Google Places hook
-  const { predictions, isLoading, error, getPlacePredictions, getPlaceDetails, clearPredictions } = useGooglePlaces();
+  const { predictions, isLoading, error, isInitialized, getPlacePredictions, getPlaceDetails, clearPredictions } = useGooglePlaces();
 
   // Handle destination input change with debounced search
   const handleDestinationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,8 +93,12 @@ export default function EnhancedSearchBar() {
     // Debounce the search
     const timeout = setTimeout(() => {
       if (value.trim().length >= 2) {
-        getPlacePredictions(value);
-        setShowSuggestions(true);
+        if (isInitialized) {
+          getPlacePredictions(value);
+          setShowSuggestions(true);
+        } else {
+          setShowSuggestions(false);
+        }
       } else {
         clearPredictions();
         setShowSuggestions(false);
@@ -192,6 +198,19 @@ export default function EnhancedSearchBar() {
     };
   }, [searchTimeout]);
 
+  // Handle search button click
+  const handleSearch = () => {
+    if (destination.trim()) {
+      const searchParams = new URLSearchParams({
+        destination: destination,
+        ...(checkIn && { checkIn: format(checkIn, "yyyy-MM-dd") }),
+        ...(checkOut && { checkOut: format(checkOut, "yyyy-MM-dd") }),
+        guests: (guestCount.adults + guestCount.children).toString(),
+      });
+      navigate(`/search?${searchParams.toString()}`);
+    }
+  };
+
   return (
     <div className="w-full flex justify-center items-center mt-8 mb-8">
       <GoogleMapsLoader>
@@ -207,21 +226,31 @@ export default function EnhancedSearchBar() {
                 onChange={handleDestinationChange}
                 onFocus={() => {
                   if (destination.trim().length >= 2) {
-                    setShowSuggestions(true);
+                    if (isInitialized) {
+                      getPlacePredictions(destination);
+                      setShowSuggestions(true);
+                            } else {
+          setShowSuggestions(false);
+        }
                   }
                 }}
                 onBlur={handleBlur}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
                 className="bg-transparent outline-none text-base text-gray-700 placeholder-gray-500 font-normal mt-0.5"
                 style={{ minWidth: 0 }}
               />
-              {selectedPlace && (
+              {/* {selectedPlace && (
                 <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
                   <MapPin className="w-3 h-3" />
                   <span>
                     {selectedPlace.geometry.location.lat.toFixed(4)}, {selectedPlace.geometry.location.lng.toFixed(4)}
                   </span>
                 </div>
-              )}
+              )} */}
             {/* Portal-based dropdown rendering */}
             {showSuggestions &&
               createPortal(
@@ -260,7 +289,14 @@ export default function EnhancedSearchBar() {
                        <li className="px-5 py-4 text-sm text-red-500 text-center">
                          <div>API Error: {error}</div>
                          <div className="text-xs text-gray-400 mt-1">
-                           Please check your Google Maps API configuration
+                           {!isInitialized ? 'Google Places API is still loading...' : 'Please check your Google Maps API configuration'}
+                         </div>
+                       </li>
+                     ) : !isInitialized ? (
+                       <li className="px-5 py-4 text-sm text-gray-500 text-center">
+                         <div className="flex items-center justify-center">
+                           <Loader2 className="w-4 h-4 animate-spin text-pink-500 mr-2" />
+                           <span>Initializing Google Places...</span>
                          </div>
                        </li>
                      ) : destination.trim().length >= 2 ? (
@@ -342,6 +378,7 @@ export default function EnhancedSearchBar() {
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-pink-500 hover:bg-pink-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg border-4 border-white focus:outline-none transition"
             style={{ boxShadow: "0 4px 24px 0 rgba(0,0,0,0.10)" }}
             aria-label="Search"
+            onClick={handleSearch}
           >
             <Search className="w-6 h-6" />
           </button>

@@ -45,7 +45,17 @@ const CartPage = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showMap, setShowMap] = useState(true);
-  const [selectedLocation, setSelectedLocation] = useState<any>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    id: string;
+    title?: string;
+    name?: string;
+    location: string;
+    type: string;
+    category: string;
+    position: { lat: number; lng: number };
+    rating?: number;
+    imageUrl?: string;
+  } | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const {
     hotels,
@@ -151,10 +161,38 @@ const CartPage = () => {
   };
 
   const handleProceedToCheckout = () => {
-    navigate("/checkout");
+    // Store booking details for the success page
+    const bookingDetails = {
+      bookingId: 'BK' + Date.now(),
+      bookingDate: new Date().toISOString(),
+      totalAmount: getTotalAmount(),
+      items: {
+        hotels,
+        experiences,
+        nearbySuggestions: selectedNearbySuggestions
+      }
+    };
+    
+    // Store in localStorage as fallback
+    localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
+    
+    // Navigate to success page with booking details
+    navigate("/booking-success", { 
+      state: { bookingDetails } 
+    });
   };
 
-  const handleLocationClick = (location: any) => {
+  const handleLocationClick = (location: {
+    id: string;
+    title?: string;
+    name?: string;
+    location: string;
+    type: string;
+    category: string;
+    position: { lat: number; lng: number };
+    rating?: number;
+    imageUrl?: string;
+  }) => {
     setSelectedLocation(location);
   };
 

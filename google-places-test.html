@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Places API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Places API Test</h1>
+    
+    <div class="test-section info">
+        <h3>API Key Status</h3>
+        <p><strong>API Key:</strong> <span id="apiKeyStatus">Checking...</span></p>
+        <p><strong>API Key Value:</strong> <span id="apiKeyValue">AIzaSyBbhvPKWajYrvBj2yOQnlvrdn7DF32vj4k</span></p>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Google Places Autocomplete</h3>
+        <input type="text" id="searchInput" placeholder="Type a city name (e.g., 'Mumbai', 'Delhi')" />
+        <button onclick="testAutocomplete()">Test Autocomplete</button>
+        <div id="autocompleteResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Google Maps Loading</h3>
+        <button onclick="testMapsLoading()">Test Maps Loading</button>
+        <div id="mapsResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Debug Log</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyBbhvPKWajYrvBj2yOQnlvrdn7DF32vj4k';
+        let autocompleteService = null;
+        let placesService = null;
+
+        function log(message) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.textContent += `[${timestamp}] ${message}\n`;
+            results.scrollTop = results.scrollHeight;
+            console.log(message);
+        }
+
+        function updateApiKeyStatus() {
+            const statusElement = document.getElementById('apiKeyStatus');
+            if (API_KEY && API_KEY.length > 20) {
+                statusElement.textContent = '✅ Valid API Key';
+                statusElement.style.color = 'green';
+            } else {
+                statusElement.textContent = '❌ Invalid API Key';
+                statusElement.style.color = 'red';
+            }
+        }
+
+        function testMapsLoading() {
+            log('🗺️ Testing Google Maps loading...');
+            
+            if (typeof google === 'undefined') {
+                log('❌ Google Maps API not loaded');
+                return;
+            }
+
+            if (!google.maps) {
+                log('❌ Google Maps object not available');
+                return;
+            }
+
+            if (!google.maps.places) {
+                log('❌ Google Places API not available');
+                return;
+            }
+
+            log('✅ Google Maps API loaded successfully');
+            log('✅ Google Places API available');
+            
+            // Test creating services
+            try {
+                autocompleteService = new google.maps.places.AutocompleteService();
+                log('✅ AutocompleteService created successfully');
+                
+                const mapDiv = document.createElement('div');
+                placesService = new google.maps.places.PlacesService(mapDiv);
+                log('✅ PlacesService created successfully');
+                
+                document.getElementById('mapsResults').innerHTML = 
+                    '<div class="success">✅ Google Maps and Places API working correctly!</div>';
+            } catch (error) {
+                log('❌ Error creating services: ' + error.message);
+                document.getElementById('mapsResults').innerHTML = 
+                    '<div class="error">❌ Error creating services: ' + error.message + '</div>';
+            }
+        }
+
+        function testAutocomplete() {
+            const input = document.getElementById('searchInput').value.trim();
+            const resultsDiv = document.getElementById('autocompleteResults');
+            
+            if (!input) {
+                resultsDiv.innerHTML = '<div class="error">Please enter a search term</div>';
+                return;
+            }
+
+            if (!autocompleteService) {
+                resultsDiv.innerHTML = '<div class="error">AutocompleteService not initialized. Please test Maps loading first.</div>';
+                return;
+            }
+
+            log(`🔍 Testing autocomplete for: "${input}"`);
+            
+            autocompleteService.getPlacePredictions(
+                {
+                    input: input,
+                    componentRestrictions: { country: 'in' },
+                    types: ['(cities)']
+                },
+                (predictions, status) => {
+                    log(`📡 Autocomplete response - Status: ${status}`);
+                    log(`📡 Predictions count: ${predictions ? predictions.length : 0}`);
+                    
+                    if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                        log('✅ Autocomplete successful');
+                        let html = '<div class="success"><h4>✅ Autocomplete Results:</h4><ul>';
+                        predictions.forEach((prediction, index) => {
+                            html += `<li><strong>${prediction.structured_formatting.main_text}</strong> - ${prediction.structured_formatting.secondary_text}</li>`;
+                            log(`  ${index + 1}. ${prediction.structured_formatting.main_text} - ${prediction.structured_formatting.secondary_text}`);
+                        });
+                        html += '</ul></div>';
+                        resultsDiv.innerHTML = html;
+                    } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+                        log('⚠️ No results found');
+                        resultsDiv.innerHTML = '<div class="info">⚠️ No results found for this search term</div>';
+                    } else {
+                        log(`❌ Autocomplete error: ${status}`);
+                        resultsDiv.innerHTML = `<div class="error">❌ Autocomplete error: ${status}</div>`;
+                    }
+                }
+            );
+        }
+
+        // Load Google Maps API
+        function loadGoogleMapsAPI() {
+            log('🔄 Loading Google Maps API...');
+            
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=initMap`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        function initMap() {
+            log('✅ Google Maps API loaded and initialized');
+            updateApiKeyStatus();
+        }
+
+        // Initialize
+        updateApiKeyStatus();
+        loadGoogleMapsAPI();
+
+        // Add event listener for Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testAutocomplete();
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -8,6 +8,7 @@ import ValueProposition from "@/components/ValueProposition";
 import MediaSection from "@/components/MediaSection";
 import Certifications from "@/components/Certifications";
 import HomestayFilters from "@/components/HomestayFilters";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -989,7 +990,7 @@ const Index = () => {
       </footer>
 
       {/* AI Assistant */}
-      <AIAssistant />
+                  <AIAssistant />
     </div>
   );
 };

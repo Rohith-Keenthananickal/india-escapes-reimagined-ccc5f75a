@@ -28,6 +28,9 @@ export const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({ children }) 
     }
   }, [mapsLoaded, mapsLoadError]);
 
+  // Debug logging
+
+
   if (loadError) {
     return (
       <div className="text-center p-4 text-red-600">
@@ -73,6 +76,7 @@ export const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({ children }) 
       <div className="text-center p-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
         <p className="mt-2 text-gray-600">Loading Google Maps...</p>
+        <p className="text-xs text-gray-400 mt-1">This may take a few seconds</p>
       </div>
     );
   }

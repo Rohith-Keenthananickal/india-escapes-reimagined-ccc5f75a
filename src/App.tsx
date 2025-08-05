@@ -18,6 +18,8 @@ import Experiences from "./pages/Experiences";
 import Services from "./pages/Services";
 import LocationDemo from "./pages/LocationDemo";
 import CartPage from "./pages/CartPage";
+import BookingSuccess from "./pages/BookingSuccess";
+import SearchResults from "./pages/SearchResults";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./lib/ScrollToTop";
 
@@ -46,6 +48,8 @@ const App = () => (
     <Route path="/host" element={<HostDashboard />} />
     <Route path="/location-demo" element={<LocationDemo />} />
     <Route path="/cart" element={<CartPage />} />
+    <Route path="/booking-success" element={<BookingSuccess />} />
+    <Route path="/search" element={<SearchResults />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 </BrowserRouter>
