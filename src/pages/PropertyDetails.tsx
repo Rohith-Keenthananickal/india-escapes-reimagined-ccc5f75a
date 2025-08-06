@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import PropertyMap from "@/components/PropertyMap";
@@ -13,6 +13,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import DateFilter from "@/components/ui/DateFilter";
 import {
   Star,
   Heart,
@@ -35,6 +42,10 @@ import {
   Map,
   Navigation,
   ShoppingCart,
+  X,
+  Globe,
+  Users2,
+  Heart as HeartIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
@@ -59,8 +70,63 @@ const PropertyDetails = ({
   const [advancedView, setAdvancedView] = useState(false);
   const { addHotel, hotels } = useCart();
 
+  // Popup states
+  const [showFirstPopup, setShowFirstPopup] = useState(false);
+  const [showSecondPopup, setShowSecondPopup] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [journeyStartDate, setJourneyStartDate] = useState<Date | undefined>();
+  const [journeyEndDate, setJourneyEndDate] = useState<Date | undefined>();
+
   // Check if this property is already in cart
   const isInCart = hotels.some((hotel) => hotel.id === (id || "1"));
+
+  // Show first popup on page load
+  useEffect(() => {
+    // Check if user has already seen the popup
+    const hasSeenPopup = localStorage.getItem('hasSeenJourneyPopup');
+    
+    if (!hasSeenPopup) {
+      const timer = setTimeout(() => {
+        setShowFirstPopup(true);
+      }, 1000); // Show after 1 second
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleDateSelection = (dateRange: { from: Date; to: Date }) => {
+    setJourneyStartDate(dateRange.from);
+    setJourneyEndDate(dateRange.to);
+    setShowDateFilter(false);
+  };
+
+  const handleContinueToJourney = () => {
+    if (!journeyStartDate || !journeyEndDate) {
+      toast({
+        title: "Select dates",
+        description: "Please select both start and end dates for your journey.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Start transition
+    setIsTransitioning(true);
+    setShowFirstPopup(false);
+
+    // Show second popup after transition
+    setTimeout(() => {
+      setIsTransitioning(false);
+      setShowSecondPopup(true);
+    }, 300);
+  };
+
+  const handleCloseSecondPopup = () => {
+    setShowSecondPopup(false);
+    // Mark that user has seen the popup
+    localStorage.setItem('hasSeenJourneyPopup', 'true');
+  };
 
   // Mock property data
   const property = {
@@ -200,7 +266,190 @@ const PropertyDetails = ({
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+             {/* First Popup - Side Panel */}
+       {showFirstPopup && (
+         <div className="fixed inset-0 z-50 flex items-end justify-end">
+           {/* Backdrop */}
+           <div 
+             className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+             onClick={() => setShowFirstPopup(false)}
+           />
+           
+           {/* Side Panel */}
+           <div className="relative w-full max-w-md h-full bg-white shadow-2xl transform transition-transform duration-300 ease-out animate-in slide-in-from-right">
+             <div className="h-full flex flex-col">
+               {/* Header */}
+               <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                 <div className="flex items-center space-x-3">
+                   <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                     <Globe className="w-5 h-5 text-white" />
+                   </div>
+                   <h3 className="text-lg font-semibold text-gray-900">Journey Planner</h3>
+                 </div>
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   onClick={() => setShowFirstPopup(false)}
+                   className="hover:bg-gray-100 rounded-full w-8 h-8 p-0"
+                 >
+                   <X className="w-4 h-4" />
+                 </Button>
+               </div>
+
+               {/* Content */}
+               <div className="flex-1 p-6 overflow-y-auto">
+                 <div className="text-center mb-8">
+                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                       Start your trip from here
+                     </span>
+                   </h2>
+                   <p className="text-gray-600 text-lg leading-relaxed">
+                     Before we begin planning your Kerala journey…<br />
+                     Please let us know the date of your first sleeping day
+                   </p>
+                 </div>
+
+                 {/* Choose Dates Button */}
+                 <div className="space-y-4">
+                   <Button
+                     onClick={() => setShowDateFilter(true)}
+                     className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                   >
+                     <CalendarIcon className="w-5 h-5 mr-3" />
+                     Choose Dates
+                   </Button>
+
+                   {/* Selected Dates Display */}
+                   {journeyStartDate && journeyEndDate && (
+                     <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                       <div className="flex items-center justify-between mb-2">
+                         <span className="text-sm font-medium text-blue-900">Selected Dates:</span>
+                         <Button
+                           variant="ghost"
+                           size="sm"
+                           onClick={() => {
+                             setJourneyStartDate(undefined);
+                             setJourneyEndDate(undefined);
+                           }}
+                           className="text-blue-600 hover:text-blue-800 p-1"
+                         >
+                           <X className="w-3 h-3" />
+                         </Button>
+                       </div>
+                       <div className="flex items-center space-x-2 text-sm text-blue-700">
+                         <span>{format(journeyStartDate, "MMM d")}</span>
+                         <span>→</span>
+                         <span>{format(journeyEndDate, "MMM d")}</span>
+                       </div>
+                     </div>
+                   )}
+
+                   {/* Continue Button */}
+                   {journeyStartDate && journeyEndDate && (
+                     <Button
+                       onClick={handleContinueToJourney}
+                       className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105"
+                     >
+                       Continue to Journey
+                     </Button>
+                   )}
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+       )}
+
+      {/* Second Popup - Journey Content */}
+      <Dialog open={showSecondPopup} onOpenChange={setShowSecondPopup}>
+        <DialogContent className="sm:max-w-2xl bg-white rounded-2xl shadow-2xl border-0 p-0 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300">
+          <div className="relative">
+            {/* Background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50"></div>
+            
+            {/* Close button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCloseSecondPopup}
+              className="absolute top-4 right-4 z-10 hover:bg-white/20 rounded-full w-8 h-8 p-0"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+
+            {/* Content */}
+            <div className="relative p-8">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full mb-6">
+                  <HeartIcon className="w-10 h-10 text-white" />
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                  Your journey. Your choices. Your freedom.
+                </h2>
+                <p className="text-gray-700 text-lg leading-relaxed max-w-lg mx-auto">
+                  Start building your personalized Kerala trip homestays, local flavours, and cultural experiences, all your way.
+                </p>
+              </div>
+
+              {/* SDG Information */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 mb-6">
+                <div className="flex items-center justify-center space-x-2 mb-4">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-semibold text-green-700">SUSTAINABLE TRAVEL</span>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+                <p className="text-center text-gray-700 font-medium">
+                  Now you're also supporting local communities and becoming part of the UN Sustainable Development Goals
+                </p>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={handleCloseSecondPopup}
+                  className="flex-1 h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <Users2 className="w-4 h-4 mr-2" />
+                  Start Planning
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseSecondPopup}
+                  className="flex-1 h-12 border-2 border-gray-300 hover:border-green-400 text-gray-700 font-semibold rounded-xl transition-all duration-300"
+                >
+                  Learn More
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+             {/* Transition overlay */}
+       {isTransitioning && (
+         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+           <div className="bg-white rounded-2xl p-8 shadow-2xl animate-pulse">
+             <div className="flex items-center space-x-3">
+               <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+               <span className="text-lg font-semibold text-gray-700">Preparing your journey...</span>
+             </div>
+           </div>
+         </div>
+       )}
+
+       {/* Date Filter Modal */}
+       <DateFilter
+         isOpen={showDateFilter}
+         onClose={() => setShowDateFilter(false)}
+         onSelectDates={handleDateSelection}
+         initialDateRange={{ from: journeyStartDate, to: journeyEndDate }}
+         currentDateRange={
+           journeyStartDate && journeyEndDate ? { from: journeyStartDate, to: journeyEndDate } : undefined
+         }
+       />
+
+       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -235,6 +484,17 @@ const PropertyDetails = ({
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  localStorage.removeItem('hasSeenJourneyPopup');
+                  setShowFirstPopup(true);
+                }}
+              >
+                <Globe className="w-4 h-4 mr-2" />
+                Start Journey
+              </Button>
               <Button variant="ghost" size="sm">
                 <Share className="w-4 h-4 mr-2" />
                 Share
