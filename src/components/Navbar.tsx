@@ -160,6 +160,7 @@ const Navbar = () => {
                     Sign up
                   </DropdownMenuItem>
                   <DropdownMenuItem>Become a host</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/about")}>About Us</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
