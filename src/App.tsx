@@ -21,6 +21,7 @@ import CartPage from "./pages/CartPage";
 import BookingSuccess from "./pages/BookingSuccess";
 import SearchResults from "./pages/SearchResults";
 import About from "./pages/About";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./lib/ScrollToTop";
 
@@ -52,6 +53,7 @@ const App = () => (
     <Route path="/booking-success" element={<BookingSuccess />} />
     <Route path="/search" element={<SearchResults />} />
     <Route path="/about" element={<About />} />
+    <Route path="/privacy" element={<PrivacyPolicy />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 </BrowserRouter>
