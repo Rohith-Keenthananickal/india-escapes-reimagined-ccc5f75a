@@ -188,7 +188,7 @@ const PrivacyPolicy = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-16">
+      <section className="py-[37px]">
         <div className="container mx-auto px-4">
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <div className="flex justify-center mb-10">
