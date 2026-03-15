@@ -22,6 +22,7 @@ import BookingSuccess from "./pages/BookingSuccess";
 import SearchResults from "./pages/SearchResults";
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AccountDeletion from "./pages/AccountDeletion";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./lib/ScrollToTop";
 
@@ -54,6 +55,7 @@ const App = () => (
     <Route path="/search" element={<SearchResults />} />
     <Route path="/about" element={<About />} />
     <Route path="/privacy" element={<PrivacyPolicy />} />
+    <Route path="/account_deletion" element={<AccountDeletion />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 </BrowserRouter>
