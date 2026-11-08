@@ -10,7 +10,12 @@ interface PlacePrediction {
   types: string[];
 }
 
-interface PlaceDetails {
+export interface PlaceViewport {
+  northeast: { lat: number; lng: number };
+  southwest: { lat: number; lng: number };
+}
+
+export interface PlaceDetails {
   place_id: string;
   name: string;
   formatted_address: string;
@@ -19,8 +24,30 @@ interface PlaceDetails {
       lat: number;
       lng: number;
     };
+    viewport?: PlaceViewport;
   };
   types: string[];
+  /** Suggested search radius in km derived from viewport (clamped 15–75), else 40 */
+  radius_km: number;
+}
+
+const DEFAULT_RADIUS_KM = 40;
+const MIN_RADIUS_KM = 15;
+const MAX_RADIUS_KM = 75;
+
+/** Approximate Earth radius for haversine half-diagonal of a viewport. */
+function radiusKmFromViewport(viewport: PlaceViewport): number {
+  const { northeast: ne, southwest: sw } = viewport;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(ne.lat - sw.lat);
+  const dLng = toRad(ne.lng - sw.lng);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(sw.lat)) * Math.cos(toRad(ne.lat)) * Math.sin(dLng / 2) ** 2;
+  const diagonalKm = 2 * R * Math.asin(Math.sqrt(a));
+  const halfDiagonal = diagonalKm / 2;
+  return Math.min(MAX_RADIUS_KM, Math.max(MIN_RADIUS_KM, Math.round(halfDiagonal)));
 }
 
 export const useGooglePlaces = () => {
@@ -151,17 +178,32 @@ export const useGooglePlaces = () => {
           },
                      (place, status) => {
              if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
+              const lat = place.geometry!.location!.lat();
+              const lng = place.geometry!.location!.lng();
+              let viewport: PlaceViewport | undefined;
+              let radius_km = DEFAULT_RADIUS_KM;
+
+              const bounds = place.geometry?.viewport;
+              if (bounds) {
+                const ne = bounds.getNorthEast();
+                const sw = bounds.getSouthWest();
+                viewport = {
+                  northeast: { lat: ne.lat(), lng: ne.lng() },
+                  southwest: { lat: sw.lat(), lng: sw.lng() },
+                };
+                radius_km = radiusKmFromViewport(viewport);
+              }
+
               resolve({
                 place_id: place.place_id!,
                 name: place.name!,
                 formatted_address: place.formatted_address!,
                 geometry: {
-                  location: {
-                    lat: place.geometry!.location!.lat(),
-                    lng: place.geometry!.location!.lng(),
-                  },
+                  location: { lat, lng },
+                  viewport,
                 },
                 types: place.types || [],
+                radius_km,
               });
                          } else {
                const errorMsg = `Failed to get place details: ${status}`;
@@ -192,4 +234,4 @@ export const useGooglePlaces = () => {
     getPlaceDetails,
     clearPredictions,
   };
-}; 
+};

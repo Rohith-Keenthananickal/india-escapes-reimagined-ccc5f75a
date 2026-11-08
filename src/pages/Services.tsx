@@ -229,7 +229,7 @@ const Services = () => {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-4">
             Professional Services in Kerala
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -248,7 +248,7 @@ const Services = () => {
               placeholder="Search services or providers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 focus-visible:ring-[#2BB0BB]"
             />
           </div>
           <Select value={sortBy} onValueChange={setSortBy}>
@@ -274,10 +274,10 @@ const Services = () => {
                 {/* Category Header */}
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-                    <IconComponent className="h-6 w-6 text-primary" />
+                    <IconComponent className="h-6 w-6 text-[#1A8491]" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-foreground">{group.label}</h2>
+                    <h2 className="text-2xl font-bold font-heading text-foreground">{group.label}</h2>
                     <p className="text-muted-foreground">{group.services.length} service{group.services.length !== 1 ? 's' : ''} available</p>
                   </div>
                 </div>
@@ -286,7 +286,7 @@ const Services = () => {
                 <div className="relative">
                   <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
                     {group.services.map((service: any) => (
-                      <Card key={service.id} className="flex-none w-80 group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer overflow-hidden snap-start">
+                      <Card key={service.id} className="flex-none w-80 group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer overflow-hidden snap-start rounded-2xl border border-gray-200 hover:border-[#2BB0BB]/50">
                         <div className="relative">
                           <img
                             src={service.image}
@@ -294,8 +294,8 @@ const Services = () => {
                             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                           {service.isVerified && (
-                            <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground flex items-center gap-1">
-                              <ShieldCheck className="h-3 w-3" />
+                            <Badge className="absolute top-3 left-3 bg-[#FFD26E] text-[#1F1F1F] font-semibold border border-[#D4A237]/30 flex items-center gap-1">
+                              <ShieldCheck className="h-3 w-3 text-[#1A8491]" />
                               Verified
                             </Badge>
                           )}
@@ -321,10 +321,10 @@ const Services = () => {
                         <CardContent className="p-5">
                           <div className="space-y-3">
                             <div>
-                              <h3 className="font-semibold text-foreground line-clamp-2 text-lg">
+                              <h3 className="font-semibold font-heading text-foreground line-clamp-2 text-lg group-hover:text-[#1A8491] transition-colors">
                                 {service.title}
                               </h3>
-                              <p className="text-sm text-primary font-medium">
+                              <p className="text-sm text-[#1A8491] font-medium">
                                 {service.provider}
                               </p>
                               <div className="flex items-center text-sm text-muted-foreground mt-1">

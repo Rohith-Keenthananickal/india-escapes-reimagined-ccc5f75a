@@ -97,13 +97,13 @@ const MediaSection = () => {
           {/* Guest of the Month */}
           <div>
             <h3 className="text-xl font-semibold mb-6">Guest of the Month</h3>
-            <Card className="bg-gradient-to-br from-pink-50 to-orange-50 border border-pink-200">
+            <Card className="bg-gradient-to-br from-brand-teal-50/70 to-[#F8FAFB] border border-[#B6E5E9] rounded-2xl">
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4 mb-4">
                   <img
                     src={guestOfMonth.image}
                     alt={guestOfMonth.name}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-pink-200"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-[#2BB0BB]"
                   />
                   <div>
                     <h4 className="font-bold text-gray-900">

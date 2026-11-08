@@ -1,9 +1,14 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, Heart, ShoppingCart, Check, ImageOff } from 'lucide-react';
-import { useCart } from '@/hooks/use-cart';
-import { toast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Clock, Users, Heart, ShoppingCart, ImageOff, Loader2, Eye } from 'lucide-react';
+import { useRequireAuth } from '@/modules/cart/hooks/useRequireAuth';
+import { useCartQuery } from '@/modules/cart/hooks/useCart';
+import { useCartMutations } from '@/modules/cart/hooks/useCartMutations';
 import type { NormalizedExperience } from '../types/experiences.types';
 
 interface ExperienceCardProps {
@@ -17,28 +22,40 @@ export const ExperienceCard = ({
   isLiked = false,
   onToggleLike,
 }: ExperienceCardProps) => {
-  const { addExperience, experiences: cartExperiences } = useCart();
-  const isInCart = cartExperiences.some((item) => item.id === experience.id);
+  const navigate = useNavigate();
+  const { requireAuth, isAuthenticated } = useRequireAuth();
+  const { data: cart } = useCartQuery(isAuthenticated);
+  const { addItem } = useCartMutations();
+  const [experienceDate, setExperienceDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [guests, setGuests] = useState(1);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const handleAddToCart = () => {
-    addExperience({
-      id: experience.id,
-      title: experience.title,
-      location: 'Kerala, India',
-      price: experience.price,
-      duration: experience.duration,
-      image: experience.image,
-      guests: 1,
-    });
+  const isInCart =
+    cart?.items?.some(
+      (item) => item.item_type === 'EXPERIENCE' && item.experience_id === experience.id
+    ) ?? false;
 
-    toast({
-      title: 'Added to Cart',
-      description: `${experience.title} added to your journey.`,
+  const handleAddToCart = async () => {
+    if (isInCart) {
+      navigate('/cart');
+      return;
+    }
+    if (!requireAuth('/experiences')) return;
+    if (!showDatePicker) {
+      setShowDatePicker(true);
+      return;
+    }
+    await addItem.mutateAsync({
+      item_type: 'EXPERIENCE',
+      experience_id: experience.id,
+      experience_date: experienceDate,
+      guest_count: Math.max(1, guests),
     });
+    setShowDatePicker(false);
   };
 
   return (
-    <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-amber-400 bg-white flex flex-col justify-between rounded-2xl">
+    <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-[#2BB0BB]/50 bg-white flex flex-col justify-between rounded-2xl">
       <div>
         <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 flex items-center justify-center">
           {experience.image ? (
@@ -56,7 +73,7 @@ export const ExperienceCard = ({
           )}
 
           {experience.category && (
-            <Badge className="absolute top-3 left-3 bg-amber-600 text-white shadow-sm font-semibold text-xs">
+            <Badge className="absolute top-3 left-3 bg-[#D4A237] text-white shadow-sm font-semibold text-xs">
               {experience.category}
             </Badge>
           )}
@@ -80,7 +97,7 @@ export const ExperienceCard = ({
 
         <CardContent className="p-5 space-y-3">
           <div className="flex justify-between items-start gap-2">
-            <h3 className="font-bold text-gray-900 text-lg group-hover:text-amber-600 transition-colors line-clamp-1">
+            <h3 className="font-bold text-gray-900 text-lg group-hover:text-[#1A8491] transition-colors line-clamp-1 font-heading">
               {experience.title}
             </h3>
           </div>
@@ -101,6 +118,29 @@ export const ExperienceCard = ({
               </div>
             )}
           </div>
+
+          {showDatePicker && !isInCart && (
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <Input
+                type="date"
+                value={experienceDate}
+                min={format(new Date(), 'yyyy-MM-dd')}
+                onChange={(e) => setExperienceDate(e.target.value)}
+                className="text-xs"
+              />
+              <select
+                value={guests}
+                onChange={(e) => setGuests(Number(e.target.value))}
+                className="text-xs border border-gray-200 rounded-md px-2 bg-gray-50"
+              >
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>
+                    {n} guest{n === 1 ? '' : 's'}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </CardContent>
       </div>
 
@@ -111,7 +151,10 @@ export const ExperienceCard = ({
               <span className="text-xl font-extrabold text-gray-900">
                 ₹{experience.price.toLocaleString()}
               </span>
-              <span className="text-gray-500 text-xs"> / {experience.isPriceByGuest ? 'guest' : 'group'}</span>
+              <span className="text-gray-500 text-xs">
+                {' '}
+                / {experience.isPriceByGuest ? 'guest' : 'group'}
+              </span>
             </>
           ) : (
             <span className="text-sm font-bold text-gray-600">Price on inquiry</span>
@@ -120,16 +163,22 @@ export const ExperienceCard = ({
 
         <Button
           onClick={handleAddToCart}
-          disabled={isInCart}
+          disabled={addItem.isPending}
           className={`font-semibold text-xs py-2 px-3 gap-1.5 transition-all ${
             isInCart
               ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-              : 'bg-amber-600 hover:bg-amber-700 text-white'
+              : 'bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-bold'
           }`}
         >
-          {isInCart ? (
+          {addItem.isPending ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : isInCart ? (
             <>
-              <Check className="w-3.5 h-3.5" /> Added
+              <Eye className="w-3.5 h-3.5" /> View Cart
+            </>
+          ) : showDatePicker ? (
+            <>
+              <ShoppingCart className="w-3.5 h-3.5" /> Confirm
             </>
           ) : (
             <>

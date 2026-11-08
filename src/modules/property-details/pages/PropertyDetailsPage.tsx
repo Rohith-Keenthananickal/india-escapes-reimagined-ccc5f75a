@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from '@/components/Navbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -44,14 +47,108 @@ import { PropertyBookingCard } from '../components/PropertyBookingCard';
 import { PropertyLocationMap } from '../components/PropertyLocationMap';
 import type { RoomDetail } from '../types/propertyDetails.types';
 
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
 export const PropertyDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const mainRef = useRef<HTMLElement>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
   const [activeRoomPhotoIdx, setActiveRoomPhotoIdx] = useState(0);
 
   const { data: property, isLoading, isError, error, refetch } = usePropertyDetails(id);
+
+  // GSAP Animations
+  useGSAP(
+    () => {
+      if (!property) return;
+
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      // Title & Header info
+      tl.from('.prop-header-info', {
+        y: 25,
+        opacity: 0,
+        duration: 0.7,
+      });
+
+      // Gallery
+      tl.from(
+        '.prop-gallery-wrapper',
+        {
+          y: 30,
+          opacity: 0,
+          duration: 0.8,
+        },
+        '-=0.4'
+      );
+
+      // Highlights strip
+      tl.from(
+        '.prop-highlight-item',
+        {
+          y: 20,
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.5,
+          stagger: 0.08,
+          ease: 'back.out(1.4)',
+        },
+        '-=0.3'
+      );
+
+      // Sticky booking sidebar
+      tl.from(
+        '.prop-sticky-booking',
+        {
+          x: 25,
+          opacity: 0,
+          duration: 0.8,
+        },
+        '-=0.5'
+      );
+
+      // ScrollTrigger for room cards
+      gsap.from('.prop-room-card', {
+        y: 35,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.prop-rooms-section',
+          start: 'top 85%',
+        },
+      });
+
+      // ScrollTrigger for amenities
+      gsap.from('.prop-amenity-item', {
+        y: 20,
+        opacity: 0,
+        duration: 0.4,
+        stagger: 0.04,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.prop-amenities-section',
+          start: 'top 85%',
+        },
+      });
+
+      // ScrollTrigger for map and surroundings
+      gsap.from('.prop-map-block', {
+        y: 35,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.prop-location-section',
+          start: 'top 85%',
+        },
+      });
+    },
+    { dependencies: [property?.id], scope: mainRef }
+  );
 
   if (isLoading) {
     return (
@@ -111,7 +208,7 @@ export const PropertyDetailsPage = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 py-8 w-full flex-1">
+      <main ref={mainRef} className="max-w-7xl mx-auto px-4 py-8 w-full flex-1">
         {/* Navigation & Header Actions */}
         <div className="flex items-center justify-between mb-5">
           <Button
@@ -150,9 +247,9 @@ export const PropertyDetailsPage = () => {
         </div>
 
         {/* Title & Metadata */}
-        <div className="mb-6 space-y-2">
+        <div className="prop-header-info mb-6 space-y-2">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight font-heading">
               {property.title}
             </h1>
             {property.classification && property.classification !== 'UNCLASSIFIED' && (
@@ -185,24 +282,26 @@ export const PropertyDetailsPage = () => {
             </div>
             <span>•</span>
             <div className="flex items-center text-gray-600">
-              <MapPin className="w-4 h-4 text-rose-500 mr-1 shrink-0" />
+              <MapPin className="w-4 h-4 text-[#2BB0BB] mr-1 shrink-0" />
               <span>{property.location}</span>
             </div>
           </div>
         </div>
 
         {/* Image Gallery */}
-        <PropertyImageGallery
-          images={property.images}
-          title={property.title}
-          classification={property.classification}
-          isVerified={property.host.isVerified}
-        />
+        <div className="prop-gallery-wrapper">
+          <PropertyImageGallery
+            images={property.images}
+            title={property.title}
+            classification={property.classification}
+            isVerified={property.host.isVerified}
+          />
+        </div>
 
         {/* Key Highlights Strip (Airbnb Style) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          <div className="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
-            <Shield className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+          <div className="prop-highlight-item flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
+            <Shield className="w-5 h-5 text-[#1A8491] shrink-0 mt-0.5" />
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">Verified Homestay</h4>
               <p className="text-xs text-gray-500 mt-0.5">
@@ -211,7 +310,7 @@ export const PropertyDetailsPage = () => {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
+          <div className="prop-highlight-item flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
             <Accessibility className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">
@@ -223,7 +322,7 @@ export const PropertyDetailsPage = () => {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
+          <div className="prop-highlight-item flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
             <Sparkles className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">Serene Environment</h4>
@@ -233,7 +332,7 @@ export const PropertyDetailsPage = () => {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
+          <div className="prop-highlight-item flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
             <Sparkle className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">Dedicated Host Care</h4>
@@ -321,7 +420,7 @@ export const PropertyDetailsPage = () => {
 
             {/* Rooms & Accommodations with Visual Image Previews */}
             {property.rooms.length > 0 && (
-              <div className="space-y-4 pb-8 border-b border-gray-200">
+              <div className="prop-rooms-section space-y-4 pb-8 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">Where you'll sleep</h2>
@@ -336,7 +435,7 @@ export const PropertyDetailsPage = () => {
                     <div
                       key={room.id}
                       onClick={() => handleOpenRoomModal(room)}
-                      className="group border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden hover:border-emerald-400 hover:shadow-lg transition-all cursor-pointer flex flex-col"
+                      className="prop-room-card group border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden hover:border-emerald-400 hover:shadow-lg transition-all cursor-pointer flex flex-col"
                     >
                       {/* Room Photo Preview Header */}
                       <div className="relative h-48 w-full bg-gray-100 overflow-hidden">
@@ -422,7 +521,7 @@ export const PropertyDetailsPage = () => {
             )}
 
             {/* Getting Around & Location with Interactive Google Map */}
-            <div className="space-y-4 pb-8 border-b border-gray-200">
+            <div className="prop-location-section space-y-4 pb-8 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">Where you'll be & Getting around</h2>
@@ -441,11 +540,11 @@ export const PropertyDetailsPage = () => {
                 )}
               </div>
 
-              <div className="p-5 bg-white rounded-2xl border border-gray-200 shadow-sm space-y-4">
+              <div className="prop-map-block p-5 bg-white rounded-2xl border border-gray-200 shadow-sm space-y-4">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-[#2BB0BB] shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-gray-900 text-sm">Property Address</h4>
+                    <h4 className="font-semibold text-gray-900 text-sm font-heading">Property Address</h4>
                     <p className="text-gray-600 text-sm">{property.location}</p>
                     {property.locationDetails?.floor && (
                       <p className="text-xs text-gray-500 mt-0.5">
@@ -517,12 +616,12 @@ export const PropertyDetailsPage = () => {
             </div>
 
             {/* Amenities & Comfort Services */}
-            <div className="space-y-4 pb-8 border-b border-gray-200">
+            <div className="prop-amenities-section space-y-4 pb-8 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900">What this place offers</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {Array.from(new Set([...property.amenities, ...property.comfortServices])).map(
                   (amenity, idx) => (
-                    <div key={idx} className="flex items-center gap-3 text-gray-700 text-sm">
+                    <div key={idx} className="prop-amenity-item flex items-center gap-3 text-gray-700 text-sm">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>{amenity}</span>
                     </div>
@@ -619,7 +718,7 @@ export const PropertyDetailsPage = () => {
           </div>
 
           {/* Sticky Booking Widget */}
-          <div className="lg:col-span-1">
+          <div className="prop-sticky-booking lg:col-span-1">
             <PropertyBookingCard property={property} />
           </div>
         </div>

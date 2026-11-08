@@ -49,6 +49,7 @@ interface DateFilterProps {
   onSelectDates: (dateRange: { from: Date; to: Date }) => void;
   initialDateRange?: { from?: Date; to?: Date };
   currentDateRange?: { from: Date; to: Date };
+  initialSection?: "checkin" | "checkout";
 }
 
 const DateFilter = ({
@@ -57,6 +58,7 @@ const DateFilter = ({
   onSelectDates,
   initialDateRange,
   currentDateRange,
+  initialSection = "checkin",
 }: DateFilterProps) => {
   const [checkInDate, setCheckInDate] = useState<Date | undefined>(
     initialDateRange?.from
@@ -65,8 +67,20 @@ const DateFilter = ({
     initialDateRange?.to
   );
   const [activeSection, setActiveSection] = useState<"checkin" | "checkout">(
-    "checkin"
+    initialSection
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialSection) {
+        setActiveSection(initialSection);
+      }
+      const from = currentDateRange?.from || initialDateRange?.from;
+      const to = currentDateRange?.to || initialDateRange?.to;
+      if (from) setCheckInDate(from);
+      if (to) setCheckOutDate(to);
+    }
+  }, [isOpen, initialSection, currentDateRange, initialDateRange]);
 
   useEffect(() => {
     if (initialDateRange?.from) setCheckInDate(initialDateRange.from);

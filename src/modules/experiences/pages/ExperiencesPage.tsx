@@ -1,4 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from '@/components/Navbar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,7 +11,10 @@ import { Search, Compass, AlertCircle, RefreshCw, Sparkles } from 'lucide-react'
 import { ExperienceCard } from '../components/ExperienceCard';
 import { useExperiences } from '../hooks/useExperiences';
 
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
 export const ExperiencesPage = () => {
+  const pageRef = useRef<HTMLDivElement>(null);
   const [likedExperiences, setLikedExperiences] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -60,46 +66,83 @@ export const ExperiencesPage = () => {
     });
   }, [experiences, selectedCategory, searchQuery, sortBy]);
 
+  // GSAP animations
+  useGSAP(
+    () => {
+      gsap.from('.exp-header', {
+        y: -25,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power3.out',
+      });
+
+      gsap.from('.exp-filter-bar', {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.out',
+        delay: 0.2,
+      });
+    },
+    { scope: pageRef }
+  );
+
+  useGSAP(
+    () => {
+      if (displayedExperiences.length === 0) return;
+
+      gsap.from('.exp-card-item', {
+        y: 35,
+        opacity: 0,
+        scale: 0.96,
+        duration: 0.6,
+        stagger: 0.08,
+        ease: 'power2.out',
+      });
+    },
+    { dependencies: [displayedExperiences.length], scope: pageRef }
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div ref={pageRef} className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 py-8 w-full flex-1">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="exp-header text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full mb-3">
             <Sparkles className="w-3.5 h-3.5" /> Handpicked Kerala Traditions
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-3">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-3 font-heading">
             Kerala Experiences & Adventures
           </h1>
-          <p className="text-gray-600 text-lg leading-relaxed">
+          <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
             Immerse yourself in authentic village walks, canoe rides, tea plantation treks, and cultural traditions led by passionate local hosts.
           </p>
         </div>
 
         {/* Search & Filters Bar */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="exp-filter-bar bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative w-full md:w-96">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search experiences..."
-              className="pl-9 bg-gray-50 border-gray-200"
+              className="pl-9 bg-gray-50 border-gray-200 rounded-xl text-xs h-10"
             />
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             {/* Category Select */}
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48 bg-gray-50">
+              <SelectTrigger className="w-full md:w-48 bg-gray-50 rounded-xl text-xs h-10">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat === 'all' ? 'All Categories' : cat}
+                  <SelectItem key={cat} value={cat} className="text-xs capitalize">
+                    {cat === 'all' ? 'All Categories' : cat.toLowerCase().replace(/_/g, ' ')}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -107,14 +150,14 @@ export const ExperiencesPage = () => {
 
             {/* Sort By */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-44 bg-gray-50">
+              <SelectTrigger className="w-full md:w-44 bg-gray-50 rounded-xl text-xs h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="popularity">Most Popular</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="rating">Highest Rated</SelectItem>
+                <SelectItem value="popularity" className="text-xs">Most Popular</SelectItem>
+                <SelectItem value="price-low" className="text-xs">Price: Low to High</SelectItem>
+                <SelectItem value="price-high" className="text-xs">Price: High to Low</SelectItem>
+                <SelectItem value="rating" className="text-xs">Highest Rated</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -168,12 +211,13 @@ export const ExperiencesPage = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayedExperiences.map((exp) => (
-                  <ExperienceCard
-                    key={exp.id}
-                    experience={exp}
-                    isLiked={likedExperiences.includes(exp.id)}
-                    onToggleLike={toggleLike}
-                  />
+                  <div key={exp.id} className="exp-card-item">
+                    <ExperienceCard
+                      experience={exp}
+                      isLiked={likedExperiences.includes(exp.id)}
+                      onToggleLike={toggleLike}
+                    />
+                  </div>
                 ))}
               </div>
             )}

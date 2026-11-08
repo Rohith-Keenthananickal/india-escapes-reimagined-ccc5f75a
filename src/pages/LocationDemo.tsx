@@ -41,7 +41,7 @@ const LocationDemo = () => {
     distance: 0,
     description: "Beautiful homestay with stunning mountain views",
     icon: Home,
-    color: "purple",
+    color: "teal",
     address: "Mall Road, Mussoorie, Uttarakhand",
     phone: "+91 98765 43210",
     website: "https://mountainview.com",
@@ -178,7 +178,7 @@ const LocationDemo = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Grid className="w-5 h-5 text-purple-600" />
+                  <Grid className="w-5 h-5 text-[#1A8491]" />
                   <span>Location Card Components</span>
                 </CardTitle>
                 <p className="text-gray-600">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { GoogleMap, Marker, InfoWindow, OverlayView } from "@react-google-maps/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,38 +61,25 @@ const PriceMarker = ({ property, onClick, isSelected }: {
                        <div className={`
                  border-2 rounded-2xl shadow-lg px-3 py-2 min-w-[80px]
                  ${isSelected
-                   ? 'bg-black shadow-xl scale-110 z-50'
-                   : 'bg-white border-gray-300 hover:border-pink-400'
+                   ? 'bg-[#1F1F1F] text-white border-[#2BB0BB] shadow-xl scale-110 z-50'
+                   : 'bg-white border-gray-300 hover:border-[#2BB0BB]'
                  }
                `}>
                  <div className="text-center">
                    <div className={`text-sm font-bold ${
-                     isSelected ? 'text-white' : 'text-gray-900'
+                     isSelected ? 'text-[#FFD26E]' : 'text-gray-900'
                    }`}>
                      ₹{property.price.toLocaleString()}
                    </div>
-            {/* <div className="text-xs text-gray-500">
-              per night
-            </div>
-            {property.isNew && (
-              <div className="text-xs text-green-600 font-medium mt-1">
-                NEW
-              </div>
-            )} */}
-            {/* {property.isSuperhost && (
-              <div className="text-xs text-purple-600 font-medium mt-1">
-                SUPERHOST
-              </div>
-            )} */}
-          </div>
-        </div>
-        {/* Arrow pointing down */}
-        <div className="flex justify-center">
-          <div className={`
-            w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent
-            ${isSelected ? 'border-t-pink-500' : 'border-t-gray-300'}
-          `}></div>
-        </div>
+                 </div>
+               </div>
+               {/* Arrow pointing down */}
+               <div className="flex justify-center">
+                 <div className={`
+                   w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent
+                   ${isSelected ? 'border-t-[#2BB0BB]' : 'border-t-gray-300'}
+                 `}></div>
+               </div>
       </div>
     </OverlayView>
   );
@@ -437,7 +425,13 @@ const SearchResults = () => {
   };
 
   const handleBookNow = (propertyId: number) => {
-    navigate(`/property/${propertyId}`);
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
+    const params = new URLSearchParams();
+    params.set('checkIn', searchParams.get('checkIn') || todayStr);
+    params.set('checkOut', searchParams.get('checkOut') || tomorrowStr);
+    params.set('guests', searchParams.get('guests') || '2');
+    navigate(`/property/${propertyId}?${params.toString()}`);
   };
 
   const closePropertyOverlay = () => {
@@ -678,7 +672,7 @@ const SearchResults = () => {
                             </Badge>
                           )}
                           {property.isSuperhost && (
-                            <Badge className="bg-purple-600 text-white text-xs px-2 py-1">
+                            <Badge className="bg-[#FFD26E] text-[#1F1F1F] font-semibold border border-[#D4A237]/40 text-xs px-2 py-1 shadow-xs">
                               Superhost
                             </Badge>
                           )}

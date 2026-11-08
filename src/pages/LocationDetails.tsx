@@ -130,7 +130,7 @@ const LocationDetails = () => {
   const getLocationColor = (type: string) => {
     const colorMap = {
       waterfall: "blue",
-      homestay: "purple",
+      homestay: "teal",
       hotel: "indigo",
       restaurant: "orange",
       service: "green",
@@ -154,7 +154,7 @@ const LocationDetails = () => {
 
   const getCategoryColor = (category: string) => {
     const colorMap = {
-      experiences: "purple",
+      experiences: "teal",
       services: "green",
       accommodations: "indigo",
     };
@@ -558,7 +558,7 @@ const LocationDetails = () => {
                   ) : (
                     <Button
                       onClick={handleAddToCart}
-                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      className="w-full bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-bold transition-colors shadow-sm"
                       size="lg"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />

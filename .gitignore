@@ -12,6 +12,13 @@ node_modules
 dist-ssr
 *.local
 
+# Secrets / local env (never commit)
+.env
+.env.*
+!.env.example
+client_secret*.json
+*.apps.googleusercontent.com.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

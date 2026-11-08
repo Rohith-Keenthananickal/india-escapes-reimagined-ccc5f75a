@@ -552,14 +552,14 @@ const NearbyLocations = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <div className="bg-gradient-to-r from-brand-teal-50 to-[#E1F4F6] p-4 rounded-xl border border-[#B6E5E9] shadow-md hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-200 rounded-lg">
-              <Sparkles className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-brand-teal-100 rounded-lg">
+              <Sparkles className="w-5 h-5 text-[#1A8491]" />
             </div>
             <div>
-              <p className="text-sm text-purple-600 font-medium">Experiences</p>
-              <p className="text-2xl font-bold text-purple-900">
+              <p className="text-sm text-[#1A8491] font-semibold">Experiences</p>
+              <p className="text-2xl font-bold font-heading text-[#1F1F1F]">
                 {getLocationsByCategory("experiences").length}
               </p>
             </div>
@@ -703,9 +703,9 @@ const NearbyLocations = ({
                     {category === "experiences" && (
                       <Badge
                         variant="secondary"
-                        className="bg-purple-100 text-purple-800"
+                        className="bg-[#FFD26E]/20 text-[#1F1F1F] border border-[#D4A237]/40 font-semibold"
                       >
-                        <TrendingUp className="w-3 h-3 mr-1" />
+                        <TrendingUp className="w-3 h-3 mr-1 text-[#D4A237]" />
                         Trending
                       </Badge>
                     )}

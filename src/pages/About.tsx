@@ -87,15 +87,15 @@ const About = () => {
         
         <div className="relative z-10 max-w-6xl mx-auto text-center">
           <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-            About Hevan Connect Travel
+            About TriphavenCo
           </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Revolutionizing Global Tourism Through
-            <span className="text-primary"> Authentic Connections</span>
+          <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-6 leading-tight">
+            Revolutionizing Authentic Homestays Through
+            <span className="text-[#FFD26E]"> Cultural Connections</span>
           </h1>
           <p className="text-xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-            A tech-driven tourism startup that bridges global travelers with authentic homestays, 
-            immersive cultural experiences, and trusted local services across Europe, North America, and Asia.
+            A tech-driven tourism platform that bridges global travelers with authentic Kerala homestays, 
+            immersive cultural experiences, and trusted local services.
           </p>
         </div>
       </section>
@@ -210,8 +210,8 @@ const About = () => {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Why Choose Hevan Connect?
+            <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4">
+              Why Choose TriphavenCo?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
               We're not just offering a place to stay—we're reimagining the future of tourism. 
@@ -263,11 +263,11 @@ const About = () => {
               <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
                 UN Sustainable Development Goals
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-6">
                 Supporting Global Sustainability
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                At Hevan Connect, we align with 10 key UN Sustainable Development Goals (SDGs) 
+                At TriphavenCo, we align with 10 key UN Sustainable Development Goals (SDGs) 
                 through our responsible tourism model. Every booking creates a ripple effect of 
                 positive impact across communities worldwide.
               </p>

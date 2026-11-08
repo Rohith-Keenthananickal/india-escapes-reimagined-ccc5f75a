@@ -58,25 +58,24 @@ const AccountDeletion = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-teal-50/60 to-[#F8FAFB] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">VR</span>
-            </div>
-            <span className="text-2xl font-bold text-gray-900">
-              Hevan Connect Travel
-            </span>
+            <img 
+              src="/Logo_color.svg" 
+              alt="TriphavenCo Logo" 
+              className="h-9 w-auto" 
+            />
           </Link>
         </div>
 
-        <Card className="shadow-xl">
+        <Card className="shadow-xl border-border">
           <CardHeader className="text-center">
             <div className="mx-auto w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-2">
               <Trash2 className="w-7 h-7 text-red-600" />
             </div>
-            <CardTitle className="text-2xl font-bold">Delete your account</CardTitle>
+            <CardTitle className="text-2xl font-bold font-heading text-[#1F1F1F]">Delete your account</CardTitle>
             <p className="text-gray-600">
               Enter the email address associated with your account. We&apos;ll send
               you instructions to complete the deletion.
@@ -94,7 +93,7 @@ const AccountDeletion = () => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 focus-visible:ring-[#2BB0BB]"
                     autoComplete="email"
                   />
                 </div>
@@ -102,7 +101,7 @@ const AccountDeletion = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-pink-500 hover:bg-pink-600"
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold transition-colors"
               >
                 Request account deletion
               </Button>
@@ -111,7 +110,7 @@ const AccountDeletion = () => {
             <div className="text-center">
               <Link
                 to="/login"
-                className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center text-sm text-gray-600 hover:text-[#1A8491] font-medium"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to login

@@ -1,87 +1,103 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* TriphavenCo Official Brand Design Tokens */
+    --color-primary: #2BB0BB;
+    --color-primary-700: #1A8491;
+    --color-secondary: #FFD26E;
+    --color-secondary-700: #D4A237;
+    --color-text-primary: #1F1F1F;
+    --color-background: #F8FAFB;
+    --font-primary: 'Poppins', sans-serif;
+    --font-secondary: 'Sora', sans-serif;
+
+    /* Semantic HSL tokens consumed by Tailwind & shadcn */
+    --background: 200 33% 98%; /* #F8FAFB light neutral */
+    --foreground: 0 0% 12%;    /* #1F1F1F dark primary text */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 12%;
 
-    --primary: 330 77% 60%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary Teal #2BB0BB (canonical) with #1F1F1F dark foreground for WCAG AA 6.35:1 contrast */
+    --primary: 185 63% 45%;
+    --primary-700: 186 70% 34%; /* #1A8491 */
+    --primary-foreground: 0 0% 12%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary Yellow #FFD26E with #1F1F1F dark foreground for WCAG AA 11.6:1 contrast */
+    --secondary: 41 100% 72%;
+    --secondary-700: 41 64% 52%; /* #D4A237 */
+    --secondary-foreground: 0 0% 12%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 200 15% 94%;
+    --muted-foreground: 206 10% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 185 50% 95%;
+    --accent-foreground: 186 70% 30%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 330 77% 60%;
+    --border: 200 14% 90%;
+    --input: 200 14% 90%;
+    --ring: 185 63% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 200 33% 98%;
+    --sidebar-foreground: 0 0% 12%;
+    --sidebar-primary: 185 63% 45%;
+    --sidebar-primary-foreground: 0 0% 12%;
+    --sidebar-accent: 185 50% 95%;
+    --sidebar-accent-foreground: 186 70% 30%;
+    --sidebar-border: 200 14% 90%;
+    --sidebar-ring: 185 63% 45%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 12%;
+    --foreground: 200 33% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 15%;
+    --card-foreground: 200 33% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 200 33% 98%;
 
-    --primary: 330 77% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 185 63% 45%;
+    --primary-700: 186 70% 34%;
+    --primary-foreground: 0 0% 12%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 41 100% 72%;
+    --secondary-700: 41 64% 52%;
+    --secondary-foreground: 0 0% 12%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 200 15% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 186 70% 20%;
+    --accent-foreground: 185 63% 65%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 0 0% 24%;
+    --input: 0 0% 24%;
+    --ring: 185 63% 45%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 15%;
+    --sidebar-foreground: 200 33% 98%;
+    --sidebar-primary: 185 63% 45%;
+    --sidebar-primary-foreground: 0 0% 12%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 200 33% 98%;
+    --sidebar-border: 0 0% 24%;
+    --sidebar-ring: 185 63% 45%;
   }
 }
 
@@ -91,24 +107,29 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    font-family: var(--font-primary);
+    @apply bg-background text-foreground antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-secondary);
+    letter-spacing: -0.015em;
   }
 }
 
-/* Custom styles */
+/* Custom TriphavenCo brand helper utilities */
 .property-card-hover {
-  @apply transition-all duration-300 ease-in-out transform hover:shadow-lg hover:-translate-y-1;
+  @apply transition-all duration-300 ease-in-out transform hover:shadow-xl hover:-translate-y-1 hover:border-[#2BB0BB]/40;
 }
 
 .gradient-overlay {
-  @apply absolute inset-0 bg-gradient-to-t from-black/70 to-transparent;
+  @apply absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent;
 }
 
 .icon-circle {
-  @apply w-10 h-10 rounded-full flex items-center justify-center bg-white;
+  @apply w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-sm;
 }
 
-/* Custom animations */
 .hover-scale {
   @apply transition-transform duration-200 hover:scale-105;
 }

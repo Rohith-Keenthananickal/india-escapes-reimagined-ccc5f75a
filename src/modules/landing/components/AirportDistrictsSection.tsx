@@ -40,10 +40,10 @@ export const AirportDistrictsSection = () => {
   return (
     <section className="max-w-7xl mx-auto px-4 py-16">
       <div className="text-center mb-12">
-        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600">
+        <div className="w-12 h-12 bg-[#E1F4F6] rounded-full flex items-center justify-center mx-auto mb-3 text-[#1A8491]">
           <Plane className="w-6 h-6" />
         </div>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
+        <h2 className="text-3xl md:text-4xl font-extrabold font-heading text-gray-900">
           Airport-Accessible District Highlights
         </h2>
         <p className="text-lg text-gray-600 mt-2">
@@ -55,25 +55,25 @@ export const AirportDistrictsSection = () => {
         {AIRPORT_DISTRICTS.map((district) => (
           <Card
             key={district.code}
-            className="group hover:shadow-xl transition-all duration-300 text-center p-6 border-2 border-gray-100 hover:border-blue-400 bg-white rounded-2xl flex flex-col justify-between"
+            className="group hover:shadow-xl transition-all duration-300 text-center p-6 border-2 border-gray-100 hover:border-[#2BB0BB]/50 bg-white rounded-2xl flex flex-col justify-between"
           >
             <div className="mb-4">
-              <div className="w-14 h-14 bg-blue-50 group-hover:bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-colors">
-                <Plane className="w-7 h-7 text-blue-600 group-hover:scale-110 transition-transform" />
+              <div className="w-14 h-14 bg-brand-teal-50 group-hover:bg-[#E1F4F6] rounded-2xl flex items-center justify-center mx-auto mb-3 transition-colors">
+                <Plane className="w-7 h-7 text-[#1A8491] group-hover:scale-110 transition-transform" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1">
+              <h3 className="text-xl font-bold font-heading text-gray-900 mb-1">
                 {district.name}
               </h3>
               <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                 {district.description}
               </p>
-              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 font-semibold px-3 py-0.5">
+              <Badge className="bg-[#FFD26E]/20 text-[#1F1F1F] border border-[#D4A237]/40 font-semibold px-3 py-0.5 shadow-none">
                 Airport Code: {district.code}
               </Badge>
             </div>
 
             <div className="border-t border-gray-100 pt-4 mt-2">
-              <div className="text-2xl font-extrabold text-blue-600">
+              <div className="text-2xl font-extrabold text-[#1A8491]">
                 {district.stays}+
               </div>
               <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">

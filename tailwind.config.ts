@@ -19,6 +19,12 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Poppins', 'sans-serif'],
+				primary: ['Poppins', 'sans-serif'],
+				heading: ['Sora', 'sans-serif'],
+				secondary: ['Sora', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -27,11 +33,13 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					700: 'hsl(var(--primary-700))',
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					foreground: 'hsl(var(--secondary-foreground))',
+					700: 'hsl(var(--secondary-700))',
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -62,6 +70,39 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Official TriphavenCo Brand Design Tokens
+				brand: {
+					primary: '#2BB0BB',
+					'primary-700': '#1A8491',
+					secondary: '#FFD26E',
+					'secondary-700': '#D4A237',
+					dark: '#1F1F1F',
+					light: '#F8FAFB',
+					teal: {
+						50: '#F0F9FA',
+						100: '#E1F4F6',
+						200: '#B6E5E9',
+						300: '#8CD5DC',
+						400: '#52C2CC',
+						500: '#2BB0BB', // Canonical primary teal
+						600: '#23959E',
+						700: '#1A8491', // Primary 700
+						800: '#156771',
+						900: '#0F474E',
+					},
+					gold: {
+						50: '#FFFDF5',
+						100: '#FFF9E6',
+						200: '#FFF2CC',
+						300: '#FFE599',
+						400: '#FFD26E', // Secondary yellow
+						500: '#E6BC50',
+						600: '#D4A237', // Secondary 700
+						700: '#A67B22',
+						800: '#755414',
+						900: '#473208',
+					}
 				}
 			},
 			borderRadius: {

@@ -60,6 +60,19 @@ export interface BackendPropertyItem {
   progress_step: number;
   is_verified: boolean;
   property_details?: PropertyDetailsResponse | null;
+
+  // Dynamic pricing fields from backend
+  price_per_night?: number | null;
+  total_price?: number | null;
+  price?: number | null;
+  currency?: string;
+  is_available?: boolean;
+  pricing_type?: string | null;
+  number_of_nights?: number | null;
+  min_nightly_price?: number | null;
+  max_nightly_price?: number | null;
+  is_entire_place?: boolean;
+
   created_at: string;
   updated_at: string;
 }
@@ -163,6 +176,10 @@ export interface LandingPropertyCard {
   classification: string;
   district?: string;
   daysAgo?: number;
+  totalPrice?: number;
+  numberOfNights?: number;
+  isAvailable?: boolean;
+  pricingType?: string;
 }
 
 export interface FilterState {

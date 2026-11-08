@@ -79,12 +79,21 @@ export function mapBackendPropertyToCard(prop: BackendPropertyItem): LandingProp
 
   const hostDisplay = prop.host_name || details?.other_name || (details?.host_languages?.length ? `Host (${details.host_languages[0]})` : `Host #${prop.user_id}`);
 
+  // Calculate effective price from backend pricing fields
+  const effectivePrice = Number(
+    prop.price_per_night ?? prop.price ?? (prop.total_price && prop.number_of_nights ? Math.round(prop.total_price / prop.number_of_nights) : (prop.total_price ?? 0))
+  );
+
   return {
     id: prop.id,
     title: prop.property_name || `Property #${prop.id}`,
     location,
-    // Real values: 0 represents that pricing or reviews are not yet provided by the API
-    price: 0,
+    // Real pricing calculated from backend rooms / dates / whole property
+    price: effectivePrice,
+    totalPrice: prop.total_price ? Number(prop.total_price) : undefined,
+    numberOfNights: prop.number_of_nights ?? undefined,
+    isAvailable: prop.is_available !== false,
+    pricingType: prop.pricing_type || (effectivePrice > 0 ? 'STARTING_FROM' : 'ON_REQUEST'),
     rating: 0,
     reviews: 0,
     images,
@@ -122,6 +131,7 @@ export const landingService = {
       page: 1,
       limit,
       status: ['ACTIVE'],
+      verification_status: ['APPROVED'],
     });
 
     return (res.data || []).map(mapBackendPropertyToCard);
@@ -137,6 +147,7 @@ export const landingService = {
           skip: 0,
           limit,
           status_filter: 'ACTIVE',
+          approval_status_filter: 'APPROVED',
         },
       });
       return res.data || [];

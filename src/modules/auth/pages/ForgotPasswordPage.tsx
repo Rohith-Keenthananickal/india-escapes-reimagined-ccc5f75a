@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,25 +7,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
-const ForgotPassword = () => {
+export const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle password reset logic here
     setIsSubmitted(true);
     toast({
-      title: "Reset link sent!",
-      description: "Check your email for password reset instructions.",
+      title: 'Reset link sent!',
+      description: 'Check your email for password reset instructions.',
     });
   };
 
   const handleResend = () => {
     toast({
-      title: "Email resent!",
-      description: "Check your inbox for the new reset link.",
+      title: 'Email resent!',
+      description: 'Check your inbox for the new reset link.',
     });
   };
 
@@ -52,8 +50,11 @@ const ForgotPassword = () => {
                   resend
                 </Button>
               </div>
-              
-              <Button onClick={() => navigate('/login')} className="w-full bg-pink-500 hover:bg-pink-600">
+
+              <Button
+                onClick={() => navigate('/login')}
+                className="w-full bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-bold transition-colors"
+              >
                 Back to login
               </Button>
             </CardContent>
@@ -64,21 +65,24 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-teal-50/60 to-[#F8FAFB] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* TriphavenCo Official Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">VR</span>
-            </div>
-            <span className="text-2xl font-bold text-gray-900">Hevan Connect Travel</span>
+          <Link to="/" className="inline-flex items-center justify-center">
+            <img
+              src="/Logo_color.svg"
+              alt="TriphavenCo"
+              className="h-10 w-auto object-contain"
+            />
           </Link>
         </div>
 
-        <Card className="shadow-xl">
+        <Card className="shadow-xl border-gray-200/80 rounded-2xl bg-white">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Forgot your password?</CardTitle>
+            <CardTitle className="text-2xl font-bold font-heading text-gray-900">
+              Forgot your password?
+            </CardTitle>
             <p className="text-gray-600">
               No worries! Enter your email and we'll send you a reset link.
             </p>
@@ -101,14 +105,17 @@ const ForgotPassword = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-pink-500 hover:bg-pink-600">
+              <Button
+                type="submit"
+                className="w-full bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-bold transition-colors"
+              >
                 Send reset link
               </Button>
             </form>
 
             <div className="text-center">
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -119,9 +126,9 @@ const ForgotPassword = () => {
         </Card>
 
         <div className="mt-8 text-center">
-          <img 
-            src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300&h=150&fit=crop" 
-            alt="Heritage building" 
+          <img
+            src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=300&h=150&fit=crop"
+            alt="Heritage building"
             className="w-full h-32 object-cover rounded-xl opacity-80"
           />
         </div>
@@ -130,4 +137,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordPage;

@@ -271,11 +271,11 @@ const LocationCard = ({
           )}
 
           {location.phone && (
-            <div className="flex items-start space-x-3 p-3 bg-purple-50 rounded-lg">
-              <Phone className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start space-x-3 p-3 bg-brand-teal-50 rounded-lg">
+              <Phone className="w-4 h-4 text-[#1A8491] mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-purple-900">Phone</p>
-                <p className="text-sm text-purple-700">{location.phone}</p>
+                <p className="text-sm font-medium text-[#1A8491]">Phone</p>
+                <p className="text-sm text-gray-700">{location.phone}</p>
               </div>
             </div>
           )}
@@ -298,7 +298,7 @@ const LocationCard = ({
             <Button
               size="sm"
               variant="outline"
-              className="flex items-center justify-center space-x-2 border-2 hover:border-blue-500 hover:bg-blue-50"
+              className="flex items-center justify-center space-x-2 border hover:border-[#2BB0BB] hover:bg-brand-teal-50 hover:text-brand-primary-700"
               onClick={handleDirections}
             >
               <Navigation className="w-4 h-4" />
@@ -307,7 +307,7 @@ const LocationCard = ({
             <Button
               size="sm"
               variant="outline"
-              className="flex items-center justify-center space-x-2 border-2 hover:border-green-500 hover:bg-green-50"
+              className="flex items-center justify-center space-x-2 border hover:border-[#2BB0BB] hover:bg-brand-teal-50 hover:text-brand-primary-700"
               onClick={handleViewOnGoogleMaps}
             >
               <ExternalLink className="w-4 h-4" />
@@ -317,7 +317,7 @@ const LocationCard = ({
               <Button
                 size="sm"
                 variant="outline"
-                className="flex items-center justify-center space-x-2 border-2 hover:border-purple-500 hover:bg-purple-50"
+                className="flex items-center justify-center space-x-2 border hover:border-[#2BB0BB] hover:bg-brand-teal-50 hover:text-brand-primary-700"
                 onClick={handlePhoneClick}
               >
                 <Phone className="w-4 h-4" />
@@ -328,7 +328,7 @@ const LocationCard = ({
               <Button
                 size="sm"
                 variant="outline"
-                className="flex items-center justify-center space-x-2 border-2 hover:border-orange-500 hover:bg-orange-50"
+                className="flex items-center justify-center space-x-2 border hover:border-[#D4A237] hover:bg-brand-gold-50 hover:text-[#D4A237]"
                 onClick={handleWebsiteClick}
               >
                 <Globe className="w-4 h-4" />
@@ -338,7 +338,7 @@ const LocationCard = ({
             {showAddToCart && (
               <Button
                 size="sm"
-                className="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex items-center justify-center space-x-2 bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-semibold transition-colors"
                 onClick={handleAddToCart}
               >
                 <ShoppingCart className="w-4 h-4" />

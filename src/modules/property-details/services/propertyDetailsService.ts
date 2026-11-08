@@ -177,12 +177,21 @@ export const propertyDetailsService = {
     const hostUserType = hostUser?.user_type || 'HOST';
     const memberSince = hostUser?.created_at ? new Date(hostUser.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : undefined;
 
+    // Determine base per-person price from configured rooms or whole property
+    const roomPrices = (prop.rooms || [])
+      .map((r: any) => r.weekday_price)
+      .filter((p: any) => typeof p === 'number' && p > 0);
+    if (prop.whole_property_weekday_price && prop.whole_property_weekday_price > 0) {
+      roomPrices.push(prop.whole_property_weekday_price);
+    }
+    const basePerPersonPrice = roomPrices.length > 0 ? Math.min(...roomPrices) : 0;
+
     return {
       id: prop.id,
       userId: prop.user_id,
       title: prop.property_name || 'Kerala Homestay Retreat',
       location,
-      price: 0,
+      price: basePerPersonPrice,
       rating: 0,
       reviewCount: 0,
       images,

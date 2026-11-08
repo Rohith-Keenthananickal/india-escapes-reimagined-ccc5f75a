@@ -1,617 +1,1015 @@
-
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Star, Heart, Calendar, MessageCircle, Bell, Settings, CreditCard, MapPin, Edit } from 'lucide-react';
-import { format } from 'date-fns';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import {
+  Heart,
+  Calendar,
+  MessageCircle,
+  Bell,
+  Settings,
+  CreditCard,
+  MapPin,
+  Edit,
+  Loader2,
+  Star,
+  CheckCircle2,
+  ShieldCheck,
+  Compass,
+  ArrowRight,
+  LogOut,
+  Send,
+  Plus,
+  Trash2,
+  Sparkles,
+  Lock,
+  User as UserIcon,
+  Phone,
+  Mail,
+  Camera,
+  Check,
+} from 'lucide-react';
+import { useAuth } from '@/modules/auth';
+import { useTripsQuery } from '@/modules/bookings/hooks/useTrips';
+import { TripOrderCard } from '@/modules/bookings/components/TripOrderCard';
+import { toast } from '@/hooks/use-toast';
 
-const UserDashboard = () => {
-  const [activeTab, setActiveTab] = useState('bookings');
+interface MessageThread {
+  id: number;
+  host: string;
+  image: string;
+  property: string;
+  lastMessage: string;
+  time: string;
+  unread: boolean;
+  history: Array<{ sender: 'host' | 'user'; text: string; time: string }>;
+}
 
-  const upcomingBookings = [
+export default function UserDashboard() {
+  const [activeTab, setActiveTab] = useState<'bookings' | 'wishlist' | 'messages' | 'notifications' | 'settings'>('bookings');
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { data: tripOrders, isLoading: tripsLoading } = useTripsQuery();
+
+  // Wishlists state
+  const [wishlists, setWishlists] = useState([
     {
       id: 1,
-      property: "Cozy Hill Station Cottage",
-      location: "Mussoorie, Uttarakhand",
-      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c93a?w=400&h=300&fit=crop",
-      checkIn: new Date(2025, 6, 15),
-      checkOut: new Date(2025, 6, 21),
-      price: 3500 * 6,
-      status: "confirmed"
-    }
-  ];
-
-  const pastBookings = [
-    {
-      id: 2,
-      property: "Heritage Haveli Experience",
-      location: "Jaipur, Rajasthan",
-      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=300&fit=crop",
-      checkIn: new Date(2024, 2, 5),
-      checkOut: new Date(2024, 2, 10),
-      price: 6500 * 5,
-      status: "completed",
-      rating: 5
-    }
-  ];
-
-  const wishlists = [
-    {
-      id: 1,
-      name: "Summer Getaways",
+      name: 'Summer Getaways',
       count: 4,
-      coverImage: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=300&h=200&fit=crop"
+      coverImage: 'https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=300&fit=crop',
     },
     {
       id: 2,
-      name: "Mountain Retreats",
+      name: 'Mountain Retreats',
       count: 3,
-      coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop"
-    }
-  ];
-
-  const savedProperties = [
+      coverImage: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=300&fit=crop',
+    },
     {
       id: 3,
-      title: "Backwater Villa Retreat",
-      location: "Alleppey, Kerala",
+      name: 'Heritage Backwater Homestays',
+      count: 5,
+      coverImage: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=500&h=300&fit=crop',
+    },
+  ]);
+
+  const [savedProperties, setSavedProperties] = useState([
+    {
+      id: 3,
+      title: 'Backwater Villa Retreat',
+      location: 'Alleppey, Kerala',
       price: 4200,
-      rating: 4.7,
-      image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop"
+      rating: 4.85,
+      image: 'https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=350&fit=crop',
+      liked: true,
     },
     {
       id: 4,
-      title: "Mountain View Homestay",
-      location: "Manali, Himachal Pradesh",
-      price: 2800,
-      rating: 4.6,
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
-    }
-  ];
+      title: 'Tea Garden Heritage Bungalow',
+      location: 'Munnar, Kerala',
+      price: 3600,
+      rating: 4.92,
+      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=350&fit=crop',
+      liked: true,
+    },
+    {
+      id: 5,
+      title: 'Cliffside Ocean Homestay',
+      location: 'Varkala, Kerala',
+      price: 5100,
+      rating: 4.78,
+      image: 'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=500&h=350&fit=crop',
+      liked: true,
+    },
+  ]);
 
-  const messages = [
+  // Messages state
+  const [messages, setMessages] = useState<MessageThread[]>([
     {
       id: 1,
-      host: "Priya",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b5c5?w=50&h=50&fit=crop&crop=face",
-      property: "Cozy Hill Station Cottage",
-      lastMessage: "Hi there! Looking forward to hosting you. Let me know if you need anything before your arrival.",
-      time: "2 hours ago",
-      unread: true
-    }
-  ];
-
-  const notifications = [
-    {
-      id: 1,
-      title: "Booking confirmed",
-      message: "Your booking at Cozy Hill Station Cottage has been confirmed.",
-      time: "3 hours ago",
-      read: false
+      host: 'Priya Sharma (Superhost)',
+      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5c5?w=100&h=100&fit=crop&crop=face',
+      property: 'Cozy Munnar Hill Cottage',
+      lastMessage: 'Hi there! Looking forward to hosting you in Munnar. Let me know if you need anything before arrival.',
+      time: '2 hours ago',
+      unread: true,
+      history: [
+        { sender: 'host', text: 'Hi Tanvi, welcome to our hill cottage! Your booking is confirmed.', time: '10:00 AM' },
+        { sender: 'user', text: 'Thank you Priya! Is there vehicle parking available on premises?', time: '10:15 AM' },
+        { sender: 'host', text: 'Yes, we have private covered parking right beside the cottage.', time: '10:20 AM' },
+        { sender: 'host', text: 'Hi there! Looking forward to hosting you in Munnar. Let me know if you need anything before arrival.', time: '11:30 AM' },
+      ],
     },
     {
       id: 2,
-      title: "Price drop alert",
-      message: "A property in your wishlist is now 15% off!",
-      time: "1 day ago",
-      read: true
+      host: 'Mathew Thomas',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+      property: 'Vembanad Lake Backwater Stay',
+      lastMessage: 'The sunset canoe boat tour is scheduled for 5:30 PM tomorrow.',
+      time: '1 day ago',
+      unread: false,
+      history: [
+        { sender: 'host', text: 'Hello! Looking forward to taking you on the lake.', time: 'Yesterday' },
+        { sender: 'host', text: 'The sunset canoe boat tour is scheduled for 5:30 PM tomorrow.', time: 'Yesterday' },
+      ],
+    },
+  ]);
+
+  const [selectedThreadId, setSelectedThreadId] = useState<number>(1);
+  const [chatInput, setChatInput] = useState('');
+
+  // Notifications state
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: 'Booking Confirmed',
+      message: 'Your stay at Cozy Munnar Hill Cottage has been locked in and verified.',
+      time: '3 hours ago',
+      read: false,
+      type: 'booking',
+    },
+    {
+      id: 2,
+      title: 'Special Host Price Drop',
+      message: 'Tea Garden Heritage Bungalow in your wishlist is now 15% off for next month.',
+      time: '1 day ago',
+      read: true,
+      type: 'promo',
     },
     {
       id: 3,
-      title: "Review reminder",
-      message: "How was your stay at Heritage Haveli Experience?",
-      time: "3 days ago",
-      read: true
-    }
-  ];
+      title: 'Review Reminder',
+      message: 'Share your travel memories for your recent Kerala Backwaters trip.',
+      time: '3 days ago',
+      read: true,
+      type: 'review',
+    },
+  ]);
+
+  // Settings form state
+  const [fullName, setFullName] = useState(user?.full_name || 'Tanvi Patel');
+  const [email, setEmail] = useState(user?.email || 'tanvi.patel@example.com');
+  const [phone, setPhone] = useState(user?.phone_number || '+91 98765 43210');
+  const [location, setLocation] = useState('Mumbai, Maharashtra, India');
+  const [bio, setBio] = useState('Travel enthusiast passionate about serene backwaters, heritage villas, and culinary journeys across Kerala.');
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [smsNotifs, setSmsNotifs] = useState(true);
+  const [marketingNotifs, setMarketingNotifs] = useState(false);
+
+  // Derived user display
+  const displayName = fullName || user?.full_name || 'Guest Traveler';
+  const displayEmail = email || user?.email || 'guest@triphavenco.com';
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  const activeThread = messages.find((m) => m.id === selectedThreadId) || messages[0];
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    const newMsg = { sender: 'user' as const, text: chatInput.trim(), time: 'Just now' };
+    setMessages((prev) =>
+      prev.map((thread) =>
+        thread.id === selectedThreadId
+          ? {
+              ...thread,
+              lastMessage: newMsg.text,
+              time: 'Just now',
+              history: [...thread.history, newMsg],
+            }
+          : thread
+      )
+    );
+    setChatInput('');
+  };
+
+  const handleToggleLike = (id: number) => {
+    setSavedProperties((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, liked: !p.liked } : p))
+    );
+  };
+
+  const handleMarkAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    toast({
+      title: 'Notifications updated',
+      description: 'All notifications marked as read.',
+    });
+  };
+
+  const handleSaveSettings = () => {
+    toast({
+      title: 'Profile Updated',
+      description: 'Your account preferences and profile information have been saved.',
+    });
+  };
+
+  const unreadMessagesCount = messages.filter((m) => m.unread).length;
+  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F8FAFB] pb-16">
       <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Sidebar */}
-          <div>
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <Avatar className="w-20 h-20 mx-auto">
-                    <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" />
-                    <AvatarFallback>TP</AvatarFallback>
-                  </Avatar>
-                  <h3 className="font-bold text-lg mt-4">Tanvi Patel</h3>
-                  <p className="text-sm text-gray-600">Mumbai, India</p>
-                </div>
 
-                <div className="space-y-1">
-                  <Button 
-                    variant={activeTab === 'bookings' ? 'default' : 'ghost'} 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('bookings')}
-                  >
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Bookings
-                  </Button>
-                  <Button 
-                    variant={activeTab === 'wishlist' ? 'default' : 'ghost'} 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('wishlist')}
-                  >
-                    <Heart className="w-4 h-4 mr-2" />
-                    Wishlist
-                  </Button>
-                  <Button 
-                    variant={activeTab === 'messages' ? 'default' : 'ghost'} 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('messages')}
-                  >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Messages
-                  </Button>
-                  <Button 
-                    variant={activeTab === 'notifications' ? 'default' : 'ghost'} 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('notifications')}
-                  >
-                    <Bell className="w-4 h-4 mr-2" />
-                    Notifications
-                  </Button>
-                  <Button 
-                    variant={activeTab === 'settings' ? 'default' : 'ghost'} 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('settings')}
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Top Welcome Banner */}
+        <div className="bg-white rounded-3xl border border-gray-200/90 p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#2BB0BB] via-teal-400 to-[#FFD26E]" />
+          
+          <div className="flex items-center gap-5">
+            <div className="relative">
+              <Avatar className="w-20 h-20 border-2 border-white shadow-md">
+                <AvatarImage src={user?.profile_image || 'https://images.unsplash.com/photo-1494790108755-2616b612b5c5?w=200&h=200&fit=crop&crop=face'} />
+                <AvatarFallback className="bg-teal-100 text-[#1A8491] font-bold text-lg">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-sm" title="Verified Account">
+                <ShieldCheck className="w-3.5 h-3.5" />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl sm:text-3xl font-heading font-bold text-gray-900 tracking-tight">
+                  Welcome back, {displayName}
+                </h1>
+                <Badge className="bg-teal-50 text-[#1A8491] border-teal-200 font-medium text-xs">
+                  Verified Guest
+                </Badge>
+              </div>
+              <p className="text-sm text-gray-500 flex items-center gap-2">
+                <span>{displayEmail}</span>
+                <span>•</span>
+                <span>Kerala Explorer</span>
+              </p>
+            </div>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            {/* Bookings Tab */}
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => navigate('/properties')}
+              className="bg-[#2BB0BB] hover:bg-[#1A8491] text-white font-medium rounded-xl h-11 px-5 shadow-sm transition-all"
+            >
+              <Compass className="w-4 h-4 mr-2" />
+              <span>Explore Escapes</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* 2-Column Dashboard Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Sidebar Navigation (4 cols on lg, 3 on xl) */}
+          <div className="lg:col-span-4 xl:col-span-3 space-y-4">
+            <Card className="rounded-3xl border border-gray-200/90 shadow-sm overflow-hidden bg-white">
+              <CardContent className="p-3.5 space-y-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('bookings')}
+                  className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'bookings'
+                      ? 'bg-teal-50 text-[#1A8491] shadow-xs'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Calendar className={`w-4 h-4 ${activeTab === 'bookings' ? 'text-[#1A8491]' : 'text-gray-400'}`} />
+                    <span>My Trips & Stays</span>
+                  </div>
+                  {tripOrders && tripOrders.length > 0 && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-teal-100/70 text-[#1A8491]">
+                      {tripOrders.length}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('wishlist')}
+                  className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'wishlist'
+                      ? 'bg-teal-50 text-[#1A8491] shadow-xs'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Heart className={`w-4 h-4 ${activeTab === 'wishlist' ? 'text-[#1A8491]' : 'text-gray-400'}`} />
+                    <span>Wishlist & Saved</span>
+                  </div>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                    {savedProperties.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('messages')}
+                  className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'messages'
+                      ? 'bg-teal-50 text-[#1A8491] shadow-xs'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <MessageCircle className={`w-4 h-4 ${activeTab === 'messages' ? 'text-[#1A8491]' : 'text-gray-400'}`} />
+                    <span>Host Messages</span>
+                  </div>
+                  {unreadMessagesCount > 0 && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                      {unreadMessagesCount} new
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('notifications')}
+                  className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'notifications'
+                      ? 'bg-teal-50 text-[#1A8491] shadow-xs'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Bell className={`w-4 h-4 ${activeTab === 'notifications' ? 'text-[#1A8491]' : 'text-gray-400'}`} />
+                    <span>Notifications</span>
+                  </div>
+                  {unreadNotificationsCount > 0 && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
+                      {unreadNotificationsCount}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('settings')}
+                  className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'settings'
+                      ? 'bg-teal-50 text-[#1A8491] shadow-xs'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Settings className={`w-4 h-4 ${activeTab === 'settings' ? 'text-[#1A8491]' : 'text-gray-400'}`} />
+                    <span>Account Settings</span>
+                  </div>
+                </button>
+
+                <Separator className="my-2 bg-gray-100" />
+
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="w-full flex items-center gap-2.5 p-3 rounded-2xl text-xs sm:text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </CardContent>
+            </Card>
+
+            {/* Quick Travel Tip Card */}
+            <div className="bg-gradient-to-br from-[#2BB0BB]/10 to-teal-50 rounded-3xl border border-teal-100 p-5 space-y-2.5 text-xs text-gray-700">
+              <div className="flex items-center gap-2 font-heading font-semibold text-[#1A8491]">
+                <Sparkles className="w-4 h-4" />
+                <span>Kerala Travel Tip</span>
+              </div>
+              <p className="leading-relaxed">
+                Monsoon retreats in Wayanad and Munnar offer peaceful backwater boat cruises with serene mist. Check our curated seasonal escapes!
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/properties')}
+                className="font-semibold text-[#1A8491] hover:underline flex items-center gap-1 pt-1"
+              >
+                <span>Browse properties</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+
+          {/* Right Main Content (8 cols on lg, 9 on xl) */}
+          <div className="lg:col-span-8 xl:col-span-9">
+            {/* 1. BOOKINGS TAB */}
             {activeTab === 'bookings' && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold">Your Bookings</h2>
-                <Tabs defaultValue="upcoming">
-                  <TabsList>
-                    <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                    <TabsTrigger value="past">Past</TabsTrigger>
-                    <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="upcoming">
-                    <div className="space-y-4 mt-6">
-                      {upcomingBookings.map((booking) => (
-                        <Card key={booking.id}>
-                          <CardContent className="p-0">
-                            <div className="flex flex-col md:flex-row">
-                              {/* Image */}
-                              <div className="w-full md:w-48 h-48">
-                                <img 
-                                  src={booking.image} 
-                                  alt={booking.property}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              
-                              {/* Details */}
-                              <div className="flex-1 p-6">
-                                <div className="flex items-start justify-between">
-                                  <div>
-                                    <h3 className="font-semibold text-lg">{booking.property}</h3>
-                                    <p className="text-sm text-gray-600 flex items-center mt-1">
-                                      <MapPin className="w-3 h-3 mr-1" />
-                                      {booking.location}
-                                    </p>
-                                  </div>
-                                  <Badge className="bg-green-50 text-green-700 border-green-200">
-                                    {booking.status === 'confirmed' ? 'Confirmed' : 'Pending'}
-                                  </Badge>
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-                                  <div>
-                                    <p className="text-gray-600">Check-in</p>
-                                    <p className="font-medium">{format(booking.checkIn, "EEE, MMM d yyyy")}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-gray-600">Check-out</p>
-                                    <p className="font-medium">{format(booking.checkOut, "EEE, MMM d yyyy")}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-gray-600">Total amount</p>
-                                    <p className="font-medium">₹{booking.price.toLocaleString()}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-gray-600">Booking ID</p>
-                                    <p className="font-medium">VR{booking.id}7823</p>
-                                  </div>
-                                </div>
-                                
-                                <div className="flex space-x-3 mt-5">
-                                  <Button className="bg-pink-500 hover:bg-pink-600">View details</Button>
-                                  <Button variant="outline">Get directions</Button>
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+              <div className="space-y-6 animate-fade-in">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-heading font-bold text-gray-900">
+                      My Trips & Reservations
+                    </h2>
+                    <p className="text-xs text-gray-500">
+                      Track upcoming stays, check-in instructions, and payment receipts.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/trips')}
+                    className="rounded-xl text-xs font-semibold h-9 border-gray-200"
+                  >
+                    Open Trips Page →
+                  </Button>
+                </div>
+
+                {tripsLoading ? (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-3">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#2BB0BB]" />
+                    <p className="text-xs text-gray-500">Loading your reservations…</p>
+                  </div>
+                ) : !tripOrders?.length ? (
+                  <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center space-y-4">
+                    <div className="w-16 h-16 rounded-2xl bg-teal-50 text-[#1A8491] flex items-center justify-center mx-auto">
+                      <Calendar className="w-8 h-8" />
                     </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="past">
-                    <div className="space-y-4 mt-6">
-                      {pastBookings.map((booking) => (
-                        <Card key={booking.id}>
-                          <CardContent className="p-0">
-                            <div className="flex flex-col md:flex-row">
-                              {/* Image */}
-                              <div className="w-full md:w-48 h-48">
-                                <img 
-                                  src={booking.image} 
-                                  alt={booking.property}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              
-                              {/* Details */}
-                              <div className="flex-1 p-6">
-                                <div className="flex items-start justify-between">
-                                  <div>
-                                    <h3 className="font-semibold text-lg">{booking.property}</h3>
-                                    <p className="text-sm text-gray-600 flex items-center mt-1">
-                                      <MapPin className="w-3 h-3 mr-1" />
-                                      {booking.location}
-                                    </p>
-                                  </div>
-                                  <div className="flex items-center">
-                                    {[...Array(booking.rating)].map((_, i) => (
-                                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                    ))}
-                                  </div>
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-                                  <div>
-                                    <p className="text-gray-600">Check-in</p>
-                                    <p className="font-medium">{format(booking.checkIn, "EEE, MMM d yyyy")}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-gray-600">Check-out</p>
-                                    <p className="font-medium">{format(booking.checkOut, "EEE, MMM d yyyy")}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-gray-600">Total amount</p>
-                                    <p className="font-medium">₹{booking.price.toLocaleString()}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-gray-600">Booking ID</p>
-                                    <p className="font-medium">VR{booking.id}7823</p>
-                                  </div>
-                                </div>
-                                
-                                <div className="flex space-x-3 mt-5">
-                                  <Button variant="outline">View details</Button>
-                                  <Button variant="secondary">Book again</Button>
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                    <div className="space-y-1">
+                      <h3 className="font-heading font-bold text-lg text-gray-900">No active trips yet</h3>
+                      <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
+                        Ready to experience Kerala? Explore authentic backwater homestays and heritage plantations.
+                      </p>
                     </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="cancelled">
-                    <div className="mt-8 text-center">
-                      <p className="text-gray-600">No cancelled bookings found</p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                    <Button
+                      onClick={() => navigate('/properties')}
+                      className="bg-[#2BB0BB] hover:bg-[#1A8491] text-white font-medium rounded-xl px-5 h-10 text-xs shadow-sm"
+                    >
+                      Browse Stays
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {tripOrders.map((order) => (
+                      <TripOrderCard key={order.id} order={order} />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Wishlist Tab */}
+            {/* 2. WISHLIST TAB */}
             {activeTab === 'wishlist' && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold">Your Wishlist</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="space-y-6 animate-fade-in">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-heading font-bold text-gray-900">
+                      Saved Wishlists & Collections
+                    </h2>
+                    <p className="text-xs text-gray-500">
+                      Organize your dream escapes into curated travel collections.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Wishlist Collections */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {wishlists.map((list) => (
-                    <Card key={list.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                      <div className="relative h-48">
-                        <img 
-                          src={list.coverImage} 
+                    <div
+                      key={list.id}
+                      className="group cursor-pointer rounded-2xl overflow-hidden border border-gray-200/80 bg-white hover:shadow-md transition-all duration-300"
+                    >
+                      <div className="relative h-36 overflow-hidden">
+                        <img
+                          src={list.coverImage}
                           alt={list.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-end">
-                          <div className="p-4 text-white">
-                            <h3 className="font-bold text-lg">{list.name}</h3>
-                            <p className="text-sm opacity-90">{list.count} properties</p>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-3.5">
+                          <div className="text-white">
+                            <h4 className="font-heading font-bold text-sm leading-tight">
+                              {list.name}
+                            </h4>
+                            <p className="text-[11px] opacity-80 mt-0.5">{list.count} properties</p>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  ))}
-                  
-                  <Card className="cursor-pointer hover:shadow-md transition-shadow border-dashed">
-                    <div className="h-48 flex items-center justify-center text-center">
-                      <div>
-                        <Heart className="w-10 h-10 mx-auto mb-2 text-gray-400" />
-                        <h3 className="font-medium">Create a new wishlist</h3>
                       </div>
                     </div>
-                  </Card>
-                </div>
-                
-                <h3 className="text-xl font-medium">Saved properties</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {savedProperties.map((property) => (
-                    <Card key={property.id} className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden">
-                      <div className="relative">
-                        <img 
-                          src={property.image} 
-                          alt={property.title}
-                          className="w-full h-48 object-cover"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-3 right-3 bg-white/80 hover:bg-white"
-                        >
-                          <Heart className="w-4 h-4 fill-red-500 text-red-500" />
-                        </Button>
-                      </div>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-medium text-gray-900">{property.title}</h3>
-                          <div className="flex items-center">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
-                            <span>{property.rating}</span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-2 flex items-center">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          {property.location}
-                        </p>
-                        <div>
-                          <span className="font-bold">₹{property.price.toLocaleString()}</span>
-                          <span className="text-gray-600"> / night</span>
-                        </div>
-                      </CardContent>
-                    </Card>
                   ))}
-                </div>
-              </div>
-            )}
 
-            {/* Messages Tab */}
-            {activeTab === 'messages' && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold">Messages</h2>
-                
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <Card key={message.id} className={`hover:shadow-md transition-shadow ${message.unread ? 'border-l-4 border-l-blue-500' : ''}`}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start space-x-4">
-                          <Avatar>
-                            <AvatarImage src={message.image} />
-                            <AvatarFallback>{message.host[0].toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 space-y-1">
-                            <div className="flex justify-between items-start">
-                              <h3 className="font-medium">{message.host}</h3>
-                              <span className="text-xs text-gray-500">{message.time}</span>
+                  {/* Create New Wishlist */}
+                  <div
+                    onClick={() =>
+                      toast({
+                        title: 'Create Collection',
+                        description: 'Select properties to group into a new custom collection.',
+                      })
+                    }
+                    className="cursor-pointer rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#2BB0BB] hover:bg-teal-50/20 p-6 flex flex-col items-center justify-center text-center transition-all min-h-[144px]"
+                  >
+                    <Plus className="w-7 h-7 text-gray-400 mb-1" />
+                    <span className="font-heading font-semibold text-xs text-gray-700">
+                      Create Collection
+                    </span>
+                  </div>
+                </div>
+
+                {/* Saved Properties Grid */}
+                <div className="pt-4 space-y-4">
+                  <h3 className="font-heading font-bold text-lg text-gray-900">
+                    Saved Homestays ({savedProperties.length})
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {savedProperties.map((property) => (
+                      <div
+                        key={property.id}
+                        className="group bg-white rounded-2xl border border-gray-200/90 overflow-hidden hover:shadow-md hover:border-[#2BB0BB]/50 transition-all duration-300 flex flex-col"
+                      >
+                        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                          <img
+                            src={property.image}
+                            alt={property.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleToggleLike(property.id)}
+                            className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                            title="Remove from wishlist"
+                          >
+                            <Heart
+                              className={`w-4 h-4 ${
+                                property.liked ? 'fill-red-500 text-red-500' : 'text-gray-400'
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <h4 className="font-heading font-semibold text-sm text-gray-900 line-clamp-1 group-hover:text-[#1A8491] transition-colors">
+                                {property.title}
+                              </h4>
+                              <div className="flex items-center gap-1 text-xs font-semibold text-gray-800">
+                                <Star className="w-3.5 h-3.5 fill-[#FFD26E] text-[#FFD26E]" />
+                                <span>{property.rating}</span>
+                              </div>
                             </div>
-                            <p className="text-sm text-gray-600 font-medium">{message.property}</p>
-                            <p className="text-sm line-clamp-2">{message.lastMessage}</p>
+                            <p className="text-xs text-gray-500 flex items-center gap-1">
+                              <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
+                              <span className="truncate">{property.location}</span>
+                            </p>
+                          </div>
+
+                          <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                            <div>
+                              <span className="font-heading font-bold text-base text-gray-900">
+                                ₹{property.price.toLocaleString()}
+                              </span>
+                              <span className="text-xs text-gray-500"> / night</span>
+                            </div>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(`/property/${property.id}`)}
+                              className="rounded-xl text-xs h-8 px-3 border-gray-200 hover:border-[#2BB0BB] hover:text-[#1A8491]"
+                            >
+                              View Stay
+                            </Button>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  
-                  <div className="text-center">
-                    <p className="text-gray-600">No more messages</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Notifications Tab */}
-            {activeTab === 'notifications' && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold">Notifications</h2>
-                
-                <div className="space-y-4">
-                  {notifications.map((notification) => (
-                    <Card 
-                      key={notification.id} 
-                      className={`hover:shadow-md transition-shadow ${!notification.read ? 'bg-blue-50' : ''}`}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium">{notification.title}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                          </div>
-                          <span className="text-xs text-gray-500">{notification.time}</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+            {/* 3. MESSAGES TAB (Two-pane interactive messenger) */}
+            {activeTab === 'messages' && (
+              <div className="space-y-6 animate-fade-in">
+                <div className="pb-3 border-b border-gray-200">
+                  <h2 className="text-xl sm:text-2xl font-heading font-bold text-gray-900">
+                    Host Conversations & Inquiries
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    Direct communication with your Kerala stay hosts and tour guides.
+                  </p>
                 </div>
 
-                <div className="text-center">
-                  <Button variant="outline">Mark all as read</Button>
+                <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[500px]">
+                  {/* Left Chat Threads List (5 cols) */}
+                  <div className="md:col-span-5 border-r border-gray-150 flex flex-col">
+                    <div className="p-3.5 border-b border-gray-150 bg-gray-50/50">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                        Active Chats ({messages.length})
+                      </span>
+                    </div>
+
+                    <div className="divide-y divide-gray-100 overflow-y-auto flex-1">
+                      {messages.map((thread) => {
+                        const isSelected = thread.id === selectedThreadId;
+                        return (
+                          <div
+                            key={thread.id}
+                            onClick={() => setSelectedThreadId(thread.id)}
+                            className={`p-4 cursor-pointer transition-colors flex items-start gap-3 ${
+                              isSelected ? 'bg-teal-50/60' : 'hover:bg-gray-50'
+                            }`}
+                          >
+                            <Avatar className="w-10 h-10 shrink-0">
+                              <AvatarImage src={thread.image} />
+                              <AvatarFallback>{thread.host[0]}</AvatarFallback>
+                            </Avatar>
+
+                            <div className="flex-1 min-w-0 space-y-0.5">
+                              <div className="flex items-center justify-between gap-1">
+                                <h4 className="font-heading font-semibold text-xs text-gray-900 truncate">
+                                  {thread.host}
+                                </h4>
+                                <span className="text-[10px] text-gray-400 shrink-0">{thread.time}</span>
+                              </div>
+                              <p className="text-[11px] font-medium text-[#1A8491] truncate">{thread.property}</p>
+                              <p className="text-xs text-gray-500 line-clamp-1">{thread.lastMessage}</p>
+                            </div>
+
+                            {thread.unread && (
+                              <span className="w-2 h-2 rounded-full bg-[#2BB0BB] shrink-0 mt-1" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right Active Conversation Pane (7 cols) */}
+                  <div className="md:col-span-7 flex flex-col justify-between bg-gray-50/30">
+                    {/* Chat Header */}
+                    <div className="p-4 border-b border-gray-150 bg-white flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={activeThread.image} />
+                          <AvatarFallback>{activeThread.host[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="font-heading font-semibold text-sm text-gray-900">
+                            {activeThread.host}
+                          </h4>
+                          <p className="text-xs text-gray-500">{activeThread.property}</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs text-emerald-700 bg-emerald-50 border-emerald-200">
+                        Host Online
+                      </Badge>
+                    </div>
+
+                    {/* Messages Body */}
+                    <div className="p-4 space-y-3 overflow-y-auto flex-1 max-h-[350px]">
+                      {activeThread.history.map((msg, i) => (
+                        <div
+                          key={i}
+                          className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-[78%] rounded-2xl p-3 text-xs leading-relaxed ${
+                              msg.sender === 'user'
+                                ? 'bg-[#2BB0BB] text-white rounded-br-none shadow-xs'
+                                : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-xs'
+                            }`}
+                          >
+                            <p>{msg.text}</p>
+                            <span
+                              className={`text-[9px] block mt-1 text-right ${
+                                msg.sender === 'user' ? 'text-white/80' : 'text-gray-400'
+                              }`}
+                            >
+                              {msg.time}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Chat Input Bar */}
+                    <div className="p-3 bg-white border-t border-gray-150 flex items-center gap-2">
+                      <Input
+                        placeholder={`Message ${activeThread.host}…`}
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                        className="rounded-xl border-gray-200 text-xs h-10"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={handleSendMessage}
+                        className="bg-[#2BB0BB] hover:bg-[#1A8491] text-white rounded-xl h-10 px-4"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Settings Tab */}
+            {/* 4. NOTIFICATIONS TAB */}
+            {activeTab === 'notifications' && (
+              <div className="space-y-6 animate-fade-in">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-heading font-bold text-gray-900">
+                      Notifications & Updates
+                    </h2>
+                    <p className="text-xs text-gray-500">
+                      Stay informed about booking confirmations, price alerts, and host replies.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleMarkAllRead}
+                    className="rounded-xl text-xs h-9 border-gray-200"
+                  >
+                    Mark All as Read
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  {notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      className={`p-4 rounded-2xl border transition-all flex items-start justify-between gap-4 ${
+                        !notif.read
+                          ? 'bg-teal-50/50 border-teal-200 shadow-xs'
+                          : 'bg-white border-gray-200/90'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3.5">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                            notif.type === 'booking'
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : notif.type === 'promo'
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-blue-100 text-blue-700'
+                          }`}
+                        >
+                          {notif.type === 'booking' ? (
+                            <Calendar className="w-4 h-4" />
+                          ) : notif.type === 'promo' ? (
+                            <Sparkles className="w-4 h-4" />
+                          ) : (
+                            <Bell className="w-4 h-4" />
+                          )}
+                        </div>
+
+                        <div className="space-y-0.5">
+                          <h4 className="font-heading font-semibold text-sm text-gray-900">
+                            {notif.title}
+                          </h4>
+                          <p className="text-xs text-gray-600 leading-relaxed">{notif.message}</p>
+                          <span className="text-[10px] text-gray-400 block pt-1">{notif.time}</span>
+                        </div>
+                      </div>
+
+                      {!notif.read && (
+                        <span className="w-2 h-2 rounded-full bg-[#2BB0BB] shrink-0 mt-2" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 5. SETTINGS TAB */}
             {activeTab === 'settings' && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold">Account Settings</h2>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Profile Information</CardTitle>
+              <div className="space-y-6 animate-fade-in">
+                <div className="pb-3 border-b border-gray-200">
+                  <h2 className="text-xl sm:text-2xl font-heading font-bold text-gray-900">
+                    Account & Profile Settings
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    Update personal profile details, preferences, and payment security.
+                  </p>
+                </div>
+
+                {/* Profile Information Card */}
+                <Card className="rounded-3xl border border-gray-200/90 shadow-sm bg-white overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-heading font-bold text-gray-900">
+                      Personal Information
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <Avatar className="w-16 h-16">
-                        <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" />
-                        <AvatarFallback>TP</AvatarFallback>
+                  <CardContent className="space-y-5">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="w-16 h-16 border border-gray-200">
+                        <AvatarImage src={user?.profile_image || 'https://images.unsplash.com/photo-1494790108755-2616b612b5c5?w=200&h=200&fit=crop&crop=face'} />
+                        <AvatarFallback className="bg-teal-100 text-[#1A8491] font-bold">
+                          {initials}
+                        </AvatarFallback>
                       </Avatar>
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4 mr-2" />
-                        Change photo
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          toast({ title: 'Photo Update', description: 'Upload dialog triggered.' })
+                        }
+                        className="rounded-xl text-xs h-9 border-gray-200"
+                      >
+                        <Camera className="w-3.5 h-3.5 mr-1.5 text-gray-500" />
+                        <span>Change Photo</span>
                       </Button>
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">First name</Label>
-                        <Input id="firstName" defaultValue="Tanvi" />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="fullName" className="text-xs font-semibold text-gray-700">
+                          Full Legal Name
+                        </Label>
+                        <Input
+                          id="fullName"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          className="rounded-xl border-gray-200 text-xs h-10"
+                        />
                       </div>
-                      <div>
-                        <Label htmlFor="lastName">Last name</Label>
-                        <Input id="lastName" defaultValue="Patel" />
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="email" className="text-xs font-semibold text-gray-700">
+                          Email Address
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="rounded-xl border-gray-200 text-xs h-10"
+                        />
                       </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="email">Email address</Label>
-                      <Input id="email" type="email" defaultValue="tanvi.patel@example.com" />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="phone">Phone number</Label>
-                      <Input id="phone" type="tel" defaultValue="+91 98765 43210" />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="location">Location</Label>
-                      <Input id="location" defaultValue="Mumbai, India" />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="bio">Bio</Label>
-                      <Textarea id="bio" rows={3} placeholder="Write something about yourself..." />
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="phone" className="text-xs font-semibold text-gray-700">
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="rounded-xl border-gray-200 text-xs h-10"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="location" className="text-xs font-semibold text-gray-700">
+                          Home Location / City
+                        </Label>
+                        <Input
+                          id="location"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          className="rounded-xl border-gray-200 text-xs h-10"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5 sm:col-span-2">
+                        <Label htmlFor="bio" className="text-xs font-semibold text-gray-700">
+                          Travel Bio & Introduction
+                        </Label>
+                        <Textarea
+                          id="bio"
+                          rows={3}
+                          value={bio}
+                          onChange={(e) => setBio(e.target.value)}
+                          className="rounded-xl border-gray-200 text-xs"
+                          placeholder="Tell hosts a little about your travel interests..."
+                        />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Payment Methods</CardTitle>
+
+                {/* Payment Methods Card */}
+                <Card className="rounded-3xl border border-gray-200/90 shadow-sm bg-white overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-heading font-bold text-gray-900">
+                      Saved Payment Methods
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <CreditCard className="w-10 h-10 text-gray-600" />
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl bg-gray-50/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-700">
+                          <CreditCard className="w-5 h-5 text-[#1A8491]" />
+                        </div>
                         <div>
-                          <p className="font-medium">•••• •••• •••• 4528</p>
-                          <p className="text-sm text-gray-600">Expires 05/25</p>
+                          <p className="text-xs font-semibold text-gray-900 font-mono">
+                            •••• •••• •••• 4528
+                          </p>
+                          <p className="text-[11px] text-gray-500">Expires 05/27 • Visa Gold</p>
                         </div>
                       </div>
-                      <Badge>Default</Badge>
+                      <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-xs">
+                        Default
+                      </Badge>
                     </div>
-                    
-                    <Button variant="outline" className="w-full">
-                      Add payment method
+
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        toast({
+                          title: 'Add Payment Method',
+                          description: 'Secure card authorization via Cashfree gateway.',
+                        })
+                      }
+                      className="w-full rounded-xl text-xs h-10 border-gray-200 text-gray-700"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1.5" />
+                      Add New Card or UPI ID
                     </Button>
                   </CardContent>
                 </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Account Security</CardTitle>
+
+                {/* Notifications & Travel Preferences */}
+                <Card className="rounded-3xl border border-gray-200/90 shadow-sm bg-white overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-heading font-bold text-gray-900">
+                      Travel & Communication Preferences
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="currentPassword">Current password</Label>
-                      <Input id="currentPassword" type="password" />
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <p className="text-xs font-semibold text-gray-900">Email Booking Notifications</p>
+                        <p className="text-xs text-gray-500">Receive booking receipts and host check-in vouchers via email</p>
+                      </div>
+                      <Switch checked={emailNotifs} onCheckedChange={setEmailNotifs} />
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="newPassword">New password</Label>
-                      <Input id="newPassword" type="password" />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="confirmPassword">Confirm new password</Label>
-                      <Input id="confirmPassword" type="password" />
-                    </div>
-                    
-                    <Button className="bg-pink-500 hover:bg-pink-600">Update password</Button>
-                  </CardContent>
-                </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Preferences</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">Email notifications</p>
-                          <p className="text-sm text-gray-600">Receive emails about your booking activity</p>
-                        </div>
-                        <div className="flex items-center h-4">
-                          <input type="checkbox" className="h-4 w-4 rounded" defaultChecked />
-                        </div>
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <p className="text-xs font-semibold text-gray-900">WhatsApp & SMS Updates</p>
+                        <p className="text-xs text-gray-500">Real-time trip updates, flight delay notices, and caretaker contacts</p>
                       </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">SMS notifications</p>
-                          <p className="text-sm text-gray-600">Receive text messages for booking updates</p>
-                        </div>
-                        <div className="flex items-center h-4">
-                          <input type="checkbox" className="h-4 w-4 rounded" />
-                        </div>
+                      <Switch checked={smsNotifs} onCheckedChange={setSmsNotifs} />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <p className="text-xs font-semibold text-gray-900">Seasonal Travel Deals & Escapes</p>
+                        <p className="text-xs text-gray-500">Curated Kerala offers, secret villa discounts, and monsoon specials</p>
                       </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">Marketing communications</p>
-                          <p className="text-sm text-gray-600">Receive travel deals and recommendations</p>
-                        </div>
-                        <div className="flex items-center h-4">
-                          <input type="checkbox" className="h-4 w-4 rounded" defaultChecked />
-                        </div>
-                      </div>
+                      <Switch checked={marketingNotifs} onCheckedChange={setMarketingNotifs} />
                     </div>
                   </CardContent>
                 </Card>
 
-                <div className="flex space-x-4">
-                  <Button className="bg-pink-500 hover:bg-pink-600">Save changes</Button>
-                  <Button variant="outline">Cancel</Button>
+                {/* Save CTA */}
+                <div className="flex items-center gap-3 pt-2">
+                  <Button
+                    onClick={handleSaveSettings}
+                    className="bg-[#2BB0BB] hover:bg-[#1A8491] text-white font-heading font-semibold rounded-xl h-11 px-6 shadow-sm transition-all"
+                  >
+                    Save Changes
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setActiveTab('bookings')}
+                    className="rounded-xl h-11 px-6 border-gray-200 text-gray-600"
+                  >
+                    Cancel
+                  </Button>
                 </div>
               </div>
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
-};
-
-export default UserDashboard;
+}

@@ -129,7 +129,7 @@ const SearchFilters = () => {
         </div>
 
         {/* Search Button */}
-        <Button className="bg-pink-500 hover:bg-pink-600 text-white">
+        <Button className="bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-bold transition-colors shadow-sm">
           Search
         </Button>
       </div>
@@ -163,7 +163,11 @@ const SearchFilters = () => {
                 <Badge
                   key={amenity}
                   variant={selectedAmenities.includes(amenity) ? "default" : "outline"}
-                  className="cursor-pointer hover:bg-pink-100"
+                  className={`cursor-pointer transition-colors ${
+                    selectedAmenities.includes(amenity)
+                      ? "bg-[#2BB0BB] text-[#1F1F1F] font-semibold"
+                      : "hover:bg-brand-teal-50 hover:border-[#2BB0BB]"
+                  }`}
                   onClick={() => toggleAmenity(amenity)}
                 >
                   {amenity}

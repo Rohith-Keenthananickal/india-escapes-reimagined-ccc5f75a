@@ -243,11 +243,11 @@ const HostDashboard = () => {
                 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card className="bg-gradient-to-br from-pink-50 to-rose-50">
+                  <Card className="bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-100">
                     <CardContent className="p-6">
                       <div className="flex items-center space-x-2 mb-1">
-                        <CreditCard className="w-5 h-5 text-pink-600" />
-                        <h3 className="font-medium text-gray-700">Total earnings</h3>
+                        <CreditCard className="w-5 h-5 text-[#1A8491]" />
+                        <h3 className="font-medium text-gray-700 font-heading">Total earnings</h3>
                       </div>
                       <div className="text-3xl font-bold mb-2">₹{analytics.totalEarnings.toLocaleString()}</div>
                       <p className="text-xs text-gray-600">For the current year</p>
@@ -287,7 +287,7 @@ const HostDashboard = () => {
                       {monthlyEarnings.map((month) => (
                         <div key={month.month} className="flex-1 flex flex-col items-center">
                           <div 
-                            className="w-full bg-pink-500 rounded-t-md" 
+                            className="w-full bg-[#2BB0BB] rounded-t-md hover:bg-[#1A8491] transition-colors" 
                             style={{ height: `${(month.amount / 10000) * 200}px` }} 
                           ></div>
                           <div className="mt-2 text-sm">{month.month}</div>
@@ -377,8 +377,8 @@ const HostDashboard = () => {
                       {hostResources.map((resource, index) => (
                         <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
                           <CardContent className="p-6">
-                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-pink-100 mb-4">
-                              <resource.icon className="w-6 h-6 text-pink-600" />
+                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#E1F4F6] mb-4">
+                              <resource.icon className="w-6 h-6 text-[#1A8491]" />
                             </div>
                             <h3 className="font-medium mb-2">{resource.title}</h3>
                             <p className="text-sm text-gray-600">{resource.description}</p>
@@ -444,7 +444,7 @@ const HostDashboard = () => {
                             </div>
                             
                             <div className="mt-6 flex space-x-3">
-                              <Button className="bg-pink-500 hover:bg-pink-600">Edit listing</Button>
+                              <Button className="bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-medium">Edit listing</Button>
                               <Button variant="outline">View calendar</Button>
                               <Button variant="outline">Preview</Button>
                             </div>
@@ -554,7 +554,7 @@ const HostDashboard = () => {
 
                     <div className="flex justify-end space-x-4 pt-6 border-t">
                       <Button variant="outline">Save as draft</Button>
-                      <Button className="bg-pink-500 hover:bg-pink-600">Next: Availability</Button>
+                      <Button className="bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-medium">Next: Availability</Button>
                     </div>
                   </CardContent>
                 </Card>

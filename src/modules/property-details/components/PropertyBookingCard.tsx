@@ -1,12 +1,16 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Check } from 'lucide-react';
-import { useCart } from '@/hooks/use-cart';
+import { ShoppingCart, Check, Loader2, AlertTriangle, Eye } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useRequireAuth } from '@/modules/cart/hooks/useRequireAuth';
+import { useCartQuery } from '@/modules/cart/hooks/useCart';
+import { useCartMutations } from '@/modules/cart/hooks/useCartMutations';
+import { useQuoteQuery, useAvailabilityQuery } from '@/modules/bookings/hooks/useQuote';
 import type { NormalizedPropertyDetails } from '../types/propertyDetails.types';
 
 interface PropertyBookingCardProps {
@@ -15,43 +19,104 @@ interface PropertyBookingCardProps {
 
 export const PropertyBookingCard = ({ property }: PropertyBookingCardProps) => {
   const navigate = useNavigate();
-  const { addHotel, hotels } = useCart();
-  const [guests, setGuests] = useState(2);
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
+  const [searchParams] = useSearchParams();
+  const { requireAuth, isAuthenticated } = useRequireAuth();
+  const { data: cart } = useCartQuery(isAuthenticated);
+  const { addItem } = useCartMutations();
 
-  const isInCart = hotels.some((item) => String(item.id) === String(property.id));
-  const nightPrice = property.price || 0;
-  const sustainabilityFee = nightPrice > 0 ? 150 : 0;
-  const totalPrice = nightPrice + sustainabilityFee;
+  const getTodayStr = () => format(new Date(), 'yyyy-MM-dd');
+  const getTomorrowStr = () => format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
 
-  const handleAddToCart = () => {
-    const parsedCheckIn = checkIn ? new Date(checkIn) : new Date();
-    const parsedCheckOut = checkOut ? new Date(checkOut) : new Date(Date.now() + 86400000);
+  const [guests, setGuests] = useState(Number(searchParams.get('guests')) || 2);
+  const [checkIn, setCheckIn] = useState(searchParams.get('checkIn') || getTodayStr());
+  const [checkOut, setCheckOut] = useState(searchParams.get('checkOut') || getTomorrowStr());
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(
+    property.rooms?.[0]?.id ?? null
+  );
 
-    addHotel({
-      id: String(property.id),
-      title: property.title,
-      location: property.location || 'Kerala, India',
-      price: nightPrice,
-      rating: property.rating || 0,
-      image: property.images && property.images.length > 0 ? property.images[0] : '',
-      checkIn: parsedCheckIn,
-      checkOut: parsedCheckOut,
-      guests,
-      rooms: 1,
-      totalAmount: totalPrice,
-    });
+  useEffect(() => {
+    const qIn = searchParams.get('checkIn');
+    if (qIn) setCheckIn(qIn);
+    const qOut = searchParams.get('checkOut');
+    if (qOut) setCheckOut(qOut);
+    const qG = Number(searchParams.get('guests'));
+    if (qG) setGuests(qG);
+  }, [searchParams]);
 
-    toast({
-      title: 'Added to Trip Cart',
-      description: `${property.title} has been added to your journey.`,
-    });
+  const hasRooms = (property.rooms?.length ?? 0) > 0;
+  const bookingType = hasRooms ? 'ROOM' : 'WHOLE_PROPERTY';
+  const itemType = hasRooms ? 'STAY_ROOM' : 'STAY_WHOLE_PROPERTY';
+
+  const quotePayload = useMemo(
+    () =>
+      checkIn && checkOut
+        ? {
+            property_id: property.id,
+            booking_type: bookingType as 'ROOM' | 'WHOLE_PROPERTY',
+            check_in_date: checkIn,
+            check_out_date: checkOut,
+            guest_count: Math.max(1, guests || 1),
+            ...(hasRooms && selectedRoomId
+              ? { rooms: [{ room_id: selectedRoomId, quantity: 1 }], room_id: selectedRoomId }
+              : {}),
+          }
+        : null,
+    [property.id, bookingType, checkIn, checkOut, guests, hasRooms, selectedRoomId]
+  );
+
+  const { data: quote, isFetching: isQuoteLoading } = useQuoteQuery(quotePayload, true);
+  const { data: availability } = useAvailabilityQuery(quotePayload, true);
+
+  // One stay per property — if this property is already in cart, show View Cart
+  const isInCart =
+    cart?.items?.some(
+      (item) =>
+        item.property_id === property.id &&
+        (item.item_type === 'STAY_ROOM' || item.item_type === 'STAY_WHOLE_PROPERTY')
+    ) ?? false;
+
+  const displayTotal =
+    quote?.total_guest_payment ??
+    (property.price > 0 ? property.price * Math.max(1, guests || 1) : 0);
+  const nights = quote?.nights_count ?? 1;
+  const isAvailable = availability?.is_available !== false;
+
+  const buildCartPayload = () => ({
+    item_type: itemType as 'STAY_ROOM' | 'STAY_WHOLE_PROPERTY',
+    property_id: property.id,
+    check_in_date: checkIn,
+    check_out_date: checkOut,
+    guest_count: Math.max(1, guests || 1),
+    ...(hasRooms && selectedRoomId
+      ? { rooms: [{ room_id: selectedRoomId, quantity: 1 }] }
+      : {}),
+  });
+
+  const handleAddToCart = async () => {
+    if (isInCart) {
+      navigate('/cart');
+      return;
+    }
+    if (!requireAuth(`/property/${property.id}`)) return;
+    if (!checkIn || !checkOut) {
+      toast({ title: 'Select dates', description: 'Choose check-in and check-out.', variant: 'destructive' });
+      return;
+    }
+    await addItem.mutateAsync(buildCartPayload());
   };
 
-  const handleInstantBook = () => {
-    handleAddToCart();
-    navigate(`/booking/${property.id}`);
+  const handleReserve = async () => {
+    if (isInCart) {
+      navigate('/checkout');
+      return;
+    }
+    if (!requireAuth(`/property/${property.id}`)) return;
+    if (!checkIn || !checkOut) {
+      toast({ title: 'Select dates', description: 'Choose check-in and check-out.', variant: 'destructive' });
+      return;
+    }
+    await addItem.mutateAsync(buildCartPayload());
+    navigate('/checkout');
   };
 
   return (
@@ -59,12 +124,22 @@ export const PropertyBookingCard = ({ property }: PropertyBookingCardProps) => {
       <CardContent className="p-0 space-y-6">
         <div className="flex justify-between items-baseline border-b pb-4">
           <div>
-            {nightPrice > 0 ? (
+            {displayTotal > 0 ? (
               <>
-                <span className="text-3xl font-extrabold text-gray-900">
-                  ₹{nightPrice.toLocaleString()}
-                </span>
-                <span className="text-gray-500 text-sm"> / night</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-extrabold text-gray-900">
+                    ₹{Number(displayTotal).toLocaleString()}
+                  </span>
+                  <span className="text-gray-500 text-sm"> total</span>
+                </div>
+                {isQuoteLoading && (
+                  <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Updating quote…
+                  </p>
+                )}
+                {nights > 1 && !isQuoteLoading && (
+                  <p className="text-xs text-gray-500 mt-0.5">{nights} nights</p>
+                )}
               </>
             ) : (
               <span className="text-xl font-bold text-gray-700">Price on Request</span>
@@ -77,33 +152,46 @@ export const PropertyBookingCard = ({ property }: PropertyBookingCardProps) => {
           )}
         </div>
 
-        {/* Date Selectors */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Check-in</Label>
-            <div className="relative">
-              <Input
-                type="date"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
-                className="text-xs bg-gray-50"
-              />
-            </div>
+            <Input
+              type="date"
+              value={checkIn}
+              min={getTodayStr()}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className="text-xs bg-gray-50"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Check-out</Label>
-            <div className="relative">
-              <Input
-                type="date"
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
-                className="text-xs bg-gray-50"
-              />
-            </div>
+            <Input
+              type="date"
+              value={checkOut}
+              min={checkIn || getTomorrowStr()}
+              onChange={(e) => setCheckOut(e.target.value)}
+              className="text-xs bg-gray-50"
+            />
           </div>
         </div>
 
-        {/* Guests selector */}
+        {hasRooms && (
+          <div className="space-y-1.5">
+            <Label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Room</Label>
+            <select
+              value={selectedRoomId ?? ''}
+              onChange={(e) => setSelectedRoomId(Number(e.target.value))}
+              className="w-full text-sm bg-gray-50 border border-gray-200 rounded-md p-2"
+            >
+              {property.rooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {room.roomType} · up to {room.maxOccupancy} guests
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <Label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Guests</Label>
           <select
@@ -119,49 +207,94 @@ export const PropertyBookingCard = ({ property }: PropertyBookingCardProps) => {
           </select>
         </div>
 
-        {/* Pricing calculations */}
         <div className="space-y-2 border-t pt-4 text-sm text-gray-600">
-          <div className="flex justify-between">
-            <span>Base Fare (1 night)</span>
-            <span>{nightPrice > 0 ? `₹${nightPrice.toLocaleString()}` : '—'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Community & Sustainability Fee</span>
-            <span>{sustainabilityFee > 0 ? `₹${sustainabilityFee}` : '—'}</span>
-          </div>
+          {quote ? (
+            <>
+              <div className="flex justify-between">
+                <span>Accommodation</span>
+                <span>₹{Number(quote.base_accommodation_amount || 0).toLocaleString()}</span>
+              </div>
+              {(quote.accommodation_gst_amount as number) > 0 && (
+                <div className="flex justify-between">
+                  <span>GST</span>
+                  <span>₹{Number(quote.accommodation_gst_amount).toLocaleString()}</span>
+                </div>
+              )}
+              {(quote.total_guest_platform_fee as number) > 0 && (
+                <div className="flex justify-between">
+                  <span>Service fee</span>
+                  <span>₹{Number(quote.total_guest_platform_fee).toLocaleString()}</span>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex justify-between">
+              <span>Estimated</span>
+              <span>{displayTotal > 0 ? `₹${Number(displayTotal).toLocaleString()}` : '—'}</span>
+            </div>
+          )}
           <div className="flex justify-between font-bold text-base text-gray-900 border-t pt-2">
             <span>Total</span>
-            <span className="text-pink-600">
-              {totalPrice > 0 ? `₹${totalPrice.toLocaleString()}` : 'Price on request'}
+            <span className="text-[#1A8491]">
+              {displayTotal > 0 ? `₹${Number(displayTotal).toLocaleString()}` : 'Price on request'}
             </span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3 pt-2">
-          <Button
-            onClick={handleInstantBook}
-            className="w-full py-6 text-base font-bold bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg shadow-pink-600/20 rounded-xl"
-          >
-            Reserve Now
-          </Button>
+        {!isAvailable && (
+          <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 rounded-xl p-3">
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>{availability?.message || 'Not available for these dates.'}</span>
+          </div>
+        )}
 
-          <Button
-            variant="outline"
-            onClick={handleAddToCart}
-            disabled={isInCart}
-            className="w-full py-5 text-sm font-semibold border-gray-300 hover:bg-gray-50 rounded-xl gap-2"
-          >
-            {isInCart ? (
-              <>
-                <Check className="w-4 h-4 text-emerald-600" /> In Your Cart
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-4 h-4" /> Add to Journey Cart
-              </>
-            )}
-          </Button>
+        <div className="space-y-3 pt-2">
+          {isInCart ? (
+            <>
+              <div className="flex items-center justify-center gap-2 text-sm text-emerald-700 bg-emerald-50 rounded-xl py-2.5 px-3">
+                <Check className="w-4 h-4" />
+                Already in your trip cart
+              </div>
+              <Button
+                onClick={() => navigate('/cart')}
+                className="w-full py-6 text-base font-bold bg-[#2BB0BB] hover:bg-[#1A8491] text-white shadow-lg shadow-[#2BB0BB]/20 rounded-xl transition-all duration-300 gap-2"
+              >
+                <Eye className="w-4 h-4" /> View Cart
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/checkout')}
+                className="w-full py-5 text-sm font-semibold border-gray-300 hover:bg-gray-50 rounded-xl"
+              >
+                Continue to Checkout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={handleReserve}
+                disabled={!isAvailable || addItem.isPending}
+                className="w-full py-6 text-base font-bold bg-[#2BB0BB] hover:bg-[#1A8491] text-white shadow-lg shadow-[#2BB0BB]/20 rounded-xl transition-all duration-300"
+              >
+                {addItem.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Please wait…
+                  </>
+                ) : (
+                  'Reserve Now'
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={handleAddToCart}
+                disabled={!isAvailable || addItem.isPending}
+                className="w-full py-5 text-sm font-semibold border-gray-300 hover:bg-gray-50 rounded-xl gap-2"
+              >
+                <ShoppingCart className="w-4 h-4" /> Add to Trip
+              </Button>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>

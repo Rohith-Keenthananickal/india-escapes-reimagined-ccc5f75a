@@ -74,7 +74,7 @@ export const GoogleMapsLoader: React.FC<GoogleMapsLoaderProps> = ({ children }) 
   if (!isLoaded) {
     return (
       <div className="text-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2BB0BB] mx-auto"></div>
         <p className="mt-2 text-gray-600">Loading Google Maps...</p>
         <p className="text-xs text-gray-400 mt-1">This may take a few seconds</p>
       </div>

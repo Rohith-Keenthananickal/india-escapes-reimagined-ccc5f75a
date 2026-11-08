@@ -9,6 +9,7 @@ export const experiencesService = {
         skip: 0,
         limit,
         status_filter: 'ACTIVE',
+        approval_status_filter: 'APPROVED',
       },
     });
 

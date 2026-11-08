@@ -37,22 +37,22 @@ const AIAssistant = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={toggleAssistant}
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 shadow-lg"
+          className="w-14 h-14 rounded-full bg-gradient-to-r from-[#2BB0BB] to-[#1A8491] hover:from-[#23959E] hover:to-[#156771] text-white shadow-xl hover:scale-105 transition-all duration-300"
           size="icon"
         >
           {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
         </Button>
         {!hasGreeted && !isOpen && (
-          <div className="absolute -top-2 -left-2 w-4 h-4 bg-red-500 rounded-full animate-pulse"></div>
+          <div className="absolute -top-2 -left-2 w-4 h-4 bg-[#FFD26E] border-2 border-white rounded-full animate-pulse"></div>
         )}
       </div>
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 w-80 h-96 shadow-xl z-50 animate-fade-in">
-          <div className="p-4 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-t-lg">
-            <h3 className="font-semibold">AI Robert - Kerala Guide</h3>
-            <p className="text-sm opacity-90">Your personal travel assistant</p>
+        <Card className="fixed bottom-24 right-6 w-80 h-96 shadow-2xl z-50 animate-fade-in border-brand-teal-200 overflow-hidden">
+          <div className="p-4 bg-gradient-to-r from-[#2BB0BB] to-[#1A8491] text-white rounded-t-lg">
+            <h3 className="font-semibold font-heading">AI Robert - Kerala Guide</h3>
+            <p className="text-xs text-white/90">Your TriphavenCo travel assistant</p>
           </div>
           
           <CardContent className="p-4 h-64 overflow-y-auto">
@@ -66,7 +66,7 @@ const AIAssistant = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleLanguageSelect(lang)}
-                      className="text-xs"
+                      className="text-xs hover:border-[#2BB0BB] hover:bg-brand-teal-50 hover:text-brand-primary-700"
                     >
                       {lang}
                     </Button>
@@ -78,10 +78,10 @@ const AIAssistant = () => {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded-lg text-sm ${
+                    className={`p-3 rounded-xl text-sm ${
                       message.role === 'ai' 
-                        ? 'bg-gray-100 text-gray-800' 
-                        : 'bg-pink-500 text-white ml-8'
+                        ? 'bg-gray-100 text-[#1F1F1F]' 
+                        : 'bg-[#2BB0BB] text-[#1F1F1F] font-medium ml-8 shadow-xs'
                     }`}
                   >
                     {message.content}

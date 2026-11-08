@@ -47,6 +47,11 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     (defaultHeaders as Record<string, string>)['Content-Type'] = 'application/json';
   }
 
+  const token = typeof window !== 'undefined' ? localStorage.getItem('triphaven_token') : null;
+  if (token) {
+    (defaultHeaders as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch(url, {
     ...restOptions,
     headers: {

@@ -178,11 +178,11 @@ const PrivacyPolicy = () => {
           <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
             Legal Information
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold font-heading mb-4 bg-gradient-to-r from-[#1A8491] via-[#2BB0BB] to-[#1A8491] bg-clip-text text-transparent">
             Privacy Policy & Terms
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Hevan Connect Travel Pvt. Ltd. is committed to protecting your privacy and ensuring transparency in all our operations.
+            TriphavenCo is committed to protecting your privacy and ensuring transparency in all our operations.
           </p>
         </div>
       </section>

@@ -1,3 +1,7 @@
+/**
+ * @deprecated Local Zustand cart — stays/experiences now use server cart
+ * (`@/modules/cart`). Kept only for optional nearby-suggestion UI on location pages.
+ */
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

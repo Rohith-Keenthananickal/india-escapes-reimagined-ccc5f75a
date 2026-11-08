@@ -196,7 +196,7 @@ const PropertyMap = ({
   const getCartItemColor = (item: CartItem) => {
     const colorMap: Record<string, string> = {
       hotel: "#3B82F6",
-      homestay: "#8B5CF6",
+      homestay: "#2BB0BB",
       experience: "#10B981",
       attraction: "#EF4444",
       restaurant: "#F97316",
@@ -231,7 +231,7 @@ const PropertyMap = ({
     imageElement.style.overflow = "hidden";
     imageElement.style.border = "3px solid white";
     imageElement.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
-    imageElement.style.backgroundColor = "#9C27B0"; // Default background color if image fails
+    imageElement.style.backgroundColor = "#2BB0BB"; // Default background color if image fails
 
     const img = document.createElement("img");
     img.src =
@@ -538,7 +538,7 @@ const PropertyMap = ({
 
   if (loadError) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-red-50 to-pink-100 rounded-xl">
+      <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-red-50 to-rose-100/60 rounded-xl">
         <div className="text-center p-8">
           <MapPin className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-700 mb-2">
@@ -663,7 +663,7 @@ const PropertyMap = ({
               key={`route-${index}`}
               path={[segment.from.position!, segment.to.position!]}
               options={{
-                strokeColor: "#9C27B0",
+                strokeColor: "#1A8491",
                 strokeOpacity: 0.6,
                 strokeWeight: 3,
                 geodesic: true,
@@ -721,7 +721,7 @@ const PropertyMap = ({
                 <Button
                   size="sm"
                   variant="default"
-                  className="flex-1 bg-[#9C27B0] hover:bg-[#7B1FA2]"
+                  className="flex-1 bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-semibold transition-colors"
                   onClick={() => handleDirections(selectedLocation)}
                 >
                   Directions
@@ -755,7 +755,7 @@ const PropertyMap = ({
                 const url = `https://www.google.com/maps/dir/?api=1&destination=${propertyCoords.lat},${propertyCoords.lng}`;
                 window.open(url, "_blank");
               }}
-              className="flex-1 text-xs h-8 bg-[#9C27B0] hover:bg-[#7B1FA2]"
+              className="flex-1 text-xs h-8 bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-semibold transition-colors"
             >
               Directions
             </Button>

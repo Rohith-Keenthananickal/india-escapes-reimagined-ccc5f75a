@@ -1,3 +1,9 @@
+import { useRef, useEffect } from 'react';
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
 import Navbar from '@/components/Navbar';
 import BannerSlider from '@/components/BannerSlider';
 import AIAssistant from '@/components/AIAssistant';
@@ -7,29 +13,137 @@ import MediaSection from '@/components/MediaSection';
 import Certifications from '@/components/Certifications';
 
 import { HeroSection } from '../components/HeroSection';
+import { InfiniteLoopedPanels } from '../components/InfiniteLoopedPanels';
 import { AnimatedStats } from '../components/AnimatedStats';
 import { HomestayDiscoverySection } from '../components/HomestayDiscoverySection';
 import { ExperienceShowcaseSection } from '../components/ExperienceShowcaseSection';
 import { NewlyListedSection } from '../components/NewlyListedSection';
-import { AirportDistrictsSection } from '../components/AirportDistrictsSection';
 import { DistrictsSection } from '../components/DistrictsSection';
 
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
 export const LandingPage = () => {
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  // Initialize buttery smooth scrolling with Lenis synchronized to GSAP ScrollTrigger
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      touchMultiplier: 1.4,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    const tickerCallback = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+
+    gsap.ticker.add(tickerCallback);
+    gsap.ticker.lagSmoothing(0);
+
+    // Refresh ScrollTrigger after async elements and images settle
+    const refreshTimer1 = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 600);
+
+    const refreshTimer2 = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 1800);
+
+    return () => {
+      clearTimeout(refreshTimer1);
+      clearTimeout(refreshTimer2);
+      lenis.destroy();
+      gsap.ticker.remove(tickerCallback);
+    };
+  }, []);
+
+  useGSAP(
+    () => {
+      // 1. Reveal animation for "Explore Kerala's Beauty" section
+      gsap.from('.gsap-explore-header', {
+        y: 40,
+        opacity: 0,
+        duration: 0.85,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.gsap-explore-section',
+          start: 'top 85%',
+        },
+      });
+
+      // 2. Reveal animation for "About TriphavenCo"
+      gsap.from('.gsap-about-content', {
+        y: 45,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.gsap-about-section',
+          start: 'top 85%',
+        },
+      });
+
+      // 3. Reveal animation for Seasonal Booking
+      gsap.from('.gsap-seasonal-section', {
+        y: 45,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.gsap-seasonal-section',
+          start: 'top 85%',
+        },
+      });
+
+      // 4. Value Proposition section is animated internally by its own useGSAP hook
+
+      // 5. Reveal animation for Media & Certifications
+      gsap.from('.gsap-media-section', {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.gsap-media-section',
+          start: 'top 85%',
+        },
+      });
+
+      gsap.from('.gsap-cert-section', {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.gsap-cert-section',
+          start: 'top 85%',
+        },
+      });
+    },
+    { scope: pageRef }
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div ref={pageRef} className="min-h-screen bg-gray-50 flex flex-col selection:bg-[#2BB0BB] selection:text-white w-full max-w-full overflow-x-hidden">
       {/* Navigation */}
       <Navbar />
 
       {/* Hero Section & Search Bar */}
       <HeroSection />
 
+      {/* GSAP Infinite Looped Showcase Panels */}
+      <InfiniteLoopedPanels />
+
       {/* Banner Slider Section */}
-      <div className="max-w-7xl mx-auto px-4 py-16 w-full">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+      <div className="gsap-explore-section max-w-7xl mx-auto px-4 py-12 sm:py-16 w-full">
+        <div className="gsap-explore-header mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-heading text-gray-900 mb-2 sm:mb-3 tracking-tight">
             Explore Kerala's Beauty
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-xs sm:text-base md:text-lg text-gray-600">
             Discover the diverse landscapes and rich culture of God's Own Country
           </p>
         </div>
@@ -37,13 +151,16 @@ export const LandingPage = () => {
       </div>
 
       {/* Platform Introduction & Animated Counters */}
-      <section className="max-w-7xl mx-auto px-4 py-16 w-full">
-        <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            About Hevan Connect Travel
+      <section className="gsap-about-section max-w-7xl mx-auto px-4 py-12 sm:py-16 w-full">
+        <div className="gsap-about-content">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-[#1A8491] text-xs font-bold mb-3 sm:mb-4">
+            <span>Genuine Connections • Low Impact Travel</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-heading text-gray-900 mb-3 sm:mb-5 tracking-tight">
+            About TriphavenCo
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-4xl">
-            Hevan Connect Travel opens the doors to Kerala's most authentic homestay experiences—
+          <p className="text-xs sm:text-base md:text-lg text-gray-600 leading-relaxed mb-4 max-w-4xl">
+            TriphavenCo opens the doors to Kerala's most authentic homestay experiences—
             connecting travelers with traditional homes, vibrant local culture, and warm-hearted hosts.
             Every stay is handpicked to offer more than comfort: a deeper connection to the people,
             traditions, and natural beauty of Kerala. As a meaningful alternative to conventional
@@ -60,9 +177,6 @@ export const LandingPage = () => {
       {/* Live Kerala Experiences Section (Wired to Backend Experiences API) */}
       <ExperienceShowcaseSection />
 
-      {/* Airport-Accessible District Highlights */}
-      <AirportDistrictsSection />
-
       {/* Newly Listed Homestays (Live Backend Feed) */}
       <NewlyListedSection />
 
@@ -70,23 +184,31 @@ export const LandingPage = () => {
       <DistrictsSection />
 
       {/* Seasonal Booking Section */}
-      <SeasonalBooking />
+      <div className="gsap-seasonal-section">
+        <SeasonalBooking />
+      </div>
 
       {/* Value Proposition Section */}
-      <ValueProposition />
+      <div className="gsap-value-section w-full">
+        <ValueProposition />
+      </div>
 
       {/* Media Section */}
-      <MediaSection />
+      <div className="gsap-media-section">
+        <MediaSection />
+      </div>
 
       {/* Certifications Section */}
-      <Certifications />
+      <div className="gsap-cert-section">
+        <Certifications />
+      </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16 mt-auto">
+      <footer className="bg-gray-900 text-white py-12 sm:py-16 mt-auto">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-bold text-lg mb-4">Hevan Connect Travel</h3>
+              <h3 className="font-bold font-heading text-lg mb-4 text-[#FFD26E]">TriphavenCo</h3>
               <p className="text-gray-400 mb-4 text-sm leading-relaxed">
                 Your trusted platform for authentic Kerala homestay experiences.
               </p>
@@ -132,7 +254,7 @@ export const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-xs text-gray-500">
-            <p>&copy; {new Date().getFullYear()} Hevan Connect Travel. All rights reserved. | Promoting sustainable Kerala tourism.</p>
+            <p>&copy; {new Date().getFullYear()} TriphavenCo. All rights reserved. | Promoting sustainable Kerala tourism.</p>
           </div>
         </div>
       </footer>

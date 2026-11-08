@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow, Libraries } from '@react-google-maps/api';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, ExternalLink, Layers, Compass, Loader2 } from 'lucide-react';
 
@@ -11,6 +11,8 @@ interface PropertyLocationMapProps {
   googleMapLink?: string;
   propertyImage?: string;
 }
+
+const libraries: Libraries = ['places'];
 
 const mapContainerStyle = {
   width: '100%',
@@ -48,8 +50,9 @@ export const PropertyLocationMap = ({
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   const { isLoaded, loadError } = useJsApiLoader({
-    id: 'property-location-map-script',
+    id: 'google-map-script',
     googleMapsApiKey: apiKey,
+    libraries,
   });
 
   const center = { lat: latitude, lng: longitude };
@@ -84,12 +87,12 @@ export const PropertyLocationMap = ({
     // Elegant fallback card if Google Maps script fails to load
     return (
       <div className="relative w-full h-[360px] rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 to-emerald-50/50 border border-gray-200 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center mb-3 text-rose-600 shadow-sm">
+        <div className="w-14 h-14 rounded-full bg-[#E1F4F6] flex items-center justify-center mb-3 text-[#1A8491] shadow-sm">
           <MapPin className="w-7 h-7" />
         </div>
-        <h4 className="font-bold text-gray-900 text-base mb-1">{title}</h4>
+        <h4 className="font-bold text-gray-900 text-base mb-1 font-heading">{title}</h4>
         <p className="text-sm text-gray-600 max-w-md mb-4">{address}</p>
-        <Button onClick={handleDirections} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md">
+        <Button onClick={handleDirections} className="gap-2 bg-[#2BB0BB] hover:bg-[#1A8491] text-[#1F1F1F] hover:text-white font-semibold rounded-xl shadow-md transition-colors">
           <ExternalLink className="w-4 h-4" /> Open in Google Maps
         </Button>
       </div>
@@ -99,7 +102,7 @@ export const PropertyLocationMap = ({
   if (!isLoaded) {
     return (
       <div className="w-full h-[380px] rounded-2xl bg-gray-100 animate-pulse flex flex-col items-center justify-center text-gray-400 gap-2 border border-gray-200">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#2BB0BB]" />
         <span className="text-xs font-medium">Loading interactive map...</span>
       </div>
     );
@@ -161,7 +164,7 @@ export const PropertyLocationMap = ({
                 <span className="text-[10px] text-emerald-700 font-semibold">Verified Location</span>
                 <button
                   onClick={handleDirections}
-                  className="text-[10px] text-blue-600 font-bold hover:underline"
+                  className="text-[10px] text-[#1A8491] font-bold hover:underline"
                 >
                   Directions →
                 </button>
