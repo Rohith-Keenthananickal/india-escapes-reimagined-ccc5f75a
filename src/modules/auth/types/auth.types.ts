@@ -27,7 +27,12 @@ export interface UserProfile {
   email: string;
   full_name: string;
   profile_image?: string | null;
+  /** Active portal role for this session (GUEST on guest UI). */
   user_type: UserRole;
+  /** Canonical primary role (unchanged when GUEST is added). */
+  primary_role?: UserRole;
+  /** All roles held by this identity. */
+  roles?: UserRole[];
   auth_provider: AuthProviderType;
   email_verified: boolean;
   phone_number?: string | null;
@@ -48,19 +53,24 @@ export interface TokenResponse {
 
 export type AuthResponse = TokenResponse;
 
+export type AuthPortal = UserRole;
+
 export interface GoogleLoginPayload {
   id_token: string;
+  portal?: AuthPortal;
 }
 
 export interface EmailLoginPayload {
   email: string;
   password?: string;
   remember_me?: boolean;
+  portal?: AuthPortal;
 }
 
 export interface MobileOTPLoginPayload {
   phone_number: string;
   otp: string;
+  portal?: AuthPortal;
 }
 
 export interface RegisterPayload {
@@ -73,6 +83,9 @@ export interface RegisterPayload {
   nationality?: string;
   passport_number?: string;
   agree_marketing?: boolean;
+  portal?: AuthPortal;
+  /** Required email OTP — guest signup cannot complete without verification. */
+  otp_code: string;
 }
 
 export interface SignUpPayload {

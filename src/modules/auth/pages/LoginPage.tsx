@@ -71,10 +71,7 @@ export const LoginPage: React.FC = () => {
       const searchParams = new URLSearchParams(location.search);
       const returnUrl = searchParams.get('returnUrl');
       const locationState = location.state as { from?: { pathname?: string } } | null;
-      const redirectPath =
-        returnUrl ||
-        locationState?.from?.pathname ||
-        (user.user_type === 'HOST' ? '/host' : '/');
+      const redirectPath = returnUrl || locationState?.from?.pathname || '/';
       navigate(redirectPath, { replace: true });
     } catch (err: unknown) {
       console.error('Login error:', err);

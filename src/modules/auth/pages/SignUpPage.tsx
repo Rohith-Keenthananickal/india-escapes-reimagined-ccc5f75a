@@ -72,9 +72,29 @@ export const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const digitsOnly = (value: string) => value.replace(/\D/g, '');
+  const countryCodeOnly = (value: string) => {
+    const cleaned = value.replace(/[^\d+]/g, '');
+    if (!cleaned) return '';
+    // Keep a single leading +, digits after
+    const hasPlus = cleaned.startsWith('+');
+    const digits = cleaned.replace(/\D/g, '').slice(0, 4);
+    return hasPlus ? `+${digits}` : digits;
+  };
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    let nextValue = value;
+    if (field === 'phone') nextValue = digitsOnly(value).slice(0, 15);
+    if (field === 'countryCode') nextValue = countryCodeOnly(value);
+
+    setFormData((prev) => ({ ...prev, [field]: nextValue }));
     if (errorMessage) setErrorMessage(null);
+    // Changing email invalidates any prior OTP verification
+    if (field === 'email') {
+      setIsEmailVerified(false);
+      setOtpSent(false);
+      setOtpCode('');
+    }
   };
 
   // Password strength calculations
@@ -258,11 +278,15 @@ export const SignUpPage: React.FC = () => {
     }
   };
 
-  // Final Registration Submission (Always strictly GUEST)
+  // Final Registration Submission (Always strictly GUEST; email OTP required)
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreeToTerms) {
       setErrorMessage('Please review and agree to the Terms of Service and Privacy Policy to continue.');
+      return;
+    }
+    if (!isEmailVerified || !otpCode.trim()) {
+      setErrorMessage('Please verify your email with the OTP before creating your account.');
       return;
     }
 
@@ -281,13 +305,19 @@ export const SignUpPage: React.FC = () => {
         phone_number: formattedPhone,
         country_code: formData.countryCode,
         user_type: 'GUEST',
+        portal: 'GUEST',
         nationality: formData.nationality,
         agree_marketing: agreeToMarketing,
+        otp_code: otpCode.trim(),
       });
 
+      const otherRoles = (registeredUser.roles || []).filter((role) => role !== 'GUEST');
       toast({
-        title: 'Account created!',
-        description: `Welcome to TriphavenCo, ${registeredUser.full_name || 'Traveler'}! Your journey begins now.`,
+        title: otherRoles.length > 0 ? 'Guest access enabled!' : 'Account created!',
+        description:
+          otherRoles.length > 0
+            ? `Welcome back, ${registeredUser.full_name || 'Traveler'}! Your account can now book as a guest.`
+            : `Welcome to TriphavenCo, ${registeredUser.full_name || 'Traveler'}! Your journey begins now.`,
       });
 
       const locationState = location.state as { from?: { pathname?: string } } | null;
@@ -342,7 +372,8 @@ export const SignUpPage: React.FC = () => {
                   <div className="w-24 shrink-0">
                     <Input
                       value={googleCountryCode}
-                      onChange={(e) => setGoogleCountryCode(e.target.value)}
+                      onChange={(e) => setGoogleCountryCode(countryCodeOnly(e.target.value))}
+                      inputMode="tel"
                       className="h-11 text-center font-medium bg-white border-gray-200 rounded-xl"
                       placeholder="+91"
                     />
@@ -352,10 +383,12 @@ export const SignUpPage: React.FC = () => {
                     <Input
                       id="google-phone"
                       type="tel"
-                      placeholder="98765 43210"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="9876543210"
                       value={googlePhone}
                       onChange={(e) => {
-                        setGooglePhone(e.target.value);
+                        setGooglePhone(digitsOnly(e.target.value).slice(0, 15));
                         if (googlePhoneError) setGooglePhoneError(null);
                       }}
                       className="pl-9 h-11 bg-white border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 rounded-xl"
@@ -716,6 +749,7 @@ export const SignUpPage: React.FC = () => {
                     <Input
                       value={formData.countryCode}
                       onChange={(e) => handleInputChange('countryCode', e.target.value)}
+                      inputMode="tel"
                       className="h-11 text-center font-medium bg-white border-gray-200 rounded-xl"
                       placeholder="+91"
                     />
@@ -725,7 +759,9 @@ export const SignUpPage: React.FC = () => {
                     <Input
                       id="phone"
                       type="tel"
-                      placeholder="98765 43210"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="9876543210"
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       className="pl-9 h-11 bg-white border-gray-200 focus:border-[#2BB0BB] focus:ring-[#2BB0BB]/20 rounded-xl"
@@ -889,8 +925,8 @@ export const SignUpPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Optional Email Pre-Verification Section */}
-              <div className="p-3.5 rounded-xl border border-gray-200 bg-white space-y-3">
+              {/* Required Email Verification */}
+              <div className="p-3.5 rounded-xl border border-[#2BB0BB]/40 bg-[#F0F9FA] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <ShieldCheck className="w-4 h-4 text-[#1A8491]" />
@@ -902,16 +938,16 @@ export const SignUpPage: React.FC = () => {
                       <span>Verified</span>
                     </span>
                   ) : (
-                    <span className="text-[11px] text-gray-500">Optional before sign-up</span>
+                    <span className="text-[11px] font-semibold text-amber-600">Required</span>
                   )}
                 </div>
 
                 {!isEmailVerified && (
                   <div>
                     {!otpSent ? (
-                      <div className="flex items-center justify-between">
-                        <p className="text-[11px] text-gray-500">
-                          Verify now to get a verified traveler badge instantly.
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-[11px] text-gray-600">
+                          Verify your email with an OTP before creating your guest account.
                         </p>
                         <Button
                           type="button"
@@ -919,7 +955,7 @@ export const SignUpPage: React.FC = () => {
                           size="sm"
                           onClick={handleSendOtp}
                           disabled={isSendingOtp}
-                          className="text-xs h-8 border-[#2BB0BB] text-[#1A8491] hover:bg-[#F0F9FA]"
+                          className="text-xs h-8 shrink-0 border-[#2BB0BB] text-[#1A8491] hover:bg-white"
                         >
                           {isSendingOtp ? (
                             <Loader2 className="w-3 h-3 animate-spin mr-1" />
@@ -931,11 +967,15 @@ export const SignUpPage: React.FC = () => {
                       <div className="space-y-2 pt-1">
                         <div className="flex space-x-2">
                           <Input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            autoComplete="one-time-code"
                             placeholder="Enter 6-digit code"
                             value={otpCode}
-                            onChange={(e) => setOtpCode(e.target.value)}
+                            onChange={(e) => setOtpCode(digitsOnly(e.target.value).slice(0, 6))}
                             maxLength={6}
-                            className="h-9 text-xs tracking-widest font-mono"
+                            className="h-9 text-xs tracking-widest font-mono bg-white"
                           />
                           <Button
                             type="button"
@@ -1012,7 +1052,7 @@ export const SignUpPage: React.FC = () => {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting || !agreeToTerms}
+                  disabled={isSubmitting || !agreeToTerms || !isEmailVerified}
                   className="flex-1 h-11 bg-[#2BB0BB] hover:bg-[#1A8491] text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
                 >
                   {isSubmitting ? (

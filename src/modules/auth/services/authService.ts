@@ -25,7 +25,7 @@ export const authService = {
   async register(payload: RegisterPayload): Promise<AuthResponse> {
     const response = await apiClient.post<ApiResponse<AuthResponse>>(
       '/api/v1/auth/register',
-      payload
+      { ...payload, portal: payload.portal ?? 'GUEST', user_type: 'GUEST' }
     );
     return response.data;
   },
@@ -36,7 +36,7 @@ export const authService = {
   async loginWithEmail(payload: EmailLoginPayload): Promise<AuthResponse> {
     const response = await apiClient.post<ApiResponse<AuthResponse>>(
       '/api/v1/auth/login/email',
-      payload
+      { ...payload, portal: payload.portal ?? 'GUEST' }
     );
     return response.data;
   },
@@ -48,6 +48,7 @@ export const authService = {
     const payload: MobileOTPLoginPayload = {
       phone_number: phoneNumber,
       otp,
+      portal: 'GUEST',
     };
     const response = await apiClient.post<ApiResponse<AuthResponse>>(
       '/api/v1/auth/login/mobile',
@@ -60,7 +61,7 @@ export const authService = {
    * Authenticate or register using a verified Google ID token
    */
   async loginWithGoogle(idToken: string): Promise<AuthResponse> {
-    const payload: GoogleLoginPayload = { id_token: idToken };
+    const payload: GoogleLoginPayload = { id_token: idToken, portal: 'GUEST' };
     const response = await apiClient.post<ApiResponse<AuthResponse>>(
       '/api/v1/auth/login/google',
       payload

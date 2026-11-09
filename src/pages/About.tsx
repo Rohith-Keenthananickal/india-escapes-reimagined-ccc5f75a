@@ -108,7 +108,7 @@ const About = () => {
               <Card className="p-8 bg-card border border-border">
                 <CardContent className="p-0">
                   <p className="text-lg text-foreground leading-relaxed">
-                    <strong>Hevan Connect Travel Pvt. Ltd.</strong> is a tech-driven tourism startup incorporated 
+                    <strong>TriphavenCo</strong> is a tech-driven tourism startup incorporated 
                     under the Registrar of Companies, operating a digital platform that bridges global travelers 
                     with authentic homestays, immersive cultural experiences, and trusted local services.
                   </p>
@@ -206,7 +206,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Why Choose Hevan Connect */}
+      {/* Why Choose TriphavenCo */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">

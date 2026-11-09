@@ -71,9 +71,9 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 bg-white border-b shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="relative flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 shrink-0">
+          <Link to="/" className="flex items-center space-x-2 shrink-0 z-10">
             <img
               src="/Logo_color.svg"
               alt="TriphavenCo"
@@ -81,8 +81,8 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Main Tabs - Desktop */}
-          <div className="hidden md:flex items-center space-x-2 flex-1 max-w-md mx-8">
+          {/* Main Tabs - Desktop (centered) */}
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-2">
             {mainTabs.map((tab) => {
               const IconComponent = tab.icon;
               return (
@@ -97,22 +97,22 @@ const Navbar = () => {
                 >
                   <IconComponent className="w-4 h-4" />
                   <span className="text-sm">{tab.label}</span>
-                  {(tab.id === "experiences" || tab.id === "services") && (
+                  {/* {(tab.id === "experiences" || tab.id === "services") && (
                     <Badge className="bg-brand-secondary text-brand-dark font-semibold text-xs border border-brand-secondary-700/30">
                       NEW
                     </Badge>
-                  )}
+                  )} */}
                 </button>
               );
             })}
           </div>
 
           {/* Right side */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 z-10">
             {/* Desktop: Become a host */}
             <Button
               variant="ghost"
-              onClick={() => navigate("/host-dashboard")}
+              onClick={() => window.open("https://triphavenco.com/", "_blank", "noopener,noreferrer")}
               className="hidden sm:flex text-sm font-medium hover:text-[#1A8491]"
             >
               Become a host
@@ -194,7 +194,7 @@ const Navbar = () => {
 
                   {/* Mobile-only Become a host Item */}
                   <DropdownMenuItem
-                    onClick={() => navigate("/host-dashboard")}
+                    onClick={() => window.open("https://triphavenco.com/", "_blank", "noopener,noreferrer")}
                     className="sm:hidden flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
                   >
                     <Home className="w-4 h-4 mr-2.5 text-[#1A8491]" />
@@ -262,7 +262,7 @@ const Navbar = () => {
 
                   {/* Mobile-only Become a host Item */}
                   <DropdownMenuItem
-                    onClick={() => navigate("/host-dashboard")}
+                    onClick={() => window.open("https://triphavenco.com/", "_blank", "noopener,noreferrer")}
                     className="sm:hidden flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
                   >
                     <Home className="w-4 h-4 mr-2.5 text-[#1A8491]" />

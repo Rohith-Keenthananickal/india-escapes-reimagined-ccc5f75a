@@ -144,7 +144,7 @@ const MediaSection = () => {
                   className="icon instagram relative w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 text-white shadow-lg cursor-pointer transition-transform transform hover:scale-110 focus:scale-110 outline-none"
                   onClick={() =>
                     window.open(
-                      "https://instagram.com",
+                      "https://www.instagram.com/triphavenco/",
                       "_blank",
                       "noopener,noreferrer"
                     )
@@ -152,7 +152,7 @@ const MediaSection = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       window.open(
-                        "https://instagram.com",
+                        "https://www.instagram.com/triphavenco/",
                         "_blank",
                         "noopener,noreferrer"
                       );

@@ -620,9 +620,9 @@ export const Certifications = () => {
           <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#2BB0BB]/15 rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-2xl mb-10 sm:mb-14 relative">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[#2BB0BB] text-xs font-bold mb-3">
+            {/* <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[#2BB0BB] text-xs font-bold mb-3">
               <ShieldCheck className="w-3.5 h-3.5" /> Zero Commercial Hotels
-            </span>
+            </span> */}
             <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-heading text-white tracking-tight">
               The Triphaven 4-Stage On-Site Audit
             </h3>
