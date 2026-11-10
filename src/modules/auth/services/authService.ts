@@ -12,6 +12,8 @@ import type {
   MobileOTPLoginPayload,
   RegisterPayload,
   EmailOTPPurpose,
+  EmailOTPLoginSendPayload,
+  EmailOTPLoginVerifyPayload,
   EmailOtpResponse,
   EmailOtpVerifyResponse,
   PasswordResetPayload,
@@ -37,6 +39,33 @@ export const authService = {
     const response = await apiClient.post<ApiResponse<AuthResponse>>(
       '/api/v1/auth/login/email',
       { ...payload, portal: payload.portal ?? 'GUEST' }
+    );
+    return response.data;
+  },
+
+  /**
+   * Send OTP for passwordless email login
+   */
+  async sendEmailLoginOtp(email: string): Promise<EmailOtpResponse> {
+    const payload: EmailOTPLoginSendPayload = {
+      email: email.trim().toLowerCase(),
+      portal: 'GUEST',
+    };
+    return apiClient.post<EmailOtpResponse>('/api/v1/auth/login/email-otp/send', payload);
+  },
+
+  /**
+   * Verify OTP and create a guest-portal session
+   */
+  async loginWithEmailOtp(email: string, otpCode: string): Promise<AuthResponse> {
+    const payload: EmailOTPLoginVerifyPayload = {
+      email: email.trim().toLowerCase(),
+      otp_code: otpCode.trim(),
+      portal: 'GUEST',
+    };
+    const response = await apiClient.post<ApiResponse<AuthResponse>>(
+      '/api/v1/auth/login/email-otp/verify',
+      payload
     );
     return response.data;
   },

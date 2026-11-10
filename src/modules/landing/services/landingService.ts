@@ -8,6 +8,10 @@ import type {
   LandingPropertyCard,
   BackendExperienceItem,
   DistrictItem,
+  LandingStats,
+  LandingStatsResponse,
+  LandingSegmentItem,
+  LandingSegmentsResponse,
 } from '../types/landing.types';
 
 /**
@@ -64,18 +68,9 @@ export function mapBackendPropertyToCard(prop: BackendPropertyItem): LandingProp
     amenities.push('Meals');
   }
 
-  // Categorization
-  let region = 'all';
-  const textCorpus = `${prop.property_name || ''} ${details?.about_space || ''} ${location}`.toLowerCase();
-  if (textCorpus.includes('hill') || textCorpus.includes('mountain') || textCorpus.includes('estate') || textCorpus.includes('munnar')) {
-    region = 'hills';
-  } else if (textCorpus.includes('beach') || textCorpus.includes('coast') || textCorpus.includes('sea') || textCorpus.includes('varkala') || textCorpus.includes('kovalam')) {
-    region = 'beaches';
-  } else if (textCorpus.includes('heritage') || textCorpus.includes('culture') || textCorpus.includes('traditional')) {
-    region = 'cultural';
-  } else if (textCorpus.includes('backwater') || textCorpus.includes('alleppey') || textCorpus.includes('kumarakom') || textCorpus.includes('canal')) {
-    region = 'backwater';
-  }
+  const region = prop.segment_name
+    ? prop.segment_name.toLowerCase().replace(/\s+/g, '-')
+    : 'all';
 
   const hostDisplay = prop.host_name || details?.other_name || (details?.host_languages?.length ? `Host (${details.host_languages[0]})` : `Host #${prop.user_id}`);
 
@@ -105,6 +100,8 @@ export function mapBackendPropertyToCard(prop: BackendPropertyItem): LandingProp
     amenities,
     classification: prop.classification,
     daysAgo,
+    segmentId: prop.segment_id ?? null,
+    segmentName: prop.segment_name ?? null,
   };
 }
 
@@ -117,14 +114,17 @@ export const landingService = {
       page: filters.page || 1,
       limit: filters.limit || 12,
       search_query: filters.search_query,
+      location_query: filters.location_query,
       property_type_id: filters.property_type_id,
       status: filters.status || ['ACTIVE'],
       verification_status: filters.verification_status,
+      seasonal_experiences: filters.seasonal_experiences,
+      segment_id: filters.segment_id,
     });
   },
 
   /**
-   * Fetch newly listed properties
+   * Fetch newly listed properties (backend orders by created_at desc)
    */
   async getNewlyListedProperties(limit = 4): Promise<LandingPropertyCard[]> {
     const res = await apiClient.post<PropertySearchResponse>('/api/v1/properties/search', {
@@ -134,6 +134,20 @@ export const landingService = {
       verification_status: ['APPROVED'],
     });
 
+    return (res.data || []).map(mapBackendPropertyToCard);
+  },
+
+  /**
+   * Fetch properties tagged for a seasonal experience
+   */
+  async getSeasonalProperties(season: string, limit = 3): Promise<LandingPropertyCard[]> {
+    const res = await this.searchProperties({
+      page: 1,
+      limit,
+      status: ['ACTIVE'],
+      verification_status: ['APPROVED'],
+      seasonal_experiences: [season],
+    });
     return (res.data || []).map(mapBackendPropertyToCard);
   },
 
@@ -158,15 +172,64 @@ export const landingService = {
   },
 
   /**
-   * Fetch all Kerala districts
+   * Fetch Kerala districts with property counts for the landing page
    */
   async getDistricts(): Promise<DistrictItem[]> {
     try {
-      const res = await apiClient.get<DistrictsResponse>('/api/v1/districts/');
+      const res = await apiClient.get<DistrictsResponse>('/api/v1/landing/districts');
       return res.data || [];
     } catch (err) {
-      console.warn('Failed to fetch districts, returning empty list:', err);
-      return [];
+      console.warn('Failed to fetch landing districts, falling back to /districts:', err);
+      try {
+        const fallback = await apiClient.get<DistrictsResponse>('/api/v1/districts/');
+        return fallback.data || [];
+      } catch (fallbackErr) {
+        console.warn('Failed to fetch districts, returning empty list:', fallbackErr);
+        return [];
+      }
+    }
+  },
+
+  /**
+   * Fetch live platform stats for AnimatedStats
+   */
+  async getStats(): Promise<LandingStats> {
+    const res = await apiClient.get<LandingStatsResponse>('/api/v1/landing/stats');
+    return (
+      res.data || {
+        verified_homestays: 0,
+        scenic_destinations: 0,
+        delighted_travelers: 0,
+        warm_local_hosts: 0,
+        authentic_escapes: 0,
+      }
+    );
+  },
+
+  /**
+   * Fetch active PROPERTY segments for filters / showcase panels
+   */
+  async getPropertySegments(): Promise<LandingSegmentItem[]> {
+    try {
+      const res = await apiClient.get<LandingSegmentsResponse>('/api/v1/landing/segments');
+      return res.data || [];
+    } catch (err) {
+      console.warn('Failed to fetch landing segments, falling back to /segments:', err);
+      try {
+        const fallback = await apiClient.get<LandingSegmentsResponse>('/api/v1/segments', {
+          params: { active_only: true, type: 'PROPERTY' },
+        });
+        return (fallback.data || []).map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          description: s.description,
+          property_count: 0,
+          cover_image: null,
+        }));
+      } catch (fallbackErr) {
+        console.warn('Failed to fetch segments, returning empty list:', fallbackErr);
+        return [];
+      }
     }
   },
 };

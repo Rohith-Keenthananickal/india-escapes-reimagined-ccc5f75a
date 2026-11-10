@@ -24,7 +24,6 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { GoogleAuthButton } from '../components/GoogleAuthButton';
 import { useAuth } from '../hooks/useAuth';
-import { authService } from '../services/authService';
 
 export const LoginPage: React.FC = () => {
   const [authMode, setAuthMode] = useState<'password' | 'email_otp' | 'phone_otp'>('password');
@@ -42,9 +41,11 @@ export const LoginPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { loginWithEmail } = useAuth();
+  const { loginWithEmail, loginWithEmailOtp, sendEmailLoginOtp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const digitsOnly = (value: string) => value.replace(/\D/g, '');
 
   const handleEmailPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +91,7 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Email OTP flow
+  // Email OTP login flow (dedicated login APIs — not signup EMAIL_VERIFICATION)
   const handleSendEmailOtp = async () => {
     if (!otpEmail || !otpEmail.includes('@')) {
       setErrorMessage('Please enter a valid email address to receive an OTP.');
@@ -101,14 +102,14 @@ export const LoginPage: React.FC = () => {
     setErrorMessage(null);
 
     try {
-      await authService.sendEmailOtp(otpEmail.trim(), 'EMAIL_VERIFICATION');
+      await sendEmailLoginOtp(otpEmail.trim());
       setOtpSent(true);
       toast({
         title: 'OTP code sent',
-        description: `We sent a 6-digit verification code to ${otpEmail}.`,
+        description: `We sent a 6-digit login code to ${otpEmail}.`,
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to send verification code.';
+      const msg = err instanceof Error ? err.message : 'Failed to send login code.';
       setErrorMessage(msg);
       toast({
         title: 'Request failed',
@@ -131,17 +132,22 @@ export const LoginPage: React.FC = () => {
     setErrorMessage(null);
 
     try {
-      await authService.verifyEmailOtp(otpEmail.trim(), otpCode.trim(), 'EMAIL_VERIFICATION');
+      const user = await loginWithEmailOtp(otpEmail.trim(), otpCode.trim());
       toast({
-        title: 'Verified successfully',
-        description: 'Signing you in...',
+        title: 'Welcome back!',
+        description: `Successfully signed in as ${user.full_name || user.email}.`,
       });
-      navigate('/');
+
+      const searchParams = new URLSearchParams(location.search);
+      const returnUrl = searchParams.get('returnUrl');
+      const locationState = location.state as { from?: { pathname?: string } } | null;
+      const redirectPath = returnUrl || locationState?.from?.pathname || '/';
+      navigate(redirectPath, { replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Invalid or expired OTP code.';
       setErrorMessage(msg);
       toast({
-        title: 'Verification failed',
+        title: 'Sign in failed',
         description: msg,
         variant: 'destructive',
       });
@@ -493,9 +499,13 @@ export const LoginPage: React.FC = () => {
                       <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         id="otp-code"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        autoComplete="one-time-code"
                         placeholder="••••••"
                         value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
+                        onChange={(e) => setOtpCode(digitsOnly(e.target.value).slice(0, 6))}
                         maxLength={6}
                         className="pl-9 h-11 tracking-widest font-mono text-center text-lg bg-white border-gray-200 focus:border-[#2BB0BB] rounded-xl"
                         autoFocus

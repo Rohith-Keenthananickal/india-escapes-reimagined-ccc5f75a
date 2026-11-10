@@ -19,6 +19,8 @@ export interface PropertyFilterParams {
   guests?: number;
   /** When true (default with dates), exclude unavailable stays */
   availableOnly?: boolean;
+  /** Filter by PROPERTY segment IDs */
+  segmentId?: number[];
 }
 
 export interface PropertiesListingResponse {

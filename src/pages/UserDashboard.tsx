@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,15 +20,12 @@ import {
   MapPin,
   Edit,
   Loader2,
-  Star,
   CheckCircle2,
   ShieldCheck,
   Compass,
   ArrowRight,
   LogOut,
   Send,
-  Plus,
-  Trash2,
   Sparkles,
   Lock,
   User as UserIcon,
@@ -36,10 +33,12 @@ import {
   Mail,
   Camera,
   Check,
+  Plus,
 } from 'lucide-react';
 import { useAuth } from '@/modules/auth';
 import { useTripsQuery } from '@/modules/bookings/hooks/useTrips';
 import { TripOrderCard } from '@/modules/bookings/components/TripOrderCard';
+import { useWishlistQuery, useWishlistMutations } from '@/modules/wishlist';
 import { toast } from '@/hooks/use-toast';
 
 interface MessageThread {
@@ -53,63 +52,48 @@ interface MessageThread {
   history: Array<{ sender: 'host' | 'user'; text: string; time: string }>;
 }
 
+type DashboardTab = 'bookings' | 'wishlist' | 'messages' | 'notifications' | 'settings';
+
+const DASHBOARD_TABS: DashboardTab[] = [
+  'bookings',
+  'wishlist',
+  'messages',
+  'notifications',
+  'settings',
+];
+
 export default function UserDashboard() {
-  const [activeTab, setActiveTab] = useState<'bookings' | 'wishlist' | 'messages' | 'notifications' | 'settings'>('bookings');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const initialTab: DashboardTab =
+    tabParam && DASHBOARD_TABS.includes(tabParam as DashboardTab)
+      ? (tabParam as DashboardTab)
+      : 'bookings';
+  const [activeTab, setActiveTab] = useState<DashboardTab>(initialTab);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { data: tripOrders, isLoading: tripsLoading } = useTripsQuery();
+  const {
+    data: wishlistItems,
+    isLoading: wishlistLoading,
+    isError: wishlistError,
+  } = useWishlistQuery();
+  const { removeItem, isToggling } = useWishlistMutations();
 
-  // Wishlists state
-  const [wishlists, setWishlists] = useState([
-    {
-      id: 1,
-      name: 'Summer Getaways',
-      count: 4,
-      coverImage: 'https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=300&fit=crop',
-    },
-    {
-      id: 2,
-      name: 'Mountain Retreats',
-      count: 3,
-      coverImage: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=300&fit=crop',
-    },
-    {
-      id: 3,
-      name: 'Heritage Backwater Homestays',
-      count: 5,
-      coverImage: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=500&h=300&fit=crop',
-    },
-  ]);
+  useEffect(() => {
+    if (tabParam && DASHBOARD_TABS.includes(tabParam as DashboardTab)) {
+      setActiveTab(tabParam as DashboardTab);
+    }
+  }, [tabParam]);
 
-  const [savedProperties, setSavedProperties] = useState([
-    {
-      id: 3,
-      title: 'Backwater Villa Retreat',
-      location: 'Alleppey, Kerala',
-      price: 4200,
-      rating: 4.85,
-      image: 'https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=350&fit=crop',
-      liked: true,
-    },
-    {
-      id: 4,
-      title: 'Tea Garden Heritage Bungalow',
-      location: 'Munnar, Kerala',
-      price: 3600,
-      rating: 4.92,
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=350&fit=crop',
-      liked: true,
-    },
-    {
-      id: 5,
-      title: 'Cliffside Ocean Homestay',
-      location: 'Varkala, Kerala',
-      price: 5100,
-      rating: 4.78,
-      image: 'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=500&h=350&fit=crop',
-      liked: true,
-    },
-  ]);
+  const handleTabChange = (tab: DashboardTab) => {
+    setActiveTab(tab);
+    if (tab === 'bookings') {
+      setSearchParams({}, { replace: true });
+      return;
+    }
+    setSearchParams({ tab }, { replace: true });
+  };
 
   // Messages state
   const [messages, setMessages] = useState<MessageThread[]>([
@@ -214,10 +198,8 @@ export default function UserDashboard() {
     setChatInput('');
   };
 
-  const handleToggleLike = (id: number) => {
-    setSavedProperties((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, liked: !p.liked } : p))
-    );
+  const handleRemoveFromWishlist = (propertyId: number) => {
+    removeItem.mutate(propertyId);
   };
 
   const handleMarkAllRead = () => {
@@ -296,7 +278,7 @@ export default function UserDashboard() {
               <CardContent className="p-3.5 space-y-1">
                 <button
                   type="button"
-                  onClick={() => setActiveTab('bookings')}
+                  onClick={() => handleTabChange('bookings')}
                   className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'bookings'
                       ? 'bg-teal-50 text-[#1A8491] shadow-xs'
@@ -316,7 +298,7 @@ export default function UserDashboard() {
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab('wishlist')}
+                  onClick={() => handleTabChange('wishlist')}
                   className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'wishlist'
                       ? 'bg-teal-50 text-[#1A8491] shadow-xs'
@@ -325,16 +307,18 @@ export default function UserDashboard() {
                 >
                   <div className="flex items-center gap-2.5">
                     <Heart className={`w-4 h-4 ${activeTab === 'wishlist' ? 'text-[#1A8491]' : 'text-gray-400'}`} />
-                    <span>Wishlist & Saved</span>
+                    <span>Wishlist</span>
                   </div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                    {savedProperties.length}
-                  </span>
+                  {(wishlistItems?.length ?? 0) > 0 && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                      {wishlistItems?.length}
+                    </span>
+                  )}
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab('messages')}
+                  onClick={() => handleTabChange('messages')}
                   className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'messages'
                       ? 'bg-teal-50 text-[#1A8491] shadow-xs'
@@ -354,7 +338,7 @@ export default function UserDashboard() {
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab('notifications')}
+                  onClick={() => handleTabChange('notifications')}
                   className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'notifications'
                       ? 'bg-teal-50 text-[#1A8491] shadow-xs'
@@ -374,7 +358,7 @@ export default function UserDashboard() {
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab('settings')}
+                  onClick={() => handleTabChange('settings')}
                   className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'settings'
                       ? 'bg-teal-50 text-[#1A8491] shadow-xs'
@@ -482,127 +466,121 @@ export default function UserDashboard() {
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                   <div>
                     <h2 className="text-xl sm:text-2xl font-heading font-bold text-gray-900">
-                      Saved Wishlists & Collections
+                      Wishlist
                     </h2>
                     <p className="text-xs text-gray-500">
-                      Organize your dream escapes into curated travel collections.
+                      Homestays you have saved for later.
                     </p>
                   </div>
                 </div>
 
-                {/* Wishlist Collections */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {wishlists.map((list) => (
-                    <div
-                      key={list.id}
-                      className="group cursor-pointer rounded-2xl overflow-hidden border border-gray-200/80 bg-white hover:shadow-md transition-all duration-300"
-                    >
-                      <div className="relative h-36 overflow-hidden">
-                        <img
-                          src={list.coverImage}
-                          alt={list.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-3.5">
-                          <div className="text-white">
-                            <h4 className="font-heading font-bold text-sm leading-tight">
-                              {list.name}
-                            </h4>
-                            <p className="text-[11px] opacity-80 mt-0.5">{list.count} properties</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Create New Wishlist */}
-                  <div
-                    onClick={() =>
-                      toast({
-                        title: 'Create Collection',
-                        description: 'Select properties to group into a new custom collection.',
-                      })
-                    }
-                    className="cursor-pointer rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#2BB0BB] hover:bg-teal-50/20 p-6 flex flex-col items-center justify-center text-center transition-all min-h-[144px]"
-                  >
-                    <Plus className="w-7 h-7 text-gray-400 mb-1" />
-                    <span className="font-heading font-semibold text-xs text-gray-700">
-                      Create Collection
-                    </span>
+                {wishlistLoading ? (
+                  <div className="flex flex-col items-center justify-center py-20 space-y-3">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#2BB0BB]" />
+                    <p className="text-xs text-gray-500">Loading your wishlist…</p>
                   </div>
-                </div>
+                ) : wishlistError ? (
+                  <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center space-y-2">
+                    <h3 className="font-heading font-bold text-lg text-gray-900">
+                      Could not load wishlist
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Please refresh the page and try again.
+                    </p>
+                  </div>
+                ) : !wishlistItems?.length ? (
+                  <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center space-y-4">
+                    <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto">
+                      <Heart className="w-8 h-8" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-heading font-bold text-lg text-gray-900">
+                        No saved stays yet
+                      </h3>
+                      <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
+                        Tap the heart on a homestay to save it here for later.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => navigate('/properties')}
+                      className="bg-[#2BB0BB] hover:bg-[#1A8491] text-white font-medium rounded-xl px-5 h-10 text-xs shadow-sm"
+                    >
+                      Browse Stays
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <h3 className="font-heading font-bold text-lg text-gray-900">
+                      Saved Homestays ({wishlistItems.length})
+                    </h3>
 
-                {/* Saved Properties Grid */}
-                <div className="pt-4 space-y-4">
-                  <h3 className="font-heading font-bold text-lg text-gray-900">
-                    Saved Homestays ({savedProperties.length})
-                  </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {wishlistItems.map((item) => {
+                        const property = item.property;
+                        const title = property.property_name || 'Untitled stay';
+                        const location = property.location_address || 'Location TBA';
+                        const image =
+                          property.cover_image ||
+                          'https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=500&h=350&fit=crop';
+                        const price = property.price ?? 0;
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {savedProperties.map((property) => (
-                      <div
-                        key={property.id}
-                        className="group bg-white rounded-2xl border border-gray-200/90 overflow-hidden hover:shadow-md hover:border-[#2BB0BB]/50 transition-all duration-300 flex flex-col"
-                      >
-                        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                          <img
-                            src={property.image}
-                            alt={property.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleToggleLike(property.id)}
-                            className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
-                            title="Remove from wishlist"
+                        return (
+                          <div
+                            key={item.id}
+                            className="group bg-white rounded-2xl border border-gray-200/90 overflow-hidden hover:shadow-md hover:border-[#2BB0BB]/50 transition-all duration-300 flex flex-col"
                           >
-                            <Heart
-                              className={`w-4 h-4 ${
-                                property.liked ? 'fill-red-500 text-red-500' : 'text-gray-400'
-                              }`}
-                            />
-                          </button>
-                        </div>
+                            <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                              <img
+                                src={image}
+                                alt={title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                              />
+                              <button
+                                type="button"
+                                disabled={isToggling}
+                                onClick={() => handleRemoveFromWishlist(property.id)}
+                                className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:scale-110 transition-transform disabled:opacity-60"
+                                title="Remove from wishlist"
+                              >
+                                <Heart className="w-4 h-4 fill-red-500 text-red-500" />
+                              </button>
+                            </div>
 
-                        <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between gap-1">
-                              <h4 className="font-heading font-semibold text-sm text-gray-900 line-clamp-1 group-hover:text-[#1A8491] transition-colors">
-                                {property.title}
-                              </h4>
-                              <div className="flex items-center gap-1 text-xs font-semibold text-gray-800">
-                                <Star className="w-3.5 h-3.5 fill-[#FFD26E] text-[#FFD26E]" />
-                                <span>{property.rating}</span>
+                            <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                              <div className="space-y-1">
+                                <h4 className="font-heading font-semibold text-sm text-gray-900 line-clamp-1 group-hover:text-[#1A8491] transition-colors">
+                                  {title}
+                                </h4>
+                                <p className="text-xs text-gray-500 flex items-center gap-1">
+                                  <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
+                                  <span className="truncate">{location}</span>
+                                </p>
+                              </div>
+
+                              <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                                <div>
+                                  <span className="font-heading font-bold text-base text-gray-900">
+                                    ₹{price.toLocaleString()}
+                                  </span>
+                                  <span className="text-xs text-gray-500"> / night</span>
+                                </div>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => navigate(`/property/${property.id}`)}
+                                  className="rounded-xl text-xs h-8 px-3 border-gray-200 hover:border-[#2BB0BB] hover:text-[#1A8491]"
+                                >
+                                  View Stay
+                                </Button>
                               </div>
                             </div>
-                            <p className="text-xs text-gray-500 flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
-                              <span className="truncate">{property.location}</span>
-                            </p>
                           </div>
-
-                          <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                            <div>
-                              <span className="font-heading font-bold text-base text-gray-900">
-                                ₹{property.price.toLocaleString()}
-                              </span>
-                              <span className="text-xs text-gray-500"> / night</span>
-                            </div>
-
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => navigate(`/property/${property.id}`)}
-                              className="rounded-xl text-xs h-8 px-3 border-gray-200 hover:border-[#2BB0BB] hover:text-[#1A8491]"
-                            >
-                              View Stay
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 

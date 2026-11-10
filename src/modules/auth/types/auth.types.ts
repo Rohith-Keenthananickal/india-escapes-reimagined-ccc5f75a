@@ -4,6 +4,7 @@
  */
 
 export type UserRole = 'GUEST' | 'HOST' | 'AREA_COORDINATOR' | 'ADMIN';
+export type AuthPortal = UserRole;
 export type AuthProviderType = 'EMAIL' | 'GOOGLE' | 'MOBILE';
 export type UserStatusType = 'ACTIVE' | 'BLOCKED' | 'DELETED';
 
@@ -13,7 +14,19 @@ export type EmailOTPPurpose =
   | 'WELCOME'
   | 'USER_REGISTRATION'
   | 'EMAIL_VERIFICATION'
-  | 'PASSWORD_CHANGED';
+  | 'PASSWORD_CHANGED'
+  | 'LOGIN';
+
+export interface EmailOTPLoginSendPayload {
+  email: string;
+  portal?: AuthPortal;
+}
+
+export interface EmailOTPLoginVerifyPayload {
+  email: string;
+  otp_code: string;
+  portal?: AuthPortal;
+}
 
 export interface GuestProfile {
   id?: number;
@@ -52,8 +65,6 @@ export interface TokenResponse {
 }
 
 export type AuthResponse = TokenResponse;
-
-export type AuthPortal = UserRole;
 
 export interface GoogleLoginPayload {
   id_token: string;

@@ -46,6 +46,8 @@ import { PropertyImageGallery } from '../components/PropertyImageGallery';
 import { PropertyBookingCard } from '../components/PropertyBookingCard';
 import { PropertyLocationMap } from '../components/PropertyLocationMap';
 import type { RoomDetail } from '../types/propertyDetails.types';
+import { useWishlistIdsQuery, useWishlistMutations } from '@/modules/wishlist';
+import { useRequireAuth } from '@/modules/cart/hooks/useRequireAuth';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -53,11 +55,15 @@ export const PropertyDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const mainRef = useRef<HTMLElement>(null);
-  const [isSaved, setIsSaved] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomDetail | null>(null);
   const [activeRoomPhotoIdx, setActiveRoomPhotoIdx] = useState(0);
+  const { requireAuth } = useRequireAuth();
+  const { data: likedProperties = [] } = useWishlistIdsQuery();
+  const { toggleItem, isToggling } = useWishlistMutations();
 
   const { data: property, isLoading, isError, error, refetch } = usePropertyDetails(id);
+  const propertyId = property?.id ?? (id ? Number(id) : undefined);
+  const isSaved = propertyId != null && likedProperties.includes(propertyId);
 
   // GSAP Animations
   useGSAP(
@@ -235,7 +241,12 @@ export const PropertyDetailsPage = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsSaved(!isSaved)}
+              disabled={isToggling || propertyId == null}
+              onClick={() => {
+                if (propertyId == null) return;
+                if (!requireAuth()) return;
+                void toggleItem(propertyId, isSaved);
+              }}
               className="text-xs gap-1.5"
             >
               <Heart

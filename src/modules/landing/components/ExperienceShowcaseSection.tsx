@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Clock, Users, Compass, ArrowRight, Sparkles, ImageOff } from 'lucide-react';
+import { Clock, Users, Compass, ArrowRight, Sparkles } from 'lucide-react';
 import { useLandingExperiences } from '../hooks/useLandingExperiences';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -78,7 +78,15 @@ export const ExperienceShowcaseSection = () => {
             </div>
           ))}
         </div>
-      ) : activeExperiences.length === 0 ? null : (
+      ) : activeExperiences.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 sm:p-10 text-center">
+          <Compass className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">No experiences listed yet</h3>
+          <p className="text-xs sm:text-sm text-gray-600 max-w-md mx-auto">
+            Approved Kerala experiences will appear here as hosts publish village walks, canoe rides, and cultural immersions.
+          </p>
+        </div>
+      ) : (
         <div className="experience-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {activeExperiences.map((exp) => {
             const genuinePhoto =
@@ -93,6 +101,9 @@ export const ExperienceShowcaseSection = () => {
             const durationText = exp.duration
               ? `${exp.duration} ${exp.duration_unit ? exp.duration_unit.toLowerCase() + (exp.duration > 1 ? 's' : '') : 'hours'}`
               : 'Not specified';
+
+            const priceLabel = exp.is_price_by_guest ? '/ person' : '/ group';
+            const guestCap = exp.group_size || 8;
 
             return (
               <div key={exp.id} className="experience-card-item">
@@ -136,7 +147,7 @@ export const ExperienceShowcaseSection = () => {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-[#2BB0BB]" />
-                          <span>Up to {exp.max_participants || 8} guests</span>
+                          <span>Up to {guestCap} guests</span>
                         </div>
                       </div>
                     </CardContent>
@@ -146,9 +157,9 @@ export const ExperienceShowcaseSection = () => {
                     <div>
                       <span className="text-xs text-gray-400 block">From</span>
                       <span className="font-heading font-extrabold text-lg text-gray-900">
-                        ₹{Number(exp.price_per_person || 0).toLocaleString()}
+                        ₹{Number(exp.price || 0).toLocaleString()}
                       </span>
-                      <span className="text-xs text-gray-500"> / person</span>
+                      <span className="text-xs text-gray-500"> {priceLabel}</span>
                     </div>
 
                     <span className="text-xs font-semibold text-[#1A8491] group-hover:translate-x-0.5 transition-transform flex items-center gap-1">

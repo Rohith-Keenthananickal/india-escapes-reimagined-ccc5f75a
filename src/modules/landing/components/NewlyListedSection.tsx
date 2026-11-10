@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -8,18 +8,21 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HomestayCard } from './HomestayCard';
 import { useNewlyListedProperties } from '../hooks/useLandingProperties';
+import { useWishlistIdsQuery, useWishlistMutations } from '@/modules/wishlist';
+import { useRequireAuth } from '@/modules/cart/hooks/useRequireAuth';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export const NewlyListedSection = () => {
   const containerRef = useRef<HTMLElement>(null);
-  const [likedProperties, setLikedProperties] = useState<number[]>([]);
   const { data: properties, isLoading } = useNewlyListedProperties(4);
+  const { requireAuth } = useRequireAuth();
+  const { data: likedProperties = [] } = useWishlistIdsQuery();
+  const { toggleItem } = useWishlistMutations();
 
   const toggleLike = (id: number) => {
-    setLikedProperties((prev) =>
-      prev.includes(id) ? prev.filter((propId) => propId !== id) : [...prev, id]
-    );
+    if (!requireAuth()) return;
+    void toggleItem(id, likedProperties.includes(id));
   };
 
   useGSAP(

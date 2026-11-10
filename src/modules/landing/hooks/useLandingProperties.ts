@@ -5,6 +5,7 @@ import type { PropertySearchFilters, LandingPropertyCard } from '../types/landin
 export const DEFAULT_LANDING_FILTERS: PropertySearchFilters = {
   page: 1,
   limit: 20,
+  status: ['ACTIVE'],
   verification_status: ['APPROVED'],
 };
 
@@ -20,16 +21,16 @@ export function useLandingProperties(filters: PropertySearchFilters = DEFAULT_LA
         raw: response.data,
       };
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    staleTime: 1000 * 60 * 5,
   });
 
   return query;
 }
 
 export function useNewlyListedProperties(limit = 4) {
-  const query = useLandingProperties(DEFAULT_LANDING_FILTERS);
-  return {
-    ...query,
-    data: query.data?.cards ? query.data.cards.slice(0, limit) : undefined,
-  };
+  return useQuery({
+    queryKey: ['landing-newly-listed', limit],
+    queryFn: () => landingService.getNewlyListedProperties(limit),
+    staleTime: 1000 * 60 * 5,
+  });
 }

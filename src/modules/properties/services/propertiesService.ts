@@ -42,6 +42,9 @@ export const propertiesService = {
       if (params.priceRange[0] > 0) payload.min_price = params.priceRange[0];
       if (params.priceRange[1] < 20000) payload.max_price = params.priceRange[1];
     }
+    if (params.segmentId && params.segmentId.length > 0) {
+      payload.segment_id = params.segmentId;
+    }
 
     const response = await apiClient.post<PropertySearchResponse>('/api/v1/properties/search', payload);
     const properties = (response.data || []).map(mapBackendPropertyToCard);

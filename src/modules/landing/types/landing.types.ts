@@ -41,6 +41,8 @@ export interface BackendPropertyItem {
   area_coordinator_id?: number | null;
   property_type_id?: number | null;
   property_type_name?: string | null;
+  segment_id?: number | null;
+  segment_name?: string | null;
   id_proof_type?: string | null;
   id_proof_url?: string | null;
   certificate_number?: string | null;
@@ -102,6 +104,9 @@ export interface PropertySearchFilters {
   page?: number;
   limit?: number;
   search_query?: string;
+  location_query?: string;
+  seasonal_experiences?: string[];
+  segment_id?: number[];
 }
 
 /**
@@ -149,11 +154,27 @@ export interface DistrictItem {
   code?: string | null;
   is_active: boolean;
   created_at?: string;
+  property_count?: number;
+  description?: string | null;
 }
 
 export interface DistrictsResponse {
   status: string;
   data: DistrictItem[];
+}
+
+export interface LandingStats {
+  verified_homestays: number;
+  scenic_destinations: number;
+  delighted_travelers: number;
+  warm_local_hosts: number;
+  authentic_escapes: number;
+}
+
+export interface LandingStatsResponse {
+  status: string;
+  data: LandingStats;
+  message?: string;
 }
 
 /**
@@ -180,6 +201,8 @@ export interface LandingPropertyCard {
   numberOfNights?: number;
   isAvailable?: boolean;
   pricingType?: string;
+  segmentId?: number | null;
+  segmentName?: string | null;
 }
 
 export interface FilterState {
@@ -187,4 +210,19 @@ export interface FilterState {
   filters: string[];
   sortBy: string;
   searchQuery?: string;
+  segmentId?: number | null;
+}
+
+export interface LandingSegmentItem {
+  id: number;
+  name: string;
+  description?: string | null;
+  property_count: number;
+  cover_image?: string | null;
+}
+
+export interface LandingSegmentsResponse {
+  status: string;
+  data: LandingSegmentItem[];
+  message?: string;
 }

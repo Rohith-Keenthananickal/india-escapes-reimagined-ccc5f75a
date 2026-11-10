@@ -5,7 +5,6 @@ import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { MapPin } from 'lucide-react';
 import { useDistricts } from '../hooks/useDistricts';
 
@@ -31,9 +30,9 @@ const DISTRICT_HIGHLIGHTS: Record<string, string> = {
 
 export const DistrictsSection = () => {
   const containerRef = useRef<HTMLElement>(null);
-  const { data: districts, isLoading } = useDistricts();
+  const { data: districts } = useDistricts();
 
-  // If backend returns empty or loading, we provide the 14 standard districts gracefully
+  // If backend returns empty, fall back to the 14 standard districts with zero counts
   const displayDistricts = (districts && districts.length > 0)
     ? districts
     : Object.keys(DISTRICT_HIGHLIGHTS).map((name, index) => ({
@@ -41,6 +40,7 @@ export const DistrictsSection = () => {
         name,
         state: 'Kerala',
         is_active: true,
+        property_count: 0,
       }));
 
   useGSAP(
@@ -78,7 +78,7 @@ export const DistrictsSection = () => {
       <div className="districts-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
         {displayDistricts.map((district) => {
           const highlight = DISTRICT_HIGHLIGHTS[district.name] || 'Authentic Homestays & Scenic Escapes';
-          const estimatedCount = 25 + ((district.id * 17) % 65);
+          const stayCount = district.property_count ?? 0;
 
           return (
             <div key={district.id || district.name} className="district-card-item">
@@ -91,7 +91,7 @@ export const DistrictsSection = () => {
                       {district.name}
                     </h3>
                     <Badge variant="secondary" className="text-[11px] bg-teal-50 text-[#1A8491] border-teal-100 font-semibold shrink-0">
-                      {estimatedCount} stays
+                      {stayCount} {stayCount === 1 ? 'stay' : 'stays'}
                     </Badge>
                   </div>
                   <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-2">

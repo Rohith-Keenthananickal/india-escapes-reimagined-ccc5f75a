@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Calendar,
   Waves,
@@ -15,163 +15,58 @@ import {
   MapPin,
   ArrowRight,
   Sparkles,
+  ImageOff,
 } from 'lucide-react';
+import { useSeasonalProperties } from '@/modules/landing/hooks/useSeasonalProperties';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-interface SeasonalProperty {
-  name: string;
-  location: string;
-  price: number;
-  image: string;
-  perk: string;
-}
-
-interface Season {
+interface SeasonMeta {
   id: string;
+  apiValue: string;
   title: string;
   subtitle: string;
-  icon: any;
+  icon: typeof Sun;
   activeColor: string;
   badgeBg: string;
-  properties: SeasonalProperty[];
 }
 
-const SEASONS: Season[] = [
+const SEASONS: SeasonMeta[] = [
   {
     id: 'summer',
+    apiValue: 'Summer',
     title: 'Summer Escapes',
     subtitle: 'Misty Hill Stations & Cool Estates (Mar - May)',
     icon: Sun,
     activeColor: 'bg-amber-500 text-white',
     badgeBg: 'bg-amber-100 text-amber-800 border-amber-200',
-    properties: [
-      {
-        name: 'Tea Valley Hill Cottage',
-        location: 'Munnar, Idukki',
-        price: 3200,
-        image:
-          'https://r2imghtlak.mmtcdn.com/r2-mmt-htl-image/htl-imgs/202205021616354878-d6bd36240a5411eda28b0a58a9feac02.jpg',
-        perk: 'Private Tea Estate Walk',
-      },
-      {
-        name: 'Cool Mist Mountain Retreat',
-        location: 'Vythiri, Wayanad',
-        price: 2800,
-        image:
-          'https://cf.bstatic.com/xdata/images/hotel/max1024x768/488469872.jpg?k=6dbe643d583e33e703ed839c5122476e197d86cf55fe68b3e9ba5a8b2d1e2f18&o=&hp=1',
-        perk: 'Stream-side Campfire',
-      },
-      {
-        name: 'Silent Valley Organic Farmstay',
-        location: 'Attappadi, Palakkad',
-        price: 2600,
-        image:
-          'https://content.jdmagicbox.com/comp/palakkad/a2/9999px491.x491.180628100509.n2a2/catalogue/silent-valley-farm-stay-pudur-palakkad-farm-house-on-rent-bs9ymwqv1y.jpg',
-        perk: 'Organic Mango Orchard',
-      },
-    ],
   },
   {
     id: 'monsoon',
+    apiValue: 'Monsoon',
     title: 'Monsoon Magic',
     subtitle: 'Ayurvedic Rejuvenation & Lush Greenery (Jun - Aug)',
     icon: Waves,
     activeColor: 'bg-[#2BB0BB] text-white',
     badgeBg: 'bg-teal-100 text-[#1A8491] border-teal-200',
-    properties: [
-      {
-        name: 'Rainforest Canopy Lodge',
-        location: 'Thekkady, Idukki',
-        price: 2500,
-        image:
-          'https://www.holidify.com/images/cmsuploads/compressed/282613902_20220901170640.jpg',
-        perk: 'Ayurvedic Herbal Garden',
-      },
-      {
-        name: 'Misty Valley Plantation Home',
-        location: 'Vagamon, Idukki',
-        price: 2200,
-        image:
-          'https://pix10.agoda.net/hotelImages/161/1615129/1615129_16101223350047693118.jpg?ca=13&ce=1&s=414x232&ar=16x9',
-        perk: 'Panoramic Cloud Views',
-      },
-      {
-        name: 'Canal Breeze Waterfront Villa',
-        location: 'Kuttanad, Alleppey',
-        price: 2700,
-        image:
-          'https://cf.bstatic.com/xdata/images/hotel/max1024x768/42865145.jpg?k=c2cf6c345084d1569bde3575f413a4bf6e82a140a654fbfd076952ff8f7265d0&o=&hp=1',
-        perk: 'Private Shikkara Ride',
-      },
-    ],
   },
   {
     id: 'onam',
+    apiValue: 'Onam',
     title: 'Onam Harvest Specials',
     subtitle: 'Grand Sadhya Feasts & Boat Races (Aug - Sep)',
     icon: Leaf,
     activeColor: 'bg-emerald-600 text-white',
     badgeBg: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    properties: [
-      {
-        name: 'Nalukettu Ancestral Heritage Stay',
-        location: 'Fort Kochi, Ernakulam',
-        price: 4500,
-        image:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQE7_N4KohWUHU3stBMFpMqgOqMvW8b5YwOSw&s',
-        perk: 'Complimentary Onam Sadhya',
-      },
-      {
-        name: 'Marari Cultural Coastal Cottage',
-        location: 'Mararikulam, Alappuzha',
-        price: 3800,
-        image:
-          'https://mararibeachpalace.com/assets/Delux%20rooms%20near%20marari%20beach%20alappey.jpg',
-        perk: 'Pookkalam Floral Workshop',
-      },
-      {
-        name: 'Tradition Trails Heritage Resort',
-        location: 'Arattupuzha, Thrissur',
-        price: 4100,
-        image: 'https://www.neelambari.co.in/assets/img/facility-banner-new.jpg',
-        perk: 'Vallam Kali Boat Race Seats',
-      },
-    ],
   },
   {
     id: 'winter',
+    apiValue: 'Winter',
     title: 'Winter Holidays',
     subtitle: 'Pleasant Sun, Golden Sands & Campfires (Nov - Feb)',
     icon: Snowflake,
     activeColor: 'bg-sky-600 text-white',
     badgeBg: 'bg-sky-100 text-sky-800 border-sky-200',
-    properties: [
-      {
-        name: 'Sunset Cliff Beach Cottage',
-        location: 'North Cliff, Varkala',
-        price: 3500,
-        image:
-          'https://cf.bstatic.com/xdata/images/hotel/max1024x768/340493803.jpg?k=7ca6954bd87fd450c59ef93a9d90bf1f2335344946c1f44b034df8b1804ccb62&o=&hp=1',
-        perk: 'Sunset Ocean Terrace',
-      },
-      {
-        name: 'Kumarakom Lakefront Wooden Villa',
-        location: 'Vembanad, Kottayam',
-        price: 4200,
-        image:
-          'https://www.honeymoonbug.com/blog/wp-content/uploads/2021/07/Kumarakom-Lake-Resort.jpg',
-        perk: 'Private Fishing Deck',
-      },
-      {
-        name: 'Hilltop Teakwood Chalet',
-        location: 'Meppadi, Wayanad',
-        price: 3900,
-        image:
-          'https://pix10.agoda.net/property/69672057/0/d8a8e2a0336c1edffc73a188fe83498a.jpeg?ce=2&s=414x232',
-        perk: 'Stargazing Balcony',
-      },
-    ],
   },
 ];
 
@@ -182,21 +77,18 @@ export const SeasonalBooking = () => {
   const navigate = useNavigate();
 
   const activeSeason = SEASONS.find((s) => s.id === activeTab) || SEASONS[0];
+  const { data: properties, isLoading } = useSeasonalProperties(activeSeason.apiValue, 3);
 
-  // GSAP tab switch animation
   useGSAP(
     () => {
-      if (!cardsGridRef.current) return;
+      if (!cardsGridRef.current || isLoading) return;
 
       const cards = gsap.utils.toArray<HTMLElement>('.seasonal-card');
+      if (cards.length === 0) return;
 
       gsap.fromTo(
         cards,
-        {
-          y: 35,
-          opacity: 0,
-          scale: 0.95,
-        },
+        { y: 35, opacity: 0, scale: 0.95 },
         {
           y: 0,
           opacity: 1,
@@ -207,7 +99,6 @@ export const SeasonalBooking = () => {
         }
       );
 
-      // Interactive 3D tilt on card mousemove
       cards.forEach((card) => {
         const handleMouseMove = (e: MouseEvent) => {
           const rect = card.getBoundingClientRect();
@@ -238,13 +129,12 @@ export const SeasonalBooking = () => {
         card.addEventListener('mouseleave', handleMouseLeave);
       });
     },
-    { dependencies: [activeTab], scope: containerRef }
+    { dependencies: [activeTab, isLoading, properties?.length], scope: containerRef }
   );
 
   return (
     <section ref={containerRef} className="py-12 sm:py-20 bg-gray-50/70 border-y border-gray-200/80">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[#1A8491] text-xs font-bold mb-3">
             <Sparkles className="w-3.5 h-3.5 text-[#2BB0BB]" /> Time Your Trip
@@ -252,12 +142,9 @@ export const SeasonalBooking = () => {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-heading text-gray-900 tracking-tight">
             Book by Season & Festival
           </h2>
-          <p className="text-xs sm:text-sm text-gray-600 mt-2">
-            {activeSeason.subtitle}
-          </p>
+          <p className="text-xs sm:text-sm text-gray-600 mt-2">{activeSeason.subtitle}</p>
         </div>
 
-        {/* Animated Season Tabs */}
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12">
           {SEASONS.map((season) => {
             const Icon = season.icon;
@@ -280,72 +167,116 @@ export const SeasonalBooking = () => {
           })}
         </div>
 
-        {/* Seasonal Property Showcase Cards with 3D Tilt */}
         <div
           ref={cardsGridRef}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7"
           style={{ perspective: 1200 }}
         >
-          {activeSeason.properties.map((prop, idx) => (
-            <div
-              key={`${prop.name}-${idx}`}
-              onClick={() =>
-                navigate(`/properties?destination=${encodeURIComponent(prop.location.split(',')[0])}`)
-              }
-              className="seasonal-card group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-200/90 hover:border-[#2BB0BB]/60 hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* Photo & Badge */}
-              <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-                <img
-                  src={prop.image}
-                  alt={prop.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-                <Badge
-                  className={`absolute top-3.5 left-3.5 ${activeSeason.badgeBg} text-xs font-bold shadow-sm border`}
-                >
-                  {prop.perk}
-                </Badge>
-              </div>
-
-              {/* Card Body */}
-              <CardContent className="p-6">
-                <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#2BB0BB]" />
-                  <span>{prop.location}</span>
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rounded-3xl border border-gray-200 bg-white overflow-hidden p-0">
+                <Skeleton className="w-full aspect-[16/10]" />
+                <div className="p-6 space-y-3">
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-5 w-1/3" />
                 </div>
+              </div>
+            ))
+          ) : !properties || properties.length === 0 ? (
+            <div className="col-span-full rounded-2xl border border-dashed border-gray-200 bg-white p-8 sm:p-10 text-center">
+              <Sparkles className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">
+                No {activeSeason.title.toLowerCase()} stays tagged yet
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 max-w-md mx-auto mb-4">
+                Hosts mark seasonal experiences on their property details. Browse all Kerala homestays meanwhile.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/properties')}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A8491] hover:underline"
+              >
+                Explore all properties <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            properties.map((prop) => {
+              const image = prop.images?.[0];
+              const perk =
+                prop.amenities?.[0] ||
+                (prop.isCertified ? 'Verified Stay' : prop.classification !== 'UNCLASSIFIED' ? prop.classification : 'Seasonal Stay');
 
-                <h3 className="font-heading font-bold text-lg text-gray-900 group-hover:text-[#1A8491] transition-colors mb-4 line-clamp-1">
-                  {prop.name}
-                </h3>
-
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-xl font-extrabold text-[#1A8491]">
-                      ₹{prop.price.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-gray-500 ml-1">/ night</span>
+              return (
+                <div
+                  key={prop.id}
+                  onClick={() => navigate(`/property/${prop.id}`)}
+                  className="seasonal-card group cursor-pointer bg-white rounded-3xl overflow-hidden border border-gray-200/90 hover:border-[#2BB0BB]/60 hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between"
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 flex items-center justify-center">
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={prop.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center text-gray-400">
+                        <ImageOff className="w-8 h-8 mb-1" />
+                        <span className="text-xs">No photo</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    <Badge
+                      className={`absolute top-3.5 left-3.5 ${activeSeason.badgeBg} text-xs font-bold shadow-sm border`}
+                    >
+                      {perk}
+                    </Badge>
                   </div>
 
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-[#1A8491] group-hover:translate-x-1 transition-transform">
-                    <span>Reserve</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#2BB0BB]" />
+                      <span className="truncate">{prop.location}</span>
+                    </div>
+
+                    <h3 className="font-heading font-bold text-lg text-gray-900 group-hover:text-[#1A8491] transition-colors mb-4 line-clamp-1">
+                      {prop.title}
+                    </h3>
+
+                    <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                      <div>
+                        {prop.price > 0 ? (
+                          <>
+                            <span className="text-xl font-extrabold text-[#1A8491]">
+                              ₹{prop.price.toLocaleString()}
+                            </span>
+                            <span className="text-xs text-gray-500 ml-1">/ night</span>
+                          </>
+                        ) : (
+                          <span className="text-sm font-bold text-[#1A8491]">On request</span>
+                        )}
+                      </div>
+
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-[#1A8491] group-hover:translate-x-1 transition-transform">
+                        <span>Reserve</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </CardContent>
                 </div>
-              </CardContent>
-            </div>
-          ))}
+              );
+            })
+          )}
         </div>
 
-        {/* Kerala Festival Calendar Strip */}
         <div className="mt-12 text-center">
           <div className="inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white border border-gray-200 shadow-sm text-xs sm:text-sm text-gray-700">
             <Calendar className="w-4 h-4 text-[#1A8491] shrink-0" />
             <span>
-              <strong>Kerala Cultural Highlights:</strong> Thrissur Pooram (Apr-May) • Nehru Trophy Boat Race (Aug) • Onam Celebrations (Aug-Sep) • Cochin Carnival (Dec)
+              <strong>Kerala Cultural Highlights:</strong> Thrissur Pooram (Apr-May) • Nehru Trophy Boat Race
+              (Aug) • Onam Celebrations (Aug-Sep) • Cochin Carnival (Dec)
             </span>
           </div>
         </div>

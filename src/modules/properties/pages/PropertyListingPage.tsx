@@ -10,6 +10,8 @@ import { AlertCircle, RefreshCw, CalendarDays, Users, MapPin } from 'lucide-reac
 import { HomestayCard } from '@/modules/landing/components/HomestayCard';
 import { PropertyFiltersSidebar } from '../components/PropertyFiltersSidebar';
 import { usePropertiesListing } from '../hooks/usePropertiesListing';
+import { useWishlistIdsQuery, useWishlistMutations } from '@/modules/wishlist';
+import { useRequireAuth } from '@/modules/cart/hooks/useRequireAuth';
 import { format } from 'date-fns';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -39,7 +41,9 @@ export const PropertyListingPage = () => {
     searchParams.get('searchQuery') ||
     '';
 
-  const [likedProperties, setLikedProperties] = useState<number[]>([]);
+  const { requireAuth } = useRequireAuth();
+  const { data: likedProperties = [] } = useWishlistIdsQuery();
+  const { toggleItem } = useWishlistMutations();
   const [sortBy, setSortBy] = useState('popular');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000]);
   const [searchQuery, setSearchQuery] = useState(toPlaceToken(initialDestination));
@@ -49,6 +53,10 @@ export const PropertyListingPage = () => {
   const [latitude, setLatitude] = useState<number | undefined>(parseCoord(searchParams.get('lat')));
   const [longitude, setLongitude] = useState<number | undefined>(parseCoord(searchParams.get('lng')));
   const [radiusKm, setRadiusKm] = useState<number | undefined>(parseCoord(searchParams.get('radius')));
+  const [segmentId, setSegmentId] = useState<number | undefined>(() => {
+    const raw = Number(searchParams.get('segment_id'));
+    return Number.isFinite(raw) && raw > 0 ? raw : undefined;
+  });
 
   // Sync state when URL search parameters change externally
   useEffect(() => {
@@ -64,6 +72,8 @@ export const PropertyListingPage = () => {
     const qLat = parseCoord(searchParams.get('lat'));
     const qLng = parseCoord(searchParams.get('lng'));
     const qRadius = parseCoord(searchParams.get('radius'));
+    const qSegmentRaw = Number(searchParams.get('segment_id'));
+    const qSegment = Number.isFinite(qSegmentRaw) && qSegmentRaw > 0 ? qSegmentRaw : undefined;
 
     setSearchQuery((prev) => (prev !== qSearch ? qSearch : prev));
     setCheckInDate((prev) => (prev !== qIn ? qIn : prev));
@@ -72,6 +82,7 @@ export const PropertyListingPage = () => {
     setLatitude((prev) => (prev !== qLat ? qLat : prev));
     setLongitude((prev) => (prev !== qLng ? qLng : prev));
     setRadiusKm((prev) => (prev !== qRadius ? qRadius : prev));
+    setSegmentId((prev) => (prev !== qSegment ? qSegment : prev));
   }, [searchParams]);
 
   // Keep URL query params synchronized when user modifies filters in the sidebar
@@ -174,12 +185,12 @@ export const PropertyListingPage = () => {
     priceRange,
     verificationStatus: ['APPROVED'],
     availableOnly: true,
+    segmentId: segmentId != null ? [segmentId] : undefined,
   });
 
   const toggleLike = (id: number) => {
-    setLikedProperties((prev) =>
-      prev.includes(id) ? prev.filter((propId) => propId !== id) : [...prev, id]
-    );
+    if (!requireAuth()) return;
+    void toggleItem(id, likedProperties.includes(id));
   };
 
   const handleReset = () => {

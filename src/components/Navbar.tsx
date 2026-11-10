@@ -169,11 +169,11 @@ const Navbar = () => {
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate("/dashboard?tab=wishlist")}
                     className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
                   >
                     <Heart className="w-4 h-4 mr-2.5 text-[#1A8491]" />
-                    <span>Wishlists</span>
+                    <span>Wishlist</span>
                   </DropdownMenuItem>
 
                   {/* Mobile-only Cart Item */}

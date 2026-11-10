@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -9,46 +9,53 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, RefreshCw, Sparkles } from 'lucide-react';
 import { HomestayCard } from './HomestayCard';
 import { useLandingProperties, DEFAULT_LANDING_FILTERS } from '../hooks/useLandingProperties';
-import type { FilterState, LandingPropertyCard } from '../types/landing.types';
+import type { FilterState, LandingPropertyCard, PropertySearchFilters } from '../types/landing.types';
+import { useWishlistIdsQuery, useWishlistMutations } from '@/modules/wishlist';
+import { useRequireAuth } from '@/modules/cart/hooks/useRequireAuth';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export const HomestayDiscoverySection = () => {
   const containerRef = useRef<HTMLElement>(null);
-  const [likedProperties, setLikedProperties] = useState<number[]>([]);
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     category: 'all',
     filters: [],
     sortBy: 'popularity',
+    segmentId: null,
   });
+  const { requireAuth } = useRequireAuth();
+  const { data: likedProperties = [] } = useWishlistIdsQuery();
+  const { toggleItem } = useWishlistMutations();
 
-  const { data, isLoading, isError, error, refetch } = useLandingProperties(DEFAULT_LANDING_FILTERS);
+  const searchFilters: PropertySearchFilters = useMemo(
+    () => ({
+      ...DEFAULT_LANDING_FILTERS,
+      segment_id:
+        activeFilters.segmentId != null && !Number.isNaN(activeFilters.segmentId)
+          ? [activeFilters.segmentId]
+          : undefined,
+    }),
+    [activeFilters.segmentId]
+  );
+
+  const { data, isLoading, isError, error, refetch } = useLandingProperties(searchFilters);
 
   const toggleLike = (id: number) => {
-    setLikedProperties((prev) =>
-      prev.includes(id) ? prev.filter((propId) => propId !== id) : [...prev, id]
-    );
+    if (!requireAuth()) return;
+    void toggleItem(id, likedProperties.includes(id));
   };
 
-  const handleFiltersChange = (newFilters: { category: string; filters: string[]; sortBy: string }) => {
+  const handleFiltersChange = useCallback((newFilters: FilterState) => {
     setActiveFilters((prev) => ({
       ...prev,
       ...newFilters,
     }));
-  };
+  }, []);
 
-  // Filter and sort the fetched properties in memory
   const displayedProperties = useMemo(() => {
     const rawCards: LandingPropertyCard[] = data?.cards || [];
 
-    // Filter
     const filtered = rawCards.filter((property) => {
-      // Category filter
-      if (activeFilters.category !== 'all' && property.region !== activeFilters.category) {
-        return false;
-      }
-
-      // Feature filters
       if (activeFilters.filters.includes('budget') && property.price >= 4000) {
         return false;
       }
@@ -58,11 +65,9 @@ export const HomestayDiscoverySection = () => {
       if (activeFilters.filters.includes('activities') && property.amenities.length <= 2) {
         return false;
       }
-
       return true;
     });
 
-    // Sort
     return [...filtered].sort((a, b) => {
       switch (activeFilters.sortBy) {
         case 'price-low':
@@ -71,13 +76,14 @@ export const HomestayDiscoverySection = () => {
           return b.price - a.price;
         case 'rating':
           return b.rating - a.rating;
+        case 'newest':
+          return (a.daysAgo || 999) - (b.daysAgo || 999);
         default:
           return 0;
       }
     });
   }, [data, activeFilters]);
 
-  // GSAP animation on cards entrance
   useGSAP(
     () => {
       if (displayedProperties.length === 0) return;
@@ -99,7 +105,6 @@ export const HomestayDiscoverySection = () => {
 
   return (
     <section ref={containerRef} className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
-      {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-8 gap-3 sm:gap-4">
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E1F4F6] text-[#1A8491] border border-[#B6E5E9] text-xs font-semibold mb-2">
@@ -114,10 +119,11 @@ export const HomestayDiscoverySection = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <HomestayFilters onFiltersChange={handleFiltersChange} totalResults={displayedProperties.length} />
+      <HomestayFilters
+        onFiltersChange={handleFiltersChange}
+        totalResults={data?.pagination?.total ?? displayedProperties.length}
+      />
 
-      {/* Loading Skeleton State */}
       {isLoading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mt-6">
           {Array.from({ length: 8 }).map((_, index) => (
@@ -136,7 +142,6 @@ export const HomestayDiscoverySection = () => {
         </div>
       )}
 
-      {/* Error State */}
       {isError && !isLoading && (
         <div className="rounded-2xl border border-rose-200 bg-rose-50/70 p-6 sm:p-8 text-center my-8 max-w-lg mx-auto">
           <AlertCircle className="w-10 h-10 text-rose-500 mx-auto mb-3" />
@@ -154,12 +159,13 @@ export const HomestayDiscoverySection = () => {
         </div>
       )}
 
-      {/* Property Cards Grid */}
       {!isLoading && !isError && (
         <>
           {displayedProperties.length === 0 ? (
             <div className="text-center py-12 sm:py-16 bg-white rounded-2xl border border-gray-200 mt-6 p-6 sm:p-8">
-              <p className="text-gray-500 text-sm sm:text-base font-medium">No homestays found matching your selected filters.</p>
+              <p className="text-gray-500 text-sm sm:text-base font-medium">
+                No homestays found matching your selected filters.
+              </p>
               <Button
                 variant="outline"
                 className="mt-4 rounded-xl text-xs sm:text-sm"
@@ -168,6 +174,7 @@ export const HomestayDiscoverySection = () => {
                     category: 'all',
                     filters: [],
                     sortBy: 'popularity',
+                    segmentId: null,
                   })
                 }
               >
@@ -188,7 +195,6 @@ export const HomestayDiscoverySection = () => {
             </div>
           )}
 
-          {/* Section Footer / View All Link */}
           <div className="text-center mt-8 sm:mt-12 px-2">
             <Button
               variant="outline"

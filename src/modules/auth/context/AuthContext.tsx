@@ -10,6 +10,8 @@ export interface AuthContextType {
   isLoading: boolean;
   loginWithGoogle: (credential: string) => Promise<UserProfile>;
   loginWithEmail: (payload: { email: string; password?: string; remember_me?: boolean }) => Promise<UserProfile>;
+  loginWithEmailOtp: (email: string, otpCode: string) => Promise<UserProfile>;
+  sendEmailLoginOtp: (email: string) => Promise<void>;
   loginWithMobile: (phoneNumber: string, otp: string) => Promise<UserProfile>;
   register: (payload: import('../types/auth.types').RegisterPayload) => Promise<UserProfile>;
   logout: () => void;
@@ -101,6 +103,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [setSession]);
 
+  const sendEmailLoginOtp = useCallback(async (email: string): Promise<void> => {
+    await authService.sendEmailLoginOtp(email);
+  }, []);
+
+  const loginWithEmailOtp = useCallback(async (email: string, otpCode: string): Promise<UserProfile> => {
+    setIsLoading(true);
+    try {
+      const authData = await authService.loginWithEmailOtp(email, otpCode);
+      setSession(authData);
+      return authData.user;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setSession]);
+
   const loginWithMobile = useCallback(async (phoneNumber: string, otp: string): Promise<UserProfile> => {
     setIsLoading(true);
     try {
@@ -152,6 +169,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         loginWithGoogle,
         loginWithEmail,
+        loginWithEmailOtp,
+        sendEmailLoginOtp,
         loginWithMobile,
         register,
         logout,
