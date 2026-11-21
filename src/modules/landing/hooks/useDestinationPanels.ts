@@ -8,7 +8,6 @@ export interface DestinationPanelDef {
   query: string;
   tagline: string;
   badge: string;
-  rating: number;
   image: string;
 }
 
@@ -23,7 +22,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Idukki',
     tagline: 'Tea hills, dams & highland homestays across the Western Ghats',
     badge: 'Hill District',
-    rating: 4.9,
     image:
       'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Idukki_Arch_Dam.jpg/960px-Idukki_Arch_Dam.jpg',
   },
@@ -33,7 +31,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Kottayam',
     tagline: 'Rubber country, lake shores & heritage Syrian Christian homes',
     badge: 'Lake Country',
-    rating: 4.88,
     image:
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Vembanad_Lake_at_Kumarakom.jpg/960px-Vembanad_Lake_at_Kumarakom.jpg',
   },
@@ -43,7 +40,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Munnar',
     tagline: 'Misty tea gardens & cool hill station homestays',
     badge: 'Hill Retreats',
-    rating: 4.9,
     image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
   },
   {
@@ -52,7 +48,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Alleppey',
     tagline: 'Venice of the East & backwater canal villas',
     badge: 'Backwaters',
-    rating: 4.95,
     image: 'https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=600&h=400&fit=crop',
   },
   {
@@ -61,7 +56,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Wayanad',
     tagline: 'Emerald rainforests, waterfalls & treehouses',
     badge: 'Eco Living',
-    rating: 4.88,
     image: 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=600&h=400&fit=crop',
   },
   {
@@ -70,7 +64,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Varkala',
     tagline: 'Cliffside sea views & golden Arabian coast',
     badge: 'Coastal Escapes',
-    rating: 4.85,
     image: 'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=600&h=400&fit=crop',
   },
   {
@@ -79,7 +72,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Kochi',
     tagline: 'Colonial heritage, spice markets & Chinese fishing nets',
     badge: 'Culture & Art',
-    rating: 4.92,
     image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&h=400&fit=crop',
   },
   {
@@ -88,7 +80,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Thekkady',
     tagline: 'Periyar wildlife, spice plantations & bamboo rafting',
     badge: 'Wildlife & Spice',
-    rating: 4.86,
     image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&h=400&fit=crop',
   },
   {
@@ -97,7 +88,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Kumarakom',
     tagline: 'Vembanad lake serenity & bird sanctuary walks',
     badge: 'Lake Hideaways',
-    rating: 4.91,
     image: 'https://www.tusktravel.com/blog/wp-content/uploads/2022/03/Kerala-kumarakom-Place.jpg',
   },
   {
@@ -106,7 +96,6 @@ export const CURATED_DESTINATIONS: DestinationPanelDef[] = [
     query: 'Kovalam',
     tagline: 'Lighthouse beach & traditional Ayurvedic wellness',
     badge: 'Ayurveda & Sun',
-    rating: 4.82,
     image: 'https://cdn.guidetour.in/wp-content/uploads/2018/01/Kovalam-Tourist-Places.jpg.webp',
   },
 ];

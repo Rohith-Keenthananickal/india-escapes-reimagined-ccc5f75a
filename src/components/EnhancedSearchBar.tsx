@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import gsap from "gsap";
 import {
   Search,
   MapPin,
@@ -18,6 +19,11 @@ import GuestFilter from "@/components/ui/GuestFilter";
 import { format } from "date-fns";
 import { useGooglePlaces, type PlaceDetails } from "@/hooks/use-google-places";
 import { GoogleMapsLoader } from "@/components/GoogleMapsLoader";
+
+interface EnhancedSearchBarProps {
+  /** Compact the bar after the page has scrolled (used in sticky header stack). */
+  compactOnScroll?: boolean;
+}
 
 /** Short display / match token from a place label ("Kochi, Keralam, India" → "Kochi"). */
 const toPlaceToken = (value: string): string => {
@@ -60,7 +66,7 @@ const SUGGESTIONS = [
   // ...add more as needed
 ];
 
-export default function EnhancedSearchBar() {
+export default function EnhancedSearchBar({ compactOnScroll = false }: EnhancedSearchBarProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -97,9 +103,38 @@ export default function EnhancedSearchBar() {
     rooms: 1,
   });
   const inputRef = useRef<HTMLInputElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [isCompact, setIsCompact] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState({});
+
+  // Compact animation while the sticky header stack stays fixed on scroll
+  useEffect(() => {
+    if (!compactOnScroll) return;
+
+    const onScroll = () => {
+      const next = window.scrollY > 24;
+      setIsCompact((prev) => (prev === next ? prev : next));
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [compactOnScroll]);
+
+  useEffect(() => {
+    if (!compactOnScroll || !shellRef.current) return;
+    const inner = shellRef.current.querySelector(".search-bar-inner");
+    if (!inner) return;
+
+    gsap.to(inner, {
+      scale: isCompact ? 0.98 : 1,
+      y: isCompact ? 0 : 0,
+      duration: 0.28,
+      ease: "power2.out",
+    });
+  }, [isCompact, compactOnScroll]);
   const [selectedPlace, setSelectedPlace] = useState<PlaceDetails | null>(null);
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // Google Places hook
   const { predictions, isLoading, error, isInitialized, getPlacePredictions, getPlaceDetails, clearPredictions } = useGooglePlaces();
@@ -282,11 +317,24 @@ export default function EnhancedSearchBar() {
   };
 
   return (
-    <div className="w-full flex justify-center items-center my-4 sm:my-8 px-3 sm:px-4">
+    <div
+      ref={shellRef}
+      className={`w-full flex justify-center items-center px-3 sm:px-4 transition-[padding] duration-300 ${
+        compactOnScroll
+          ? isCompact
+            ? "py-1.5 sm:py-2"
+            : "py-2.5 sm:py-3"
+          : "my-4 sm:my-8"
+      }`}
+    >
       <GoogleMapsLoader>
-        <div className="relative w-full max-w-4xl">
+        <div className="search-bar-inner relative w-full max-w-4xl origin-top will-change-transform">
           {/* Mobile Search Card (< 768px) */}
-          <div className="flex md:hidden flex-col bg-white rounded-3xl shadow-xl p-3 border border-gray-150 w-full space-y-2.5">
+          <div
+            className={`flex md:hidden flex-col bg-white rounded-3xl border border-gray-150 w-full space-y-2.5 transition-all duration-300 ${
+              isCompact ? "shadow-md p-2.5" : "shadow-xl p-3"
+            }`}
+          >
             {/* Destination Input Row */}
             <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-gray-50 rounded-2xl border border-gray-200/80">
               <Search className="w-4 h-4 text-[#2BB0BB] shrink-0" />
@@ -358,7 +406,13 @@ export default function EnhancedSearchBar() {
           </div>
 
           {/* Desktop Search Pill (>= 768px) */}
-          <div className="hidden md:flex items-center bg-white rounded-full shadow-2xl px-2 py-0 border-0 min-h-[72px]">
+          <div
+            className={`hidden md:flex items-center bg-white rounded-full px-2 py-0 border-0 transition-all duration-300 ${
+              isCompact
+                ? "shadow-lg min-h-[56px] ring-1 ring-gray-200/70"
+                : "shadow-2xl min-h-[72px]"
+            }`}
+          >
             {/* Where */}
             <div className="flex flex-col justify-center px-6 py-2">
               <span className="text-sm font-bold text-gray-900">Where</span>

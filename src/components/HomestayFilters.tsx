@@ -57,12 +57,6 @@ const FEATURE_FILTERS = [
     icon: Tag,
   },
   {
-    id: 'eco',
-    label: 'Eco-Certified',
-    description: 'Solar power, rainwater harvesting & organic',
-    icon: Leaf,
-  },
-  {
     id: 'activities',
     label: 'Curated Activities',
     description: 'Village walks, canoeing, cooking workshops',
@@ -271,9 +265,11 @@ export const HomestayFilters = ({ onFiltersChange, totalResults }: HomestayFilte
                       >
                         {cat.label}
                       </span>
-                      <span className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap hidden sm:inline-block">
-                        {cat.count} stays
-                      </span>
+                      {cat.count > 0 && (
+                        <span className="text-[10px] text-gray-500 mt-0.5 whitespace-nowrap hidden sm:inline-block">
+                          {cat.count} stays
+                        </span>
+                      )}
                     </div>
 
                     {isSelected && (
@@ -405,7 +401,9 @@ export const HomestayFilters = ({ onFiltersChange, totalResults }: HomestayFilte
                             {isSelected && <Check className="w-3.5 h-3.5 text-[#2BB0BB]" />}
                           </div>
                           <span className="text-xs font-bold leading-tight line-clamp-1">{cat.label}</span>
-                          <span className="text-[10px] text-gray-500 mt-0.5">{cat.count} stays</span>
+                          {cat.count > 0 && (
+                            <span className="text-[10px] text-gray-500 mt-0.5">{cat.count} stays</span>
+                          )}
                         </button>
                       );
                     })}

@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Sparkles, MapPin, ShieldCheck, Star, Compass, ArrowRight } from 'lucide-react';
-import EnhancedSearchBar from '@/components/EnhancedSearchBar';
+import { Sparkles, MapPin, Star } from 'lucide-react';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -32,10 +31,8 @@ export const HeroSection = () => {
   const tagsRef = useRef<HTMLDivElement>(null);
   const bgImageRef = useRef<HTMLDivElement>(null);
   const floatingCard1Ref = useRef<HTMLDivElement>(null);
-  const floatingCard2Ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Background carousel loop
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
@@ -43,31 +40,17 @@ export const HeroSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // GSAP Entrance & Parallax Animations
   useGSAP(
     () => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Search bar slide in
-      tl.from('.hero-search-wrapper', {
-        y: -30,
+      tl.from(pillRef.current, {
+        y: 20,
         opacity: 0,
-        duration: 0.8,
+        scale: 0.85,
+        duration: 0.7,
       });
 
-      // Floating verified pill
-      tl.from(
-        pillRef.current,
-        {
-          y: 20,
-          opacity: 0,
-          scale: 0.85,
-          duration: 0.7,
-        },
-        '-=0.4'
-      );
-
-      // Hero Headline
       tl.from(
         headlineRef.current,
         {
@@ -78,7 +61,6 @@ export const HeroSection = () => {
         '-=0.3'
       );
 
-      // Subheading
       tl.from(
         subheadRef.current,
         {
@@ -89,7 +71,6 @@ export const HeroSection = () => {
         '-=0.4'
       );
 
-      // Quick filter pills
       tl.from(
         tagsRef.current,
         {
@@ -100,20 +81,17 @@ export const HeroSection = () => {
         '-=0.3'
       );
 
-      // Floating interactive badges
       tl.from(
-        [floatingCard1Ref.current, floatingCard2Ref.current],
+        floatingCard1Ref.current,
         {
           scale: 0.8,
           opacity: 0,
           duration: 0.8,
-          stagger: 0.2,
           ease: 'back.out(1.7)',
         },
         '-=0.3'
       );
 
-      // Parallax on Scroll for the Hero background
       gsap.to(bgImageRef.current, {
         yPercent: 18,
         ease: 'none',
@@ -125,7 +103,6 @@ export const HeroSection = () => {
         },
       });
 
-      // Continuous gentle floating physics for floating badge cards
       gsap.to(floatingCard1Ref.current, {
         y: -12,
         duration: 3,
@@ -133,28 +110,13 @@ export const HeroSection = () => {
         yoyo: true,
         ease: 'sine.inOut',
       });
-
-      gsap.to(floatingCard2Ref.current, {
-        y: 12,
-        duration: 3.4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: 0.5,
-      });
     },
     { scope: containerRef }
   );
 
   return (
     <div ref={containerRef} className="relative w-full overflow-hidden">
-      {/* Top Search Bar */}
-      <div className="hero-search-wrapper w-full relative z-30">
-        <EnhancedSearchBar />
-      </div>
-
       <div className="relative min-h-[520px] sm:min-h-[600px] lg:min-h-[680px] overflow-hidden flex items-center justify-center">
-        {/* Parallax Background Container */}
         <div ref={bgImageRef} className="absolute inset-0 -top-12 -bottom-12 w-full h-[120%]">
           {HERO_IMAGES.map((img, idx) => (
             <img
@@ -172,46 +134,36 @@ export const HeroSection = () => {
           ))}
         </div>
 
-        {/* Ambient Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/35 z-10" />
 
-        {/* Hero Content */}
         <div className="relative z-20 flex flex-col items-center justify-center px-4 sm:px-6 text-center max-w-4xl mx-auto py-10 sm:py-16">
-          {/* Floating Pill */}
           <div
             ref={pillRef}
             className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-[11px] sm:text-xs font-semibold mb-4 sm:mb-6 shadow-xl max-w-full"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#FFD26E] shrink-0" />
-            <span className="truncate">Curated Homestays & Backwater Retreats Across Kerala</span>
+            <span className="truncate">Community tourism across Kerala</span>
           </div>
 
-          {/* Headline */}
           <h1
             ref={headlineRef}
             className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 sm:mb-5 tracking-tight leading-[1.15]"
           >
-            Live like a local. Discover Kerala's soul
-            <br />
-            <span className="text-[#FFD26E] bg-gradient-to-r from-[#FFD26E] via-amber-300 to-[#FFD26E] bg-clip-text text-transparent">
-              with a welcoming family
-            </span>
+            Hyperlocal Experiences &amp; Family Stays
           </h1>
 
-          {/* Subheading */}
           <p
             ref={subheadRef}
-            className="text-xs sm:text-base md:text-xl text-white/90 max-w-2xl mx-auto font-light leading-relaxed mb-5 sm:mb-6"
+            className="text-sm sm:text-lg md:text-xl text-[#FFD26E] max-w-2xl mx-auto font-semibold leading-relaxed mb-5 sm:mb-6"
           >
-            Experience authentic heritage homestays, tranquil backwaters, and genuine Kerala hospitality.
+            Community Safety Net
           </p>
 
-          {/* Quick Destination Navigation Pills */}
           <div
             ref={tagsRef}
             className="flex flex-wrap items-center justify-center gap-2 max-w-xl mx-auto"
           >
-            <span className="text-xs text-white/70 font-medium mr-1">Trending:</span>
+            <span className="text-xs text-white/70 font-medium mr-1">Popular destinations:</span>
             {POPULAR_DESTINATIONS.map((dest) => (
               <button
                 key={dest.name}
@@ -228,7 +180,6 @@ export const HeroSection = () => {
           </div>
         </div>
 
-        {/* Interactive Floating Micro-Card 1 (Desktop) */}
         <div
           ref={floatingCard1Ref}
           onClick={() => navigate('/properties?destination=Alleppey')}
@@ -244,28 +195,12 @@ export const HeroSection = () => {
           <div className="text-xs">
             <div className="flex items-center gap-1 font-bold text-gray-900">
               <Star className="w-3.5 h-3.5 fill-[#FFD26E] text-[#FFD26E]" />
-              <span>4.95 • Alleppey Canal Stay</span>
+              <span>Alleppey Canal Stay</span>
             </div>
-            <p className="text-gray-500 text-[11px] truncate">100% Verified Local Family</p>
+            <p className="text-gray-500 text-[11px] truncate">Explore local family stays</p>
           </div>
         </div>
 
-        {/* Interactive Floating Micro-Card 2 (Desktop) */}
-        <div
-          ref={floatingCard2Ref}
-          onClick={() => navigate('/properties')}
-          className="hidden md:flex absolute bottom-20 left-8 lg:left-16 z-20 items-center gap-3 p-3.5 bg-white/90 backdrop-blur-md rounded-2xl border border-white/30 shadow-2xl max-w-xs text-left cursor-pointer hover:scale-105 transition-transform"
-        >
-          <div className="w-10 h-10 rounded-xl bg-teal-50 text-[#1A8491] flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <div className="text-xs">
-            <p className="font-bold text-gray-900">Tourism Approved</p>
-            <p className="text-gray-500 text-[11px]">Background Verified Kerala Hosts</p>
-          </div>
-        </div>
-
-        {/* Carousel Slide Indicators */}
         <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-2">
           {HERO_IMAGES.map((_, idx) => (
             <button

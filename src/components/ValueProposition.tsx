@@ -189,7 +189,7 @@ const ValueProposition = () => {
             <Sparkles className="w-3.5 h-3.5 text-[#2BB0BB]" /> The TriphavenCo Difference
           </div>
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold font-heading text-gray-900 tracking-tight leading-[1.15]">
-            Why Choose Kerala Homestays?
+            Why Choose TripHavenCo?
           </h2>
           <p className="text-sm sm:text-lg text-gray-600 mt-2 sm:mt-3 font-normal">
             Immerse in genuine Kerala hospitality where hosts become family and stays become lifelong memories.

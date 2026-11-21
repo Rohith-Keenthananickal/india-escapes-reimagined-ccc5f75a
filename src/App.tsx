@@ -22,6 +22,8 @@ import TripDetail from "./pages/TripDetail";
 import SearchResults from "./pages/SearchResults";
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import HelpCenter from "./pages/HelpCenter";
+import ContactUs from "./pages/ContactUs";
 import AccountDeletion from "./pages/AccountDeletion";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./lib/ScrollToTop";
@@ -69,6 +71,8 @@ const App = () => (
             <Route path="/search" element={<SearchResults />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/contact" element={<ContactUs />} />
             <Route path="/account_deletion" element={<AccountDeletion />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

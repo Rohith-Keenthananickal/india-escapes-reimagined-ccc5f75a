@@ -59,9 +59,6 @@ export const HomestayDiscoverySection = () => {
       if (activeFilters.filters.includes('budget') && property.price >= 4000) {
         return false;
       }
-      if (activeFilters.filters.includes('eco') && !property.isEco) {
-        return false;
-      }
       if (activeFilters.filters.includes('activities') && property.amenities.length <= 2) {
         return false;
       }

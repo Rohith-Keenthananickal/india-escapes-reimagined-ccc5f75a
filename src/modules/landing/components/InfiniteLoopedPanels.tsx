@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Star, MapPin, Sparkles, ArrowRight } from 'lucide-react';
+import { MapPin, Sparkles, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDestinationPanels } from '../hooks/useDestinationPanels';
@@ -162,10 +162,6 @@ export const InfiniteLoopedPanels = () => {
                   <Badge className="bg-white/95 text-gray-900 backdrop-blur-sm border-0 font-semibold text-xs shadow-sm transition-transform duration-300 group-hover:scale-105">
                     {dest.badge}
                   </Badge>
-                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-bold border border-white/20 transition-transform duration-300 group-hover:scale-105">
-                    <Star className="w-3.5 h-3.5 fill-[#FFD26E] text-[#FFD26E]" />
-                    <span>{dest.rating}</span>
-                  </div>
                 </div>
 
                 <div className="relative z-10 p-5 text-white space-y-2">
@@ -181,7 +177,9 @@ export const InfiniteLoopedPanels = () => {
 
                   <div className="pt-2 border-t border-white/20 flex items-center justify-between text-xs">
                     <span className="font-medium text-white/90">
-                      {dest.staysCount}+ verified homestays
+                      {dest.staysCount > 0
+                        ? `${dest.staysCount}+ verified homestays`
+                        : 'Explore stays'}
                     </span>
                     <span className="font-semibold text-[#FFD26E] flex items-center gap-1 group-hover:translate-x-1.5 transition-transform duration-300">
                       Explore <ArrowRight className="w-3.5 h-3.5" />

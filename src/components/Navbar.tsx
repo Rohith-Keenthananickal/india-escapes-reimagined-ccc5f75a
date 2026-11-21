@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,14 +11,13 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  Search,
   Menu,
-  Globe,
   User,
   Heart,
   Home,
   Compass,
-  Wrench,
+  Plane,
+  MapPinned,
   LayoutDashboard,
   Luggage,
   ShoppingCart,
@@ -31,99 +29,127 @@ import {
 import Cart from "./Cart";
 import { useAuth } from "@/modules/auth";
 import { useCartItemCount } from "@/modules/cart/hooks/useCart";
+import { toast } from "@/hooks/use-toast";
 
-const Navbar = () => {
+const scrollToEcosystem = () => {
+  const el = document.getElementById("ecosystem");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  window.location.hash = "ecosystem";
+};
+
+interface NavbarProps {
+  /** When false, navbar is not sticky (use inside a parent sticky stack). Default true. */
+  sticky?: boolean;
+}
+
+const Navbar = ({ sticky = true }: NavbarProps) => {
   const { user, isAuthenticated, logout } = useAuth();
   const itemCount = useCartItemCount();
-  const [activeTab, setActiveTab] = useState("homes");
+  const [activeTab, setActiveTab] = useState("stays");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Update active tab based on current route
   useEffect(() => {
     const path = location.pathname;
     if (path === "/") {
-      setActiveTab("homes");
+      setActiveTab("stays");
     } else if (path === "/experiences") {
       setActiveTab("experiences");
-    } else if (path === "/services") {
-      setActiveTab("services");
+    } else {
+      setActiveTab("");
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (location.pathname === "/" && location.hash === "#ecosystem") {
+      const timer = window.setTimeout(() => scrollToEcosystem(), 150);
+      return () => window.clearTimeout(timer);
+    }
+  }, [location.pathname, location.hash]);
+
   const handleTabClick = (tabId: string) => {
+    if (tabId === "flights") {
+      toast({
+        title: "Flights coming soon",
+        description: "We're preparing flight bookings for Kerala journeys.",
+      });
+      return;
+    }
+
     setActiveTab(tabId);
-    if (tabId === "homes") {
+    if (tabId === "stays") {
       navigate("/");
     } else if (tabId === "experiences") {
       navigate("/experiences");
-    } else if (tabId === "services") {
-      navigate("/services");
     }
   };
 
+  const handleAtpClick = () => {
+    if (location.pathname === "/") {
+      scrollToEcosystem();
+    } else {
+      navigate("/#ecosystem");
+    }
+  };
+
+  const handleBecomeHost = () => {
+    window.open("https://triphavenco.com/", "_blank", "noopener,noreferrer");
+  };
+
   const mainTabs = [
-    { id: "homes", label: "Homes", icon: Home },
-    { id: "experiences", label: "Experiences", icon: Compass },
-    // { id: "services", label: "Services", icon: Wrench },
+    { id: "stays", label: "Stays", icon: Home, comingSoon: false },
+    { id: "experiences", label: "Experiences", icon: Compass, comingSoon: false },
+    { id: "flights", label: "Flights", icon: Plane, comingSoon: true },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b shadow-sm">
+    <nav
+      className={`${sticky ? "sticky top-0 z-50 border-b shadow-sm" : "relative z-10 border-b-0 shadow-none"} bg-white`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 shrink-0 z-10">
             <img
               src="/Logo_color.svg"
-              alt="TriphavenCo"
+              alt="TripHavenCo"
               className="h-8 md:h-9 w-auto object-contain"
             />
           </Link>
 
-          {/* Main Tabs - Desktop (centered) */}
-          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-2">
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-1.5 lg:space-x-2">
             {mainTabs.map((tab) => {
               const IconComponent = tab.icon;
               return (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => handleTabClick(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+                  className={`flex items-center space-x-1.5 lg:space-x-2 px-2.5 lg:px-4 py-2 rounded-xl transition-all duration-200 ${
                     activeTab === tab.id
                       ? "bg-brand-teal-50 text-brand-primary-700 border border-brand-teal-200 font-semibold shadow-xs"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium"
-                  }`}
+                  } ${tab.comingSoon ? "opacity-80" : ""}`}
                 >
                   <IconComponent className="w-4 h-4" />
                   <span className="text-sm">{tab.label}</span>
-                  {/* {(tab.id === "experiences" || tab.id === "services") && (
-                    <Badge className="bg-brand-secondary text-brand-dark font-semibold text-xs border border-brand-secondary-700/30">
-                      NEW
+                  {tab.comingSoon && (
+                    <Badge className="bg-brand-secondary text-brand-dark font-semibold text-[10px] border border-brand-secondary-700/30 px-1.5 py-0">
+                      Soon
                     </Badge>
-                  )} */}
+                  )}
                 </button>
               );
             })}
           </div>
 
-          {/* Right side */}
           <div className="flex items-center space-x-2 sm:space-x-4 z-10">
-            {/* Desktop: Become a host */}
-            <Button
-              variant="ghost"
-              onClick={() => window.open("https://triphavenco.com/", "_blank", "noopener,noreferrer")}
-              className="hidden sm:flex text-sm font-medium hover:text-[#1A8491]"
-            >
-              Become a host
-            </Button>
-
-            {/* Desktop: Cart */}
             <div className="hidden sm:flex items-center">
               <Cart />
             </div>
 
-            {/* User Dropdown Menu */}
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -133,12 +159,11 @@ const Navbar = () => {
                   >
                     <Menu className="w-4 h-4 text-gray-700" />
                     <Avatar className="w-6 h-6">
-                      <AvatarImage src={user?.profile_image || undefined} alt={user?.full_name || 'User'} />
+                      <AvatarImage src={user?.profile_image || undefined} alt={user?.full_name || "User"} />
                       <AvatarFallback className="text-xs bg-[#1A8491] text-white font-medium">
-                        {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
+                        {user?.full_name ? user.full_name.charAt(0).toUpperCase() : "U"}
                       </AvatarFallback>
                     </Avatar>
-                    {/* Notification indicator dot on mobile when cart has items */}
                     {itemCount > 0 && (
                       <span className="sm:hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#2BB0BB] rounded-full border-2 border-white ring-1 ring-[#2BB0BB]/30" />
                     )}
@@ -147,11 +172,11 @@ const Navbar = () => {
                 <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1.5 shadow-xl border-gray-200">
                   <div className="px-3 py-2.5 border-b border-gray-100 mb-1">
                     <p className="text-sm font-semibold text-gray-900 truncate">
-                      {user?.full_name || 'TriphavenCo Guest'}
+                      {user?.full_name || "TripHavenCo Guest"}
                     </p>
                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </div>
-                  
+
                   <DropdownMenuItem
                     onClick={() => navigate("/dashboard")}
                     className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
@@ -159,7 +184,7 @@ const Navbar = () => {
                     <LayoutDashboard className="w-4 h-4 mr-2.5 text-[#1A8491]" />
                     <span>Dashboard</span>
                   </DropdownMenuItem>
-                  
+
                   <DropdownMenuItem
                     onClick={() => navigate("/trips")}
                     className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
@@ -167,7 +192,7 @@ const Navbar = () => {
                     <Luggage className="w-4 h-4 mr-2.5 text-[#1A8491]" />
                     <span>Trips</span>
                   </DropdownMenuItem>
-                  
+
                   <DropdownMenuItem
                     onClick={() => navigate("/dashboard?tab=wishlist")}
                     className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
@@ -176,7 +201,6 @@ const Navbar = () => {
                     <span>Wishlist</span>
                   </DropdownMenuItem>
 
-                  {/* Mobile-only Cart Item */}
                   <DropdownMenuItem
                     onClick={() => navigate("/cart")}
                     className="sm:hidden flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
@@ -192,13 +216,22 @@ const Navbar = () => {
                     )}
                   </DropdownMenuItem>
 
-                  {/* Mobile-only Become a host Item */}
+                  <DropdownMenuSeparator className="my-1 border-gray-100" />
+
                   <DropdownMenuItem
-                    onClick={() => window.open("https://triphavenco.com/", "_blank", "noopener,noreferrer")}
-                    className="sm:hidden flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
+                    onClick={handleAtpClick}
+                    className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
+                  >
+                    <MapPinned className="w-4 h-4 mr-2.5 text-[#1A8491]" />
+                    <span>ATP</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={handleBecomeHost}
+                    className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
                   >
                     <Home className="w-4 h-4 mr-2.5 text-[#1A8491]" />
-                    <span>Become a host</span>
+                    <span>Become a Host</span>
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator className="my-1 border-gray-100" />
@@ -221,13 +254,12 @@ const Navbar = () => {
                   >
                     <Menu className="w-4 h-4 text-gray-700" />
                     <User className="w-4 h-4 text-gray-700" />
-                    {/* Notification indicator dot on mobile when cart has items */}
                     {itemCount > 0 && (
                       <span className="sm:hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#2BB0BB] rounded-full border-2 border-white ring-1 ring-[#2BB0BB]/30" />
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52 rounded-2xl p-1.5 shadow-xl border-gray-200">
+                <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1.5 shadow-xl border-gray-200">
                   <DropdownMenuItem
                     onClick={() => navigate("/login")}
                     className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
@@ -235,7 +267,7 @@ const Navbar = () => {
                     <LogIn className="w-4 h-4 mr-2.5 text-[#1A8491]" />
                     <span>Login</span>
                   </DropdownMenuItem>
-                  
+
                   <DropdownMenuItem
                     onClick={() => navigate("/signup")}
                     className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
@@ -244,7 +276,6 @@ const Navbar = () => {
                     <span>Sign up</span>
                   </DropdownMenuItem>
 
-                  {/* Mobile-only Cart Item */}
                   <DropdownMenuItem
                     onClick={() => navigate("/cart")}
                     className="sm:hidden flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
@@ -260,13 +291,22 @@ const Navbar = () => {
                     )}
                   </DropdownMenuItem>
 
-                  {/* Mobile-only Become a host Item */}
+                  <DropdownMenuSeparator className="my-1 border-gray-100" />
+
                   <DropdownMenuItem
-                    onClick={() => window.open("https://triphavenco.com/", "_blank", "noopener,noreferrer")}
-                    className="sm:hidden flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
+                    onClick={handleAtpClick}
+                    className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
+                  >
+                    <MapPinned className="w-4 h-4 mr-2.5 text-[#1A8491]" />
+                    <span>ATP</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={handleBecomeHost}
+                    className="flex items-center px-3 py-2 rounded-xl text-xs sm:text-sm font-medium cursor-pointer"
                   >
                     <Home className="w-4 h-4 mr-2.5 text-[#1A8491]" />
-                    <span>Become a host</span>
+                    <span>Become a Host</span>
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator className="my-1 border-gray-100" />
@@ -284,14 +324,14 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Tabs */}
         <div className="md:hidden pb-4">
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-center flex-wrap gap-2">
             {mainTabs.map((tab) => {
               const IconComponent = tab.icon;
               return (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => handleTabClick(tab.id)}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-xl transition-all ${
                     activeTab === tab.id
@@ -301,9 +341,9 @@ const Navbar = () => {
                 >
                   <IconComponent className="w-4 h-4" />
                   <span className="text-sm">{tab.label}</span>
-                  {(tab.id === "experiences" || tab.id === "services") && (
-                    <Badge className="bg-brand-secondary text-brand-dark font-semibold text-xs border border-brand-secondary-700/30">
-                      NEW
+                  {tab.comingSoon && (
+                    <Badge className="bg-brand-secondary text-brand-dark font-semibold text-[10px] border border-brand-secondary-700/30 px-1.5 py-0">
+                      Soon
                     </Badge>
                   )}
                 </button>
