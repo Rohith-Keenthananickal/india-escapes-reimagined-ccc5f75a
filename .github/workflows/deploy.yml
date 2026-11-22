@@ -1,0 +1,147 @@
+name: Build And Deploy UI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_CASHFREE_MODE: ${{ secrets.VITE_CASHFREE_MODE }}
+        run: |
+          if [ -z "$VITE_API_BASE_URL" ] || [ -z "$VITE_GOOGLE_MAPS_API_KEY" ] || [ -z "$VITE_GOOGLE_CLIENT_ID" ] || [ -z "$VITE_CASHFREE_MODE" ]; then
+            echo "Missing one or more required VITE_* secrets."
+            exit 1
+          fi
+          npm run build
+          test -f dist/index.html
+
+      - name: Package dist
+        id: pack
+        run: |
+          SHORT_SHA="$(echo "${GITHUB_SHA}" | cut -c1-7)"
+          ARCHIVE="web-dist-${SHORT_SHA}.tar.gz"
+          tar -czf "${ARCHIVE}" -C dist .
+          echo "archive=${ARCHIVE}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Configure known_hosts
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -p "${SERVER_PORT:-22}" -H "${SERVER_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          ARCHIVE: ${{ steps.pack.outputs.archive }}
+          SHORT_SHA: ${{ steps.pack.outputs.short_sha }}
+          REMOTE_ROOT: /home/rohith/TripHavenco/ui/web
+        run: |
+          set -euo pipefail
+          PORT="${SERVER_PORT:-22}"
+          REMOTE_ARCHIVE="/tmp/${ARCHIVE}"
+          RELEASE_DIR="${REMOTE_ROOT}/releases/${SHORT_SHA}"
+          CURRENT_DIR="${REMOTE_ROOT}/current"
+
+          scp -P "${PORT}" "${ARCHIVE}" "${SERVER_USER}@${SERVER_HOST}:${REMOTE_ARCHIVE}"
+
+          ssh -p "${PORT}" "${SERVER_USER}@${SERVER_HOST}" \
+            ARCHIVE="${REMOTE_ARCHIVE}" \
+            RELEASE_DIR="${RELEASE_DIR}" \
+            CURRENT_DIR="${CURRENT_DIR}" \
+            REMOTE_ROOT="${REMOTE_ROOT}" \
+            bash -s <<'REMOTE'
+          set -euo pipefail
+          mkdir -p "${REMOTE_ROOT}/releases" "${CURRENT_DIR}"
+          rm -rf "${RELEASE_DIR}"
+          mkdir -p "${RELEASE_DIR}"
+          tar -xzf "${ARCHIVE}" -C "${RELEASE_DIR}"
+          test -f "${RELEASE_DIR}/index.html"
+          rsync -a --delete "${RELEASE_DIR}/" "${CURRENT_DIR}/"
+          chmod -R a+rX "${CURRENT_DIR}"
+          rm -f "${ARCHIVE}"
+          cd "${REMOTE_ROOT}/releases"
+          ls -1dt */ 2>/dev/null | tail -n +6 | xargs -r rm -rf
+          echo "Deployed release $(basename "${RELEASE_DIR}")"
+          REMOTE
+
+      - name: Ensure nginx root points at TripHavenco
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        run: |
+          set -euo pipefail
+          PORT="${SERVER_PORT:-22}"
+          ssh -p "${PORT}" "${SERVER_USER}@${SERVER_HOST}" bash -s <<'REMOTE'
+          set -euo pipefail
+          TARGET="/etc/nginx/sites-available/heavenconnect.in"
+          NEW_ROOT="/home/rohith/TripHavenco/ui/web/current"
+          test -f "${NEW_ROOT}/index.html"
+          if grep -q "root ${NEW_ROOT};" "${TARGET}"; then
+            echo "Nginx root already points at TripHavenco."
+            exit 0
+          fi
+          if ! sudo -n true 2>/dev/null; then
+            echo "Passwordless sudo is required once to cut nginx over to ${NEW_ROOT}."
+            echo "Run on the server:"
+            echo "  sudo sed -i 's|root /var/www/html/ui/india-escapes-reimagined-ccc5f75a/dist;|root /home/rohith/TripHavenco/ui/web/current;|' ${TARGET}"
+            echo "  sudo nginx -t && sudo systemctl reload nginx"
+            exit 1
+          fi
+          sudo cp "${TARGET}" "${TARGET}.bak.pre-triphavenco.$(date +%Y%m%d%H%M%S)"
+          sudo sed -i \
+            's|root /var/www/html/ui/india-escapes-reimagined-ccc5f75a/dist;|root /home/rohith/TripHavenco/ui/web/current;|' \
+            "${TARGET}"
+          sudo nginx -t
+          sudo systemctl reload nginx
+          echo "Nginx cutover complete."
+          REMOTE
+
+      - name: Verify live site
+        run: |
+          set -euo pipefail
+          BODY="$(curl -fsS https://heavenconnect.in/)"
+          echo "$BODY" | grep -qi "TriphavenCo"
+          ASSET_PATH="$(printf '%s' "$BODY" | grep -oE '/assets/[^"]+\.js' | head -n 1)"
+          if [ -n "${ASSET_PATH}" ]; then
+            curl -fsSI "https://heavenconnect.in${ASSET_PATH}" | head -n 5
+          fi
+          echo "Live site verification passed."
