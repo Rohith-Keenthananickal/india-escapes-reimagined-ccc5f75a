@@ -109,17 +109,22 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
     <nav
       className={`${sticky ? "sticky top-0 z-50 border-b shadow-sm" : "relative z-10 border-b-0 shadow-none"} bg-white`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="relative flex justify-between items-center h-16 gap-1.5">
           <Link to="/" className="flex items-center space-x-2 shrink-0 z-10">
+            <img
+              src="/logo-icon.png"
+              alt="TripHavenCo"
+              className="h-8 min-[360px]:h-9 w-auto object-contain md:hidden"
+            />
             <img
               src="/Logo_color.svg"
               alt="TripHavenCo"
-              className="h-8 md:h-9 w-auto object-contain"
+              className="hidden md:block h-9 w-auto object-contain"
             />
           </Link>
 
-          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-1.5 lg:space-x-2">
+          <div className="flex min-w-0 md:absolute md:left-1/2 md:-translate-x-1/2 items-center gap-0.5 min-[360px]:gap-1 md:gap-0 md:space-x-1.5 lg:space-x-2">
             {mainTabs.map((tab) => {
               const IconComponent = tab.icon;
               return (
@@ -127,16 +132,20 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
                   key={tab.id}
                   type="button"
                   onClick={() => handleTabClick(tab.id)}
-                  className={`flex items-center space-x-1.5 lg:space-x-2 px-2.5 lg:px-4 py-2 rounded-xl transition-all duration-200 ${
+                  aria-label={tab.label}
+                  className={`relative flex items-center gap-1.5 lg:space-x-2 shrink-0 px-2 min-[360px]:px-2.5 lg:px-4 py-2 rounded-xl border border-transparent transition-all duration-200 ${
                     activeTab === tab.id
-                      ? "bg-brand-teal-50 text-brand-primary-700 border border-brand-teal-200 font-semibold shadow-xs"
+                      ? "bg-brand-teal-50 text-brand-primary-700 !border-brand-teal-200 font-semibold shadow-xs"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium"
                   } ${tab.comingSoon ? "opacity-80" : ""}`}
                 >
                   <IconComponent className="w-4 h-4" />
-                  <span className="text-sm">{tab.label}</span>
+                  <span className={`text-xs min-[360px]:text-sm ${activeTab === tab.id ? "" : "hidden md:inline"}`}>{tab.label}</span>
                   {tab.comingSoon && (
-                    <Badge className="bg-brand-secondary text-brand-dark font-semibold text-[10px] border border-brand-secondary-700/30 px-1.5 py-0">
+                    <span className="md:hidden absolute top-1 right-1 w-2 h-2 rounded-full bg-brand-secondary border border-white" />
+                  )}
+                  {tab.comingSoon && (
+                    <Badge className="hidden md:inline-flex bg-brand-secondary text-brand-dark font-semibold text-[10px] border border-brand-secondary-700/30 px-1.5 py-0">
                       Soon
                     </Badge>
                   )}
@@ -145,7 +154,7 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
             })}
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-4 z-10">
+          <div className="flex items-center space-x-2 sm:space-x-4 z-10 shrink-0">
             <div className="hidden sm:flex items-center">
               <Cart />
             </div>
@@ -155,9 +164,9 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative flex items-center space-x-2 border border-gray-200 hover:border-gray-300 rounded-full px-3 py-2 transition-all"
+                    className="relative flex items-center space-x-2 border border-gray-200 hover:border-gray-300 rounded-full px-2.5 min-[360px]:px-3 py-2 transition-all"
                   >
-                    <Menu className="w-4 h-4 text-gray-700" />
+                    <Menu className="w-4 h-4 text-gray-700 max-[359px]:hidden" />
                     <Avatar className="w-6 h-6">
                       <AvatarImage src={user?.profile_image || undefined} alt={user?.full_name || "User"} />
                       <AvatarFallback className="text-xs bg-[#1A8491] text-white font-medium">
@@ -250,9 +259,9 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative flex items-center space-x-2 border border-gray-200 hover:border-gray-300 rounded-full px-3 py-2 transition-all"
+                    className="relative flex items-center space-x-2 border border-gray-200 hover:border-gray-300 rounded-full px-2.5 min-[360px]:px-3 py-2 transition-all"
                   >
-                    <Menu className="w-4 h-4 text-gray-700" />
+                    <Menu className="w-4 h-4 text-gray-700 max-[359px]:hidden" />
                     <User className="w-4 h-4 text-gray-700" />
                     {itemCount > 0 && (
                       <span className="sm:hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#2BB0BB] rounded-full border-2 border-white ring-1 ring-[#2BB0BB]/30" />
@@ -321,34 +330,6 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-          </div>
-        </div>
-
-        <div className="md:hidden pb-4">
-          <div className="flex justify-center flex-wrap gap-2">
-            {mainTabs.map((tab) => {
-              const IconComponent = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleTabClick(tab.id)}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-xl transition-all ${
-                    activeTab === tab.id
-                      ? "bg-brand-teal-50 text-brand-primary-700 border border-brand-teal-200 font-semibold"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-medium"
-                  }`}
-                >
-                  <IconComponent className="w-4 h-4" />
-                  <span className="text-sm">{tab.label}</span>
-                  {tab.comingSoon && (
-                    <Badge className="bg-brand-secondary text-brand-dark font-semibold text-[10px] border border-brand-secondary-700/30 px-1.5 py-0">
-                      Soon
-                    </Badge>
-                  )}
-                </button>
-              );
-            })}
           </div>
         </div>
       </div>
