@@ -1,229 +1,114 @@
-import { useState, useMemo, useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Compass, AlertCircle, RefreshCw, Sparkles } from 'lucide-react';
-import { ExperienceCard } from '../components/ExperienceCard';
-import { useExperiences } from '../hooks/useExperiences';
+import { gsap, useGSAP, Flip, useSmoothScroll, scrollToSection } from '../lib/motion';
+import { useExperienceCatalog } from '../hooks/useExperienceCatalog';
+import type { NormalizedExperience } from '../types/experiences.types';
+import { ExperienceHero } from '../components/ExperienceHero';
+import { DiscoverSection } from '../components/DiscoverSection';
+import { CategorySection } from '../components/CategorySection';
+import { SignatureJourneys } from '../components/SignatureJourneys';
+import { HyperLocalCounter } from '../components/HyperLocalCounter';
+import { ExperienceExplorer, type SortKey } from '../components/ExperienceExplorer';
+import { SearchSection } from '../components/SearchSection';
+import { ExperienceDetailSheet } from '../components/ExperienceDetailSheet';
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
-
+/**
+ * Experiences page, structured after Experience.page.pdf:
+ *   Hero → Discover → Choose your category → Signature journeys
+ *   → 3,00,000 hyper-local → Experiences by category → Search
+ * (The design's category-master dropdown screen is intentionally omitted.)
+ */
 export const ExperiencesPage = () => {
   const pageRef = useRef<HTMLDivElement>(null);
-  const [likedExperiences, setLikedExperiences] = useState<number[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('popularity');
+  const flipState = useRef<Flip.FlipState | null>(null);
 
-  const { data: experiences, isLoading, isError, error, refetch } = useExperiences(50);
+  const [category, setCategory] = useState('all');
+  const [sortBy, setSortBy] = useState<SortKey>('popularity');
+  const [likedIds, setLikedIds] = useState<number[]>([]);
+  const [selected, setSelected] = useState<NormalizedExperience | null>(null);
 
-  const toggleLike = (id: number) => {
-    setLikedExperiences((prev) =>
-      prev.includes(id) ? prev.filter((expId) => expId !== id) : [...prev, id]
-    );
+  const { experiences, isLoading, isError, refetch } = useExperienceCatalog(50);
+
+  useSmoothScroll();
+
+  const counts = useMemo(
+    () =>
+      experiences.reduce<Record<string, number>>((acc, e) => {
+        acc[e.categorySlug] = (acc[e.categorySlug] ?? 0) + 1;
+        return acc;
+      }, {}),
+    [experiences]
+  );
+
+  /** Capture tile positions before React re-renders, so the grid can Flip. */
+  const captureFlip = () => {
+    flipState.current = Flip.getState('#explore .explore-tile');
   };
 
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    (experiences || []).forEach((exp) => {
-      if (exp.category) set.add(exp.category);
-    });
-    return ['all', ...Array.from(set)];
-  }, [experiences]);
+  const changeCategory = useCallback((slug: string) => {
+    captureFlip();
+    setCategory(slug);
+  }, []);
 
-  const displayedExperiences = useMemo(() => {
-    const list = experiences || [];
+  const changeSort = useCallback((sort: SortKey) => {
+    captureFlip();
+    setSortBy(sort);
+  }, []);
 
-    const filtered = list.filter((exp) => {
-      if (selectedCategory !== 'all' && exp.category !== selectedCategory) {
-        return false;
-      }
-      if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase();
-        const matchesTitle = exp.title.toLowerCase().includes(query);
-        const matchesDesc = exp.description.toLowerCase().includes(query);
-        if (!matchesTitle && !matchesDesc) return false;
-      }
-      return true;
-    });
+  const exploreCategory = useCallback(
+    (slug: string) => {
+      changeCategory(slug);
+      scrollToSection('explore');
+    },
+    [changeCategory]
+  );
 
-    return [...filtered].sort((a, b) => {
-      switch (sortBy) {
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
-        default:
-          return b.reviews - a.reviews;
-      }
-    });
-  }, [experiences, selectedCategory, searchQuery, sortBy]);
+  const toggleLike = useCallback((id: number) => {
+    setLikedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }, []);
 
-  // GSAP animations
+  // Page-wide scroll progress bar.
   useGSAP(
     () => {
-      gsap.from('.exp-header', {
-        y: -25,
-        opacity: 0,
-        duration: 0.7,
-        ease: 'power3.out',
-      });
-
-      gsap.from('.exp-filter-bar', {
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power3.out',
-        delay: 0.2,
+      gsap.to('.page-progress', {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: { trigger: pageRef.current, start: 'top top', end: 'bottom bottom', scrub: 0.3 },
       });
     },
     { scope: pageRef }
   );
 
-  useGSAP(
-    () => {
-      if (displayedExperiences.length === 0) return;
-
-      gsap.from('.exp-card-item', {
-        y: 35,
-        opacity: 0,
-        scale: 0.96,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: 'power2.out',
-      });
-    },
-    { dependencies: [displayedExperiences.length], scope: pageRef }
-  );
-
   return (
-    <div ref={pageRef} className="min-h-screen bg-gray-50 flex flex-col">
+    <div ref={pageRef} className="min-h-screen bg-exp-ink">
       <Navbar />
+      <div className="page-progress fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-gradient-to-r from-exp-lagoon via-exp-marigold to-exp-pink" />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
-        {/* Header */}
-        <div className="exp-header text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full mb-3">
-            <Sparkles className="w-3.5 h-3.5" /> Handpicked Kerala Traditions
-          </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-3 font-heading">
-            Kerala Experiences & Adventures
-          </h1>
-          <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
-            Immerse yourself in authentic village walks, canoe rides, tea plantation treks, and cultural traditions led by passionate local hosts.
-          </p>
-        </div>
-
-        {/* Search & Filters Bar */}
-        <div className="exp-filter-bar bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full md:w-96">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search experiences..."
-              className="pl-9 bg-gray-50 border-gray-200 rounded-xl text-xs h-10"
-            />
-          </div>
-
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            {/* Category Select */}
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48 bg-gray-50 rounded-xl text-xs h-10">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat} className="text-xs capitalize">
-                    {cat === 'all' ? 'All Categories' : cat.toLowerCase().replace(/_/g, ' ')}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Sort By */}
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-44 bg-gray-50 rounded-xl text-xs h-10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="popularity" className="text-xs">Most Popular</SelectItem>
-                <SelectItem value="price-low" className="text-xs">Price: Low to High</SelectItem>
-                <SelectItem value="price-high" className="text-xs">Price: High to Low</SelectItem>
-                <SelectItem value="rating" className="text-xs">Highest Rated</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Loading state */}
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4 space-y-3">
-                <Skeleton className="w-full h-48 rounded-xl" />
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Error state */}
-        {isError && !isLoading && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50/70 p-8 text-center my-8 max-w-lg mx-auto">
-            <AlertCircle className="w-10 h-10 text-rose-500 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Failed to load experiences</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              {error instanceof Error ? error.message : 'Backend connection error.'}
-            </p>
-            <Button onClick={() => refetch()} variant="outline" className="border-rose-300 text-rose-700">
-              <RefreshCw className="w-4 h-4 mr-2" /> Try Again
-            </Button>
-          </div>
-        )}
-
-        {/* Experiences Grid */}
-        {!isLoading && !isError && (
-          <>
-            {displayedExperiences.length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 p-8">
-                <Compass className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 text-lg font-medium">No experiences found matching your filters.</p>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedCategory('all');
-                    setSearchQuery('');
-                  }}
-                  className="mt-4"
-                >
-                  Clear Filters
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {displayedExperiences.map((exp) => (
-                  <div key={exp.id} className="exp-card-item">
-                    <ExperienceCard
-                      experience={exp}
-                      isLiked={likedExperiences.includes(exp.id)}
-                      onToggleLike={toggleLike}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+      <main>
+        <ExperienceHero />
+        <DiscoverSection />
+        <CategorySection counts={counts} onSelect={exploreCategory} />
+        <SignatureJourneys onExploreCategory={exploreCategory} />
+        <HyperLocalCounter />
+        <ExperienceExplorer
+          experiences={experiences}
+          counts={counts}
+          category={category}
+          sortBy={sortBy}
+          onCategoryChange={changeCategory}
+          onSortChange={changeSort}
+          flipState={flipState}
+          likedIds={likedIds}
+          onToggleLike={toggleLike}
+          onOpen={setSelected}
+          isSyncing={isLoading}
+          isError={isError}
+          onRetry={() => refetch()}
+        />
+        <SearchSection experiences={experiences} likedIds={likedIds} onToggleLike={toggleLike} onOpen={setSelected} />
       </main>
+
+      <ExperienceDetailSheet experience={selected} onOpenChange={(open) => !open && setSelected(null)} />
     </div>
   );
 };

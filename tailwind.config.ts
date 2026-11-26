@@ -24,6 +24,7 @@ export default {
 				primary: ['Poppins', 'sans-serif'],
 				heading: ['Sora', 'sans-serif'],
 				secondary: ['Sora', 'sans-serif'],
+				display: ['Fraunces', 'Georgia', 'serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -70,6 +71,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Experiences page palette ("Kerala dusk")
+				exp: {
+					ink: '#0D0F1E',
+					night: '#161A38',
+					plum: '#3A1747',
+					cream: '#FBF6EE',
+					sand: '#F3E9DA',
+					coral: '#FF6B57',
+					marigold: '#FFB627',
+					pink: '#F2559A',
+					lagoon: '#2BB0BB',
+					deep: '#1A8491',
 				},
 				// Official TriphavenCo Brand Design Tokens
 				brand: {
