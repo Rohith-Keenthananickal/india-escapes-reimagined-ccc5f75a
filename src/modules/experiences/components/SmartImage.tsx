@@ -16,7 +16,7 @@ export const SmartImage = ({ src, alt, className, wrapperClassName, ...rest }: S
     return (
       <div
         className={cn(
-          'flex h-full w-full items-center justify-center bg-gradient-to-br from-exp-deep via-exp-plum to-exp-ink text-white/40',
+          'flex h-full w-full items-center justify-center bg-gradient-to-br from-exp-deep via-exp-deep to-exp-ink text-white/40',
           wrapperClassName,
           className
         )}

@@ -16,7 +16,7 @@ import {
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { gsap, useGSAP, MQ, formatINR } from '../lib/motion';
-import { getCategory } from '../data/experienceContent';
+import { getCategory, onAccent } from '../data/experienceContent';
 import { useExperienceBooking } from '../hooks/useExperienceBooking';
 import type { NormalizedExperience } from '../types/experiences.types';
 import { SmartImage } from './SmartImage';
@@ -79,7 +79,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
   ];
 
   return (
-    <div ref={root} className="flex h-full flex-col" style={{ '--accent': category.accent } as CSSProperties}>
+    <div ref={root} className="flex h-full flex-col" style={{ '--accent': category.accent, '--on-accent': onAccent(category.accent) } as CSSProperties}>
       <div className="flex-1 overflow-y-auto overscroll-contain" data-lenis-prevent>
         {/* Gallery */}
         <div className="relative aspect-[4/3] overflow-hidden bg-exp-night">
@@ -106,7 +106,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
 
         <div className="px-6 pb-8 sm:px-8">
           <div className="detail-reveal -mt-2 flex flex-wrap items-center gap-2 pt-2 text-xs">
-            <span className="rounded-full bg-[var(--accent)] px-3 py-1 font-semibold text-white">{category.name}</span>
+            <span className="rounded-full bg-[var(--accent)] px-3 py-1 font-heading font-semibold text-[var(--on-accent)]">{category.name}</span>
             {experience.subcategory && (
               <span className="flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-white/70">
                 <Tag className="h-3 w-3" />
@@ -115,7 +115,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
             )}
           </div>
 
-          <SheetTitle className="detail-reveal mt-4 font-display text-4xl font-normal leading-tight text-white">
+          <SheetTitle className="detail-reveal mt-4 font-heading text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
             {experience.title}
           </SheetTitle>
           <SheetDescription className="detail-reveal mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/60">
@@ -127,7 +127,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
             )}
             {experience.rating > 0 && (
               <span className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-exp-marigold text-exp-marigold" />
+                <Star className="h-4 w-4 fill-exp-sun text-exp-sun" />
                 {experience.rating.toFixed(1)} · {experience.reviews} reviews
               </span>
             )}
@@ -136,7 +136,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
           <div className="detail-reveal mt-6 grid grid-cols-2 gap-3">
             {facts.map(({ icon: Icon, label, value }) => (
               <div key={label} className="rounded-2xl bg-white/[0.05] p-4 ring-1 ring-white/10">
-                <Icon className="mb-2 h-4 w-4 text-[var(--accent)]" />
+                <Icon className="mb-2 h-4 w-4 text-exp-teal" />
                 <p className="text-[11px] uppercase tracking-wider text-white/45">{label}</p>
                 <p className="mt-0.5 text-sm font-medium">{value}</p>
               </div>
@@ -154,7 +154,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
               <div className="flex flex-wrap gap-2">
                 {experience.included.map((item) => (
                   <span key={item} className="flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-1.5 text-sm">
-                    <Check className="h-3.5 w-3.5 text-[var(--accent)]" />
+                    <Check className="h-3.5 w-3.5 text-exp-teal" />
                     {item}
                   </span>
                 ))}
@@ -167,7 +167,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
               <ul className="space-y-1.5 text-sm text-white/80">
                 {experience.includedInPrice.map((item) => (
                   <li key={item} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-exp-sun" />
                     {item}
                   </li>
                 ))}
@@ -210,14 +210,14 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
         <div className="flex items-center justify-between gap-4">
           <div>
             {experience.price > 0 ? (
-              <p className="font-display text-2xl">
+              <p className="font-heading text-2xl font-bold">
                 {formatINR(experience.price)}
                 <span className="ml-1 font-sans text-xs text-white/50">/ {experience.isPriceByGuest ? 'guest' : 'group'}</span>
               </p>
             ) : (
               <p className="text-sm text-white/70">Price on inquiry</p>
             )}
-            {!booking.canBook && <p className="text-xs text-exp-marigold">Preview listing · bookings open soon</p>}
+            {!booking.canBook && <p className="text-xs text-exp-sun">Preview listing · bookings open soon</p>}
           </div>
 
           {booking.canBook && !booking.isInCart && (
@@ -250,7 +250,7 @@ const DetailBody = ({ experience }: { experience: NormalizedExperience }) => {
             disabled={!booking.canBook || booking.isPending}
             className={cn(
               'inline-flex h-11 shrink-0 items-center gap-2 rounded-full px-5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-              booking.isInCart ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-gradient-to-r from-exp-coral to-exp-pink text-white hover:brightness-110'
+              booking.isInCart ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-exp-teal text-exp-ink hover:bg-exp-sun'
             )}
           >
             {booking.isPending ? (

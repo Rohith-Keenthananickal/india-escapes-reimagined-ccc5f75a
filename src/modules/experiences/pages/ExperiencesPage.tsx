@@ -82,7 +82,7 @@ export const ExperiencesPage = () => {
   return (
     <div ref={pageRef} className="min-h-screen bg-exp-ink">
       <Navbar />
-      <div className="page-progress fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-gradient-to-r from-exp-lagoon via-exp-marigold to-exp-pink" />
+      <div className="page-progress fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-gradient-to-r from-exp-teal to-exp-sun" />
 
       <main>
         <ExperienceHero />

@@ -2,7 +2,8 @@ import { useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { gsap, useGSAP, SplitText, MQ } from '../lib/motion';
-import { SEARCH_TAGS, getCategory, resolveCategorySlug } from '../data/experienceContent';
+import { SEARCH_TAGS, getCategory, onAccent, resolveCategorySlug } from '../data/experienceContent';
+import { ContourPattern } from './brand';
 import { searchExperiences } from '../hooks/useExperienceCatalog';
 import type { NormalizedExperience } from '../types/experiences.types';
 import { ExperienceTile } from './ExperienceTile';
@@ -108,18 +109,19 @@ export const SearchSection = ({ experiences, likedIds, onToggleLike, onOpen }: S
   };
 
   return (
-    <section id="search" ref={root} className="relative overflow-hidden bg-exp-night py-24 text-exp-cream md:py-32">
-      <div className="pointer-events-none absolute -right-32 -top-32 h-[32rem] w-[32rem] rounded-full bg-exp-plum blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-40 -left-40 h-[30rem] w-[30rem] rounded-full bg-exp-lagoon/25 blur-[120px]" />
+    <section id="search" ref={root} className="relative overflow-hidden bg-exp-ink py-24 text-exp-mist md:py-32">
+      <ContourPattern className="text-exp-teal/[0.08]" seed={17} rings={12} />
+      <div className="pointer-events-none absolute -right-32 -top-32 h-[32rem] w-[32rem] rounded-full bg-exp-deep/60 blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-40 -left-40 h-[30rem] w-[30rem] rounded-full bg-exp-teal/25 blur-[120px]" />
       <div className="relative mx-auto w-[min(1200px,92%)]">
         <div className="flex items-start justify-between gap-6">
           <h2 className="leading-none">
-            <span className="search-lead block text-[clamp(1.8rem,4vw,3.2rem)] font-semibold">Search your favourite</span>
-            <span className="search-word mt-2 block font-display text-[clamp(3.2rem,10vw,8.5rem)] font-light tracking-[0.18em]">
+            <span className="search-lead block font-heading text-[clamp(1.8rem,4vw,3.2rem)] font-bold tracking-tight">Search your favourite</span>
+            <span className="search-word mt-2 block font-heading text-[clamp(3rem,9.5vw,8rem)] font-extrabold tracking-[0.12em] text-exp-teal">
               Experience
             </span>
           </h2>
-          <div className="search-logo hidden rounded-2xl bg-exp-cream px-5 py-3 md:block">
+          <div className="search-logo hidden rounded-2xl bg-exp-mist px-5 py-3 md:block">
             <img src="/Logo_color.svg" alt="TripHavenco" className="h-9 w-auto" />
           </div>
         </div>
@@ -130,7 +132,7 @@ export const SearchSection = ({ experiences, likedIds, onToggleLike, onOpen }: S
             e.preventDefault();
             inputRef.current?.blur();
           }}
-          className="search-bar mt-12 flex max-w-3xl items-center gap-3 rounded-full border-[3px] border-white/80 bg-white/[0.04] py-2 backdrop-blur pl-7 pr-2 transition-colors focus-within:border-exp-marigold focus-within:shadow-[0_0_0_6px_rgba(255,182,39,.15)]"
+          className="search-bar mt-12 flex max-w-3xl items-center gap-3 rounded-full border-2 border-exp-teal/70 bg-white/[0.04] py-2 backdrop-blur pl-7 pr-2 transition-colors focus-within:border-exp-sun focus-within:shadow-[0_0_0_6px_rgba(255,210,110,.15)]"
         >
           <input
             ref={inputRef}
@@ -148,7 +150,7 @@ export const SearchSection = ({ experiences, likedIds, onToggleLike, onOpen }: S
           <button
             type="submit"
             aria-label="Search"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-exp-coral to-exp-pink text-white transition-transform hover:scale-105"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-exp-teal text-exp-ink transition-colors hover:bg-exp-sun"
           >
             <Search className="h-5 w-5" />
           </button>
@@ -164,15 +166,15 @@ export const SearchSection = ({ experiences, likedIds, onToggleLike, onOpen }: S
                 type="button"
                 onClick={() => pickTag(tag)}
                 aria-pressed={active}
-                style={{ '--accent': accent } as CSSProperties}
+                style={{ '--accent': accent, '--on-accent': onAccent(accent) } as CSSProperties}
                 className={cn(
                   'search-tag flex items-center gap-2 rounded-full border-2 px-5 py-2.5 text-left text-sm font-semibold transition-colors duration-300',
                   active
-                    ? 'border-[var(--accent)] bg-[var(--accent)] text-white shadow-[0_10px_30px_-10px_var(--accent)]'
-                    : 'border-white/20 text-white hover:border-[var(--accent)] hover:text-[var(--accent)]'
+                    ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)] shadow-[0_10px_30px_-10px_var(--accent)]'
+                    : 'border-white/20 text-white hover:border-[var(--accent)] hover:bg-white/5'
                 )}
               >
-                <span className={cn('h-2 w-2 rounded-full', active ? 'bg-white' : 'bg-[var(--accent)]')} />
+                <span className={cn('h-2 w-2 rounded-full', active ? 'bg-[var(--on-accent)]' : 'bg-[var(--accent)]')} />
                 {tag}
               </button>
             );
@@ -203,7 +205,7 @@ export const SearchSection = ({ experiences, likedIds, onToggleLike, onOpen }: S
               </div>
             ) : (
               <div className="search-empty rounded-[1.6rem] border border-dashed border-white/20 p-10 text-center">
-                <p className="font-display text-2xl">Nothing for “{term}” yet</p>
+                <p className="font-heading text-2xl font-bold">Nothing for “{term}” yet</p>
                 <p className="mt-2 text-white/60">New hosts join every week. Try one of the tags above.</p>
               </div>
             )}

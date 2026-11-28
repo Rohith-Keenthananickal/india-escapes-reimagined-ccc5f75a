@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowDown, ChevronDown, Compass } from 'lucide-react';
 import { gsap, useGSAP, SplitText, MQ, scrollToSection } from '../lib/motion';
+import { BrandPill } from './brand';
 import { HERO_PHRASES, HYPER_LOCAL_TARGET, EXPERIENCE_CATEGORIES } from '../data/experienceContent';
 
 const SLIDES = [
@@ -18,8 +19,8 @@ const SLIDES = [
 
 const SLIDE_SECONDS = 6.5;
 
-/** Sunset gradient text (marigold → coral → pink). */
-const ACCENT_TEXT = 'bg-gradient-to-r from-exp-marigold via-exp-coral to-exp-pink bg-clip-text text-transparent pr-[0.06em]';
+/** Brand Secondary → Secondary 700 highlight (#FFD26E → #D4A237). */
+const ACCENT_TEXT = 'bg-gradient-to-r from-exp-sun to-exp-gold bg-clip-text text-transparent pr-[0.04em]';
 
 interface ExploreLink {
   eyebrow: string;
@@ -187,11 +188,11 @@ export const ExperienceHero = () => {
           ))}
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-exp-ink via-exp-ink/40 to-exp-ink/60" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-exp-ink/80 via-transparent to-transparent" />
-      {/* warm dusk glows */}
-      <div className="hero-glow pointer-events-none absolute -bottom-48 -left-32 h-[34rem] w-[34rem] rounded-full bg-exp-coral/30 blur-[130px]" />
-      <div className="hero-glow pointer-events-none absolute -right-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-exp-plum/60 blur-[120px]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-exp-ink via-exp-ink/45 to-exp-night/50" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-exp-night/85 via-exp-night/20 to-transparent" />
+      {/* brand glows: Primary teal + Secondary yellow */}
+      <div className="hero-glow pointer-events-none absolute -bottom-48 -left-32 h-[34rem] w-[34rem] rounded-full bg-exp-teal/30 blur-[130px]" />
+      <div className="hero-glow pointer-events-none absolute -right-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-exp-sun/15 blur-[120px]" />
       <div className="hero-veil-scroll pointer-events-none absolute inset-0 bg-exp-ink opacity-0" />
       <div className="hero-veil pointer-events-none absolute inset-0 bg-exp-ink opacity-0" />
 
@@ -207,10 +208,10 @@ export const ExperienceHero = () => {
             className="hero-explore-item group rounded-xl px-4 py-2 text-left transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:outline-none"
           >
             <span className="block text-[10px] font-medium uppercase tracking-[0.2em] text-white/55">{link.eyebrow}</span>
-            <span className="mt-0.5 flex items-center gap-1 font-display text-lg text-white">
+            <span className="mt-0.5 flex items-center gap-1 font-heading text-base font-semibold text-white">
               {link.label}
               {!link.href && (
-                <ChevronDown className="h-4 w-4 text-exp-marigold transition-transform duration-300 group-hover:translate-y-0.5" />
+                <ChevronDown className="h-4 w-4 text-exp-sun transition-transform duration-300 group-hover:translate-y-0.5" />
               )}
             </span>
           </button>
@@ -219,14 +220,16 @@ export const ExperienceHero = () => {
 
       {/* Copy */}
       <div className="hero-content relative z-10 mx-auto mt-auto w-[min(1280px,92%)] pb-24 pt-28 md:pb-28 md:pt-10">
-        <p className="hero-eyebrow mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium tracking-wide text-white/90 backdrop-blur">
-          <Compass className="h-3.5 w-3.5 text-exp-marigold" />
-          TripHavenco Experiences · Kerala
-        </p>
+        <div className="hero-eyebrow mb-6">
+          <BrandPill tone="sun">
+            <Compass className="h-3.5 w-3.5" />
+            TripHavenco Experiences · Kerala
+          </BrandPill>
+        </div>
 
-        <h1 className="hero-title max-w-5xl font-display text-[clamp(2.6rem,7vw,6.5rem)] font-light leading-[0.95] tracking-[-0.02em]">
-          An open, provider-led <em className={`hero-accent font-normal italic ${ACCENT_TEXT}`}>experience</em>{' '}
-          <em className={`hero-accent font-normal italic ${ACCENT_TEXT}`}>marketplace</em>
+        <h1 className="hero-title max-w-5xl font-heading text-[clamp(2.4rem,6vw,5.4rem)] font-extrabold leading-[1.02] tracking-[-0.03em]">
+          An open, provider-led <em className={`hero-accent not-italic ${ACCENT_TEXT}`}>experience</em>{' '}
+          <em className={`hero-accent not-italic ${ACCENT_TEXT}`}>marketplace</em>
         </h1>
 
         <div className="hero-sub mt-6 max-w-2xl space-y-3">
@@ -239,7 +242,7 @@ export const ExperienceHero = () => {
               {HERO_PHRASES.map((phrase) => (
                 <span
                   key={phrase}
-                  className="hero-phrase col-start-1 row-start-1 whitespace-nowrap font-display italic text-exp-marigold"
+                  className="hero-phrase col-start-1 row-start-1 whitespace-nowrap font-heading font-semibold text-exp-sun"
                 >
                   {phrase}
                 </span>
@@ -252,7 +255,7 @@ export const ExperienceHero = () => {
         <div className="hero-cta mt-8 flex flex-wrap gap-3">
           <button
             onClick={() => scrollToSection('explore')}
-            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-exp-coral to-exp-pink px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-8px_rgba(255,107,87,.7)] transition-[filter,box-shadow] hover:brightness-110"
+            className="group inline-flex items-center gap-2 rounded-full bg-exp-teal px-6 py-3 text-sm font-semibold text-exp-ink shadow-[0_12px_30px_-10px_rgba(43,176,187,.9)] transition-colors duration-300 hover:bg-exp-sun"
           >
             Explore experiences
             <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
@@ -270,14 +273,14 @@ export const ExperienceHero = () => {
       <div className="hero-meta absolute inset-x-0 bottom-0 z-10 mx-auto flex w-[min(1280px,92%)] items-end justify-between gap-6 border-t border-white/10 py-5 text-xs text-white/60">
         <div className="hidden gap-8 sm:flex">
           <span>
-            <strong className="font-display text-base text-white">{HYPER_LOCAL_TARGET.toLocaleString('en-IN')}+</strong> hyper-local
+            <strong className="font-heading text-base text-white">{HYPER_LOCAL_TARGET.toLocaleString('en-IN')}+</strong> hyper-local
             experiences
           </span>
           <span>
-            <strong className="font-display text-base text-white">{EXPERIENCE_CATEGORIES.length}</strong> curated categories
+            <strong className="font-heading text-base text-white">{EXPERIENCE_CATEGORIES.length}</strong> curated categories
           </span>
           <span className="hidden lg:inline">
-            <strong className="font-display text-base text-white">100%</strong> local hosts
+            <strong className="font-heading text-base text-white">100%</strong> local hosts
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -288,14 +291,14 @@ export const ExperienceHero = () => {
               </span>
             ))}
           </div>
-          <span className="font-display text-sm text-white">
+          <span className="font-heading text-sm text-white">
             <span className="hero-count">01</span>
             <span className="text-white/40"> / {String(SLIDES.length).padStart(2, '0')}</span>
           </span>
           <div className="flex gap-1.5">
             {SLIDES.map((s) => (
               <span key={s.src} className="h-[2px] w-8 overflow-hidden bg-white/20">
-                <span className="hero-bar-fill block h-full w-full origin-left scale-x-0 bg-gradient-to-r from-exp-marigold to-exp-coral" />
+                <span className="hero-bar-fill block h-full w-full origin-left scale-x-0 bg-exp-sun" />
               </span>
             ))}
           </div>

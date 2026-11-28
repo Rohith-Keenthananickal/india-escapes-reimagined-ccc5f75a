@@ -1,11 +1,12 @@
 import { useRef } from 'react';
-import { Landmark, MapPin, Users } from 'lucide-react';
+import { Compass, Landmark, MapPin, Users } from 'lucide-react';
+import { BrandPill, ContourPattern } from './brand';
 import { gsap, useGSAP, SplitText, MQ } from '../lib/motion';
 
 const PILLARS = [
-  { icon: Users, color: '#FF6B57', title: 'The people', text: 'Farmers, artists, fishermen and families hosting in their own homes.' },
-  { icon: MapPin, color: '#1A8491', title: 'The places', text: 'Backwater hamlets, hill estates and temple towns off the usual map.' },
-  { icon: Landmark, color: '#E09A00', title: 'The traditions', text: 'Rituals, recipes and crafts handed down for generations.' },
+  { icon: Users, color: '#1A8491', title: 'The people', text: 'Farmers, artists, fishermen and families hosting in their own homes.' },
+  { icon: MapPin, color: '#D4A237', title: 'The places', text: 'Backwater hamlets, hill estates and temple towns off the usual map.' },
+  { icon: Landmark, color: '#2BB0BB', title: 'The traditions', text: 'Rituals, recipes and crafts handed down for generations.' },
 ];
 
 const BADGE_TEXT = 'local hosts · real homes · living traditions · ';
@@ -94,11 +95,14 @@ export const DiscoverSection = () => {
 
   return (
     <section id="discover" ref={root} className="relative overflow-hidden bg-exp-cream py-24 text-exp-ink md:py-32">
-      <div className="pointer-events-none absolute -right-40 -top-40 h-[30rem] w-[30rem] rounded-full bg-exp-marigold/25 blur-[110px]" />
-      <div className="pointer-events-none absolute -bottom-48 left-1/3 h-[28rem] w-[28rem] rounded-full bg-exp-coral/15 blur-[110px]" />
+      <ContourPattern className="text-exp-gold/20" seed={3} />
+      <div className="pointer-events-none absolute -right-40 -top-40 h-[30rem] w-[30rem] rounded-full bg-exp-sun/30 blur-[110px]" />
+      <div className="pointer-events-none absolute -bottom-48 left-1/3 h-[28rem] w-[28rem] rounded-full bg-exp-teal/15 blur-[110px]" />
       <div className="relative mx-auto grid w-[min(1280px,92%)] items-center gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-20">
         {/* Visual */}
         <div className="relative">
+          {/* brand teal block offset behind the photo */}
+          <div className="absolute -bottom-5 -left-5 h-full w-full rounded-[2rem] bg-exp-teal md:-bottom-6 md:-left-6" aria-hidden />
           <div className="discover-frame relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-black md:aspect-[5/5.2]">
             <img
               src="/experiences/kathakali-makeup-closeup.jpg"
@@ -107,8 +111,8 @@ export const DiscoverSection = () => {
               loading="lazy"
             />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-white">
-              <p className="text-[11px] uppercase tracking-[0.25em] text-white/60">Behind the curtain</p>
-              <p className="font-display text-xl italic">Chutti: the 90-minute Kathakali makeover</p>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-exp-sun">Behind the curtain</p>
+              <p className="font-heading text-xl font-bold">Chutti: the 90-minute Kathakali makeover</p>
             </div>
           </div>
 
@@ -117,9 +121,8 @@ export const DiscoverSection = () => {
             <svg viewBox="0 0 120 120" className="discover-badge absolute inset-0 h-full w-full" aria-hidden>
               <defs>
                 <linearGradient id="discover-badge-grad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#FFB627" />
-                  <stop offset="55%" stopColor="#FF6B57" />
-                  <stop offset="100%" stopColor="#F2559A" />
+                  <stop offset="0%" stopColor="#2BB0BB" />
+                  <stop offset="100%" stopColor="#1A8491" />
                 </linearGradient>
                 <path id="discover-circle" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" />
               </defs>
@@ -131,27 +134,27 @@ export const DiscoverSection = () => {
                 </textPath>
               </text>
             </svg>
-            <span className="relative text-2xl text-white">✦</span>
+            <Compass className="relative h-8 w-8 text-exp-sun" strokeWidth={1.75} />
           </div>
         </div>
 
         {/* Copy */}
         <div className="discover-copy">
-          <p className="discover-eyebrow mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-exp-coral">
-            Hidden gems · Sceneries
-          </p>
+          <div className="discover-eyebrow mb-5">
+            <BrandPill tone="teal">Hidden gems · Sceneries</BrandPill>
+          </div>
           <h2
-            className="discover-title font-display text-[clamp(2.8rem,6vw,5.5rem)] font-normal uppercase leading-[0.92] tracking-[-0.01em]"
+            className="discover-title font-heading text-[clamp(2.6rem,5.5vw,4.8rem)] font-extrabold leading-[1] tracking-[-0.03em]"
             style={{ perspective: 600 }}
           >
             Discover
             <br />
-            <span className="text-exp-coral">Experiences</span>
+            <span className="text-exp-deep">Experiences</span>
           </h2>
-          <p className="discover-lead mt-6 max-w-lg text-xl leading-snug text-[#3a3a3a] md:text-2xl">
+          <p className="discover-lead mt-6 max-w-lg font-heading text-xl font-semibold leading-snug text-exp-ink/85 md:text-2xl">
             Explore the people, places, traditions and hidden treasures of Kerala.
           </p>
-          <p className="discover-body mt-8 max-w-xl font-display text-lg leading-relaxed text-[#2b2b2b]">
+          <p className="discover-body mt-6 max-w-xl text-base leading-relaxed text-exp-ink/70 md:text-lg">
             Discover Kerala beyond the usual destinations with TripHavenco. Explore authentic local experiences rooted in
             the lives, traditions and talents of our communities. From village adventures and culinary journeys to art,
             culture, nature and spirituality, discover unique experiences created by local people, waiting to be explored
@@ -167,8 +170,8 @@ export const DiscoverSection = () => {
                 >
                   <Icon className="h-5 w-5" />
                 </span>
-                <p className="font-semibold">{title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-black/60">{text}</p>
+                <p className="font-heading font-bold">{title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-exp-ink/60">{text}</p>
               </div>
             ))}
           </div>

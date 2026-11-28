@@ -10,6 +10,15 @@ import type { ExperienceCategory, SignatureJourney } from '../types/experiences.
 
 const img = (name: string) => `/experiences/${name}.jpg`;
 
+/**
+ * Category accents come only from the TriphavenCo brand palette
+ * (Primary #2BB0BB, Primary 700 #1A8491, Secondary #FFD26E, Secondary 700 #D4A237).
+ */
+const DARK_TEXT_ON = new Set(['#2BB0BB', '#FFD26E', '#D4A237']);
+
+/** Readable text colour on top of a brand accent (brand guide: #1F1F1F on teal/yellow). */
+export const onAccent = (accent: string) => (DARK_TEXT_ON.has(accent.toUpperCase()) ? '#1F1F1F' : '#FFFFFF');
+
 export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   {
     slug: 'water',
@@ -23,7 +32,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'farm',
-    accent: '#5DBB46',
+    accent: '#D4A237',
     name: 'Farm & Village Life',
     short: 'Farm & Village',
     description:
@@ -33,7 +42,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'adventure',
-    accent: '#FF8A3D',
+    accent: '#1A8491',
     name: 'Adventure & Outdoor',
     short: 'Adventure',
     description:
@@ -43,7 +52,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'spiritual',
-    accent: '#FFB627',
+    accent: '#FFD26E',
     name: 'Spiritual & Heritage',
     short: 'Spiritual',
     description:
@@ -53,7 +62,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'food',
-    accent: '#FF6B57',
+    accent: '#2BB0BB',
     name: 'Food & Cooking',
     short: 'Food',
     description:
@@ -63,7 +72,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'art',
-    accent: '#E2456B',
+    accent: '#1A8491',
     name: 'Art, Culture & Traditions',
     short: 'Art & Culture',
     description:
@@ -73,7 +82,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'camping',
-    accent: '#8B7CF6',
+    accent: '#D4A237',
     name: 'Camping & Retreats',
     short: 'Camping',
     description:
@@ -83,7 +92,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'wildlife',
-    accent: '#22A06B',
+    accent: '#1A8491',
     name: 'Wildlife & Nature',
     short: 'Wildlife',
     description:
@@ -93,7 +102,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'wellness',
-    accent: '#4FC3B0',
+    accent: '#2BB0BB',
     name: 'Wellness & Rejuvenation',
     short: 'Wellness',
     description:
@@ -103,7 +112,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
   },
   {
     slug: 'events',
-    accent: '#F2559A',
+    accent: '#FFD26E',
     name: 'Events & Special Experiences',
     short: 'Events',
     description:
@@ -115,7 +124,7 @@ export const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
 
 export const OTHER_CATEGORY: ExperienceCategory = {
   slug: 'other',
-  accent: '#9AA0B8',
+  accent: '#1A8491',
   name: 'Other / Unique Experiences',
   short: 'Unique',
   description: 'One-of-a-kind experiences that don’t fit a box.',
@@ -147,7 +156,7 @@ export function getCategory(slug: string): ExperienceCategory {
 export const SIGNATURE_JOURNEYS: SignatureJourney[] = [
   {
     id: 'sunday-with-nature',
-    tint: '#0E2A1F',
+    tint: '#0F474E',
     title: 'Sunday with Nature',
     audience: 'For a family of four',
     tagline: 'A half-day village experience, ankle-deep in green paddy.',
@@ -160,7 +169,7 @@ export const SIGNATURE_JOURNEYS: SignatureJourney[] = [
   },
   {
     id: 'date-with-kerala',
-    tint: '#2A1438',
+    tint: '#1F1F1F',
     title: 'Date with Kerala',
     audience: 'For couples',
     tagline: 'A romantic evening at a scenic waterside spot.',
@@ -173,7 +182,7 @@ export const SIGNATURE_JOURNEYS: SignatureJourney[] = [
   },
   {
     id: 'rediscover-kerala',
-    tint: '#2E1015',
+    tint: '#0F474E',
     title: 'Rediscover Kerala',
     audience: 'For residents & visiting NRIs',
     tagline: 'A cultural homecoming: the art, the food and the people behind them.',
@@ -186,7 +195,7 @@ export const SIGNATURE_JOURNEYS: SignatureJourney[] = [
   },
   {
     id: 'family-day-out',
-    tint: '#0C2A36',
+    tint: '#1F1F1F',
     title: 'Family Day Out',
     audience: 'For families',
     tagline: 'A private day at a farmhouse or family home.',
@@ -199,7 +208,7 @@ export const SIGNATURE_JOURNEYS: SignatureJourney[] = [
   },
   {
     id: 'sabarimala-pilgrimage',
-    tint: '#2E1C08',
+    tint: '#0F474E',
     title: 'Sabarimala Pilgrimage',
     audience: 'For devotees',
     tagline: 'The traditional pilgrimage, guided by a Guru Swami.',
@@ -217,7 +226,7 @@ export const SIGNATURE_JOURNEYS: SignatureJourney[] = [
   },
   {
     id: 'kerala-wedding',
-    tint: '#33102A',
+    tint: '#1F1F1F',
     title: 'Kerala Wedding',
     audience: 'Attend like a family member',
     tagline: 'Be a guest at a real Kerala wedding, rituals and all.',
@@ -230,7 +239,7 @@ export const SIGNATURE_JOURNEYS: SignatureJourney[] = [
   },
   {
     id: 'kerala-family-serves-food',
-    tint: '#2C190E',
+    tint: '#0F474E',
     title: 'Kerala Family Serves Food',
     audience: 'For food lovers',
     tagline: 'Home-cooked meals, served at a family table.',

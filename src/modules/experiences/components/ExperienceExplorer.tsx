@@ -3,7 +3,11 @@ import { AlertCircle, Loader2, RefreshCw, Search, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { gsap, useGSAP, Flip, ScrollTrigger, MQ, scrollToSection } from '../lib/motion';
-import { EXPERIENCE_CATEGORIES, getCategory } from '../data/experienceContent';
+import { EXPERIENCE_CATEGORIES, getCategory, onAccent } from '../data/experienceContent';
+import { BrandPill, ContourPattern } from './brand';
+
+/** 'All' uses brand black; categories use their brand accent. */
+const tabAccent = (slug: string) => (slug === 'all' ? '#1F1F1F' : getCategory(slug).accent);
 import type { NormalizedExperience } from '../types/experiences.types';
 import { ExperienceTile } from './ExperienceTile';
 
@@ -132,7 +136,7 @@ export const ExperienceExplorer = ({
       gsap.to('.tab-indicator', {
         x: active.offsetLeft,
         width: active.offsetWidth,
-        backgroundColor: category === 'all' ? '#0D0F1E' : getCategory(category).accent,
+        backgroundColor: tabAccent(category),
         duration: 0.55,
         ease: 'expo.out',
       });
@@ -144,16 +148,17 @@ export const ExperienceExplorer = ({
 
   return (
     <section id="explore" ref={root} className="relative overflow-hidden bg-exp-cream py-24 text-exp-ink md:py-32">
-      <div className="pointer-events-none absolute -left-40 top-0 h-[30rem] w-[30rem] rounded-full bg-exp-lagoon/15 blur-[120px]" />
-      <div className="pointer-events-none absolute -right-40 top-1/3 h-[30rem] w-[30rem] rounded-full bg-exp-pink/10 blur-[120px]" />
+      <ContourPattern className="text-exp-teal/[0.12]" seed={13} rings={12} />
+      <div className="pointer-events-none absolute -left-40 top-0 h-[30rem] w-[30rem] rounded-full bg-exp-teal/15 blur-[120px]" />
+      <div className="pointer-events-none absolute -right-40 top-1/3 h-[30rem] w-[30rem] rounded-full bg-exp-sun/25 blur-[120px]" />
       <div className="relative mx-auto w-[min(1320px,92%)]">
         <div className="explore-head mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-exp-coral">Regional zones · Location</p>
-            <h2 className="font-display text-[clamp(2.4rem,5vw,4.5rem)] font-light leading-none">
-              Experiences <em className="bg-gradient-to-r from-exp-deep via-exp-lagoon to-exp-coral bg-clip-text pr-[0.06em] italic text-transparent">across Kerala</em>
+            <BrandPill tone="teal" className="mb-5">Regional zones · Location</BrandPill>
+            <h2 className="font-heading text-[clamp(2.2rem,4.5vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.03em]">
+              Experiences <span className="text-exp-deep">across Kerala</span>
             </h2>
-            <p className="mt-4 max-w-xl text-exp-ink/60">
+            <p className="mt-4 max-w-xl text-exp-ink/65">
               Hand-picked, hyper-local and hosted by the people who know them best. Filter by category or sort to find yours.
             </p>
           </div>
@@ -164,7 +169,7 @@ export const ExperienceExplorer = ({
               </span>
             )}
             <Select value={sortBy} onValueChange={(v) => onSortChange(v as SortKey)}>
-              <SelectTrigger className="h-11 w-48 rounded-full border-exp-ink/10 bg-white text-sm text-exp-ink shadow-sm">
+              <SelectTrigger className="h-11 w-48 rounded-full border-exp-teal/40 bg-white text-sm text-exp-ink shadow-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -178,8 +183,8 @@ export const ExperienceExplorer = ({
         </div>
 
         {isError && (
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-exp-coral/30 bg-exp-coral/10 px-5 py-3 text-sm">
-            <span className="flex items-center gap-2 text-[#B8382A]">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-exp-gold/40 bg-exp-sun/25 px-5 py-3 text-sm">
+            <span className="flex items-center gap-2 font-medium text-exp-ink [&>svg]:text-exp-gold">
               <AlertCircle className="h-4 w-4" /> We couldn’t reach live listings. Showing curated previews for now.
             </span>
             <button onClick={onRetry} className="flex items-center gap-1.5 font-semibold text-exp-ink hover:underline">
@@ -193,7 +198,7 @@ export const ExperienceExplorer = ({
           ref={tabsRef}
           role="tablist"
           aria-label="Experience categories"
-          className="relative mb-10 flex gap-1 overflow-x-auto rounded-full bg-white p-1.5 shadow-[0_10px_30px_-15px_rgba(13,15,30,.35)] ring-1 ring-exp-ink/5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="relative mb-10 flex gap-1 overflow-x-auto rounded-full bg-white p-1.5 shadow-[0_10px_30px_-15px_rgba(26,132,145,.45)] ring-1 ring-exp-teal/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <span className="tab-indicator pointer-events-none absolute left-0 top-1.5 h-[calc(100%-0.75rem)] w-0 rounded-full bg-exp-ink shadow-md" />
           {tabs.map((tab) => (
@@ -203,16 +208,17 @@ export const ExperienceExplorer = ({
               data-tab={tab.slug}
               aria-selected={category === tab.slug}
               onClick={() => onCategoryChange(tab.slug)}
+              style={category === tab.slug ? { color: onAccent(tabAccent(tab.slug)) } : undefined}
               className={cn(
                 'relative z-10 flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium transition-colors duration-300',
-                category === tab.slug ? 'text-white' : 'text-exp-ink/60 hover:text-exp-ink'
+                category === tab.slug ? '' : 'text-exp-ink/60 hover:text-exp-deep'
               )}
             >
               {tab.label}
               <span
                 className={cn(
                   'rounded-full px-1.5 text-[10px] tabular-nums',
-                  category === tab.slug ? 'bg-white/25' : 'bg-exp-ink/5'
+                  category === tab.slug ? 'bg-black/10' : 'bg-exp-teal/10'
                 )}
               >
                 {tab.count}
@@ -235,11 +241,11 @@ export const ExperienceExplorer = ({
 
           {visible.length === 0 && (
             <div className="explore-tile col-span-full rounded-[1.6rem] border border-dashed border-exp-ink/20 p-12 text-center" data-flip-id="empty">
-              <p className="font-display text-2xl">New hosts are joining this category</p>
+              <p className="font-heading text-2xl font-bold">New hosts are joining this category</p>
               <p className="mt-2 text-exp-ink/60">Check back soon, or explore everything else Kerala has to offer.</p>
               <button
                 onClick={() => onCategoryChange('all')}
-                className="mt-6 rounded-full bg-exp-coral px-5 py-2.5 text-sm font-semibold text-white"
+                className="mt-6 rounded-full bg-exp-teal px-5 py-2.5 text-sm font-semibold text-exp-ink hover:bg-exp-sun"
               >
                 Show all experiences
               </button>
@@ -250,16 +256,16 @@ export const ExperienceExplorer = ({
           {visible.length > 0 && (
             <div
               data-flip-id="discover-more"
-              className="explore-tile relative flex min-h-[320px] flex-col justify-between overflow-hidden rounded-[1.6rem] bg-gradient-to-br from-exp-night via-exp-plum to-exp-coral p-7 text-white shadow-[0_30px_60px_-25px_rgba(58,23,71,.6)]"
+              className="explore-tile relative flex min-h-[320px] flex-col justify-between overflow-hidden rounded-[1.6rem] bg-gradient-to-br from-exp-deep to-exp-night p-7 text-white shadow-[0_30px_60px_-25px_rgba(15,71,78,.7)]"
             >
-              <Sparkles className="h-7 w-7 text-exp-marigold" />
+              <Sparkles className="h-7 w-7 text-exp-sun" />
               <div>
-                <p className="font-display text-3xl leading-tight">Many more experiences await discovery</p>
+                <p className="font-heading text-3xl font-extrabold leading-tight tracking-tight">Many more experiences <span className="text-exp-sun">await discovery</span></p>
                 <p className="mt-3 text-sm text-white/70">Explore all categories and discover something extraordinary.</p>
                 <div className="mt-6 flex flex-wrap gap-2">
                   <button
                     onClick={() => scrollToSection('search')}
-                    className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-exp-ink hover:bg-exp-marigold"
+                    className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-exp-ink hover:bg-exp-sun"
                   >
                     <Search className="h-3.5 w-3.5" /> Search
                   </button>
